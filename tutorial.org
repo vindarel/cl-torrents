@@ -1,0 +1,226 @@
+
+* Step 1 - first start
+
+Scraping   The   Pirate   Bay   is    easy,   they   don't   rely   on
+javascript-generated pages. We just have to:
+
+- get the html page (=dexador=: =(dex:get <url>)=)
+- parse the html into a data structure (=plump=: =(plump:parse <html>)=)
+- search  this  request  with   CSS  selectors  (=lquery=:  =(lquery:"
+  <parsed-html> <selectors>)=)
+
+Let's go.
+
+To begin  with, we do  a search on the  website and we  copy-paste the
+url. We get one like this:
+
+#+BEGIN_SRC lisp
+(defparameter *search-url* "https://piratebay.to/search/?FilterStr=matrix&ID=&Limit=800&Letter=&Sorting=DSeeder" "base search url. KEYWORDS to be replaced.")
+#+END_SRC
+
+it has our search term in it (=matrix=) along with url parameters.
+
+We will use CSS selectors to extract information from the web page, so
+we can use  our browser's developer tools to inspect  the structure of
+the page  and guess our  selectors: right  click on a  result's title,
+choose "inspect element". It highlights some html similar to this:
+
+#+BEGIN_SRC html
+  <td class="Title">
+    <span class="ColorA">
+      <a href="https://piratebay.to/torrent/1922147/Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438/" onclick="Javascript:OpenDetailPage('https://piratebay.to/torrent/1922147/Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438/'); return false;">Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438 </a>
+    </span>
+    <br>
+      <span class="ColorB VaA">Upload Date: 20.02.15 </span>
+      <span class="ColorB VaA">Size: 796,86 MB </span>
+      <span class="ColorB"> </span>
+  </td>
+#+END_SRC
+
+
+The title is  well delimited so we'll start selecting  our elements by
+the CSS class =Title=, which gives:
+
+#+BEGIN_SRC lisp
+(defparameter *selectors* ".Title")
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(defun torrents (words)
+  ""
+  (let* ((html (dex:get *search-url*))
+         (parsed (plump:parse html))
+         (res (lquery:$ parsed *selectors*)))
+    res))
+#+END_SRC
+
+** Creating a new project
+
+ We use =cl-project=:
+
+ #+BEGIN_SRC lisp
+ (ql:quickload "cl-project")
+ (cl-project:make-project #P"~/path/to/cl-torrents/")
+ #+END_SRC
+
+ Note that it  may be easier for  you sometimes if you  create your new
+ Common  Lisp  projects  into =~/.quicklisp/local-projects=  (known  by
+ Quicklisp) or =~/.local/share/common-lisp/= (known by ASDF).
+
+** Loading the project
+
+Open the  =.asdf= file at  the project root  and compile and  load the
+file. In  Slime, it's  with =C-c  C-k= (=slime-compile-and-load-file=,
+see also the Emacs menu).
+
+Now we can load the project at the REPL:
+
+#+BEGIN_SRC lisp
+(asdf:make "cl-torrents"
+; compiling file "/home/vince/projets/cl-torrents/src/cl-torrents.lisp" (written 28 AUG 2017 10:21:07 PM):
+; compiling (IN-PACKAGE :CL-USER)
+; compiling (DEFPACKAGE CL-TORRENTS ...)
+; compiling (IN-PACKAGE :CL-TORRENTS)
+; compiling (DEFPARAMETER *SEARCH-URL* ...)
+; compiling (DEFPARAMETER *SELECTORS* ...)
+; compiling (DEFUN TORRENTS ...)
+
+; /home/vince/.cache/common-lisp/sbcl-1.3.19-linux-x64/home/vince/projets/cl-torrents/src/cl-torrents-tmp5GEXGEG5.fasl written
+; compilation finished in 0:00:00.029
+; compilation unit finished
+T
+#+END_SRC
+
+And now we can use our function with the project prefix:
+
+#+BEGIN_SRC lisp
+(cl-torrents:torrents "matrix")
+#+END_SRC
+
+or import our package and call our functions directly:
+
+#+BEGIN_SRC lisp
+(in-package :cl-torrents)
+#+END_SRC
+
+** Adding our dependencies
+
+Our new =cl-torrents.asd= looks like this:
+
+#+BEGIN_SRC lisp
+#|
+  This file is a part of cl-torrents project.
+|#
+
+(in-package :cl-user)
+(defpackage cl-torrents-asd
+  (:use :cl :asdf))
+(in-package :cl-torrents-asd)
+
+(defsystem cl-torrents
+  :version "0.1"
+  :author ""
+  :license ""
+  :depends-on ()  ;; <== list of dependencies
+  :components ((:module "src"
+                :components
+                ((:file "cl-torrents"))))
+  :description ""
+  :long-description
+  …)
+#+END_SRC
+
+For pythonistas, it is very similar to a =setup.py=.
+
+It  has the  =depends-on= paramater  which accepts  a list  of package
+names. We have to register here =dexador= and the others:
+
+#+BEGIN_SRC lisp
+  :depends-on (:str
+               :dexador
+               :plump
+               :lquery)
+#+END_SRC
+
+** Searching with our keywords
+
+Until now we only tried things out  with a given full search url. It's
+time to  write what's necessary to  insert our search terms  into this
+search url.
+
+We'll put a ={KEYWORDS}= placeholder into the url:
+
+#+BEGIN_SRC lisp
+(defparameter *search-url* "https://piratebay.to/search/?FilterStr={KEYWORDS}&ID=&Limit=800&Letter=&Sorting=DSeeder" "base search url. KEYWORDS to be replaced.")
+#+END_SRC
+
+which we will replace with a =+=-separated list of keywords.
+
+
+We basically  want to  put a =+=  in between each  word of  our search
+request (which  is a  string).  With  a little  look at  the [[https://lispcookbook.github.io/cl-cookbook/strings.html]["strings"
+cookbook  page]],  we'll  go  with  the  little  [[https://github.com/vindarel/cl-str][str]]  library  (our  lib
+actually):
+
+#+BEGIN_SRC lisp
+(ql:quickload "str")
+#+END_SRC
+
+Let's try:
+
+#+BEGIN_SRC lisp
+(defparameter words "matrix trilogy")
+;; => WORDS
+(str:words words)
+;; => ("matrix" "trilogy")
+(str:join "+" *) ;; the * : REPL shortcut to insert the last prompt
+;; => "matrix+trilogy"
+#+END_SRC
+
+and voilà. We put this at the beginning of our search function and we get:
+
+#+BEGIN_SRC lisp
+(defparameter *search-url* "https://piratebay.to/search/?FilterStr={KEYWORDS}&ID=&Limit=800&Letter=&Sorting=DSeeder" "base search url. KEYWORDS to be replaced.")
+
+(defun torrents (words)
+  "Search torrents."
+  (let* ((terms (str:words words))
+         (query (str:join "+" terms))
+         (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
+         (req (dex:get *search-url*))
+         (html (plump:parse req))
+         (res (lquery:$ html *selectors* (text))))
+    res))
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(torrents "matrix trilogy")
+#("
+Title
+"
+  "Matrix FRENCH DVDRIP 1999 COOLUpload Date: 05.06.15 Size: 700,30 MB"
+  "The Matrix Reloaded (2003) FullHD, Dual Audio: English + SpaUpload Date: 12.04.15 Size: 8,51 GB"
+  "The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 DuUpload Date: 12.02.15 Size: 12,86 GB"
+  "The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3Upload Date: 15.09.15 Size: 23,29 GB"
+  "The Matrix Trilogy (1999-2003) BDRip 1080p Dual Audio [ HindUpload Date: 14.01.15 Size: 10,23 GB"
+  "The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]Upload Date: 24.02.15 Size: 496,36 MB"
+  "Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438Upload Date: 20.02.15 Size: 796,86 MB"
+  "The Matrix Reloaded (2003) BRRip [Dual Audio] [Hindi+Eng] 50Upload Date: 22.02.15 Size: 496,39 MB"
+  [and more results]
+#+END_SRC
+
+Cool !
+
+This leads us to commit one. It was very easy !
+
+We now want or need more:
+
+- getting more content: the magnet links, each torrent's page
+- downloading the torrent files ?
+- error handling (network errors, unexpected errors)
+- scraping other sites, asynchronously  (the asynchronous part will be
+  straightforward, there's  a library for  that and it's  one function
+  change)
+- some tests
+- some cache
+- a command line tool

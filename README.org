@@ -1,0 +1,11 @@
+* Cl-Torrents
+
+Looking  for torrents  on  The  Pirate Bay  (and  others  ?) with  web
+scraping.
+
+And a tutorial !
+
+** Usage
+
+
+** Installation
