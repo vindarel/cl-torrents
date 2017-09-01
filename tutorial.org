@@ -4,9 +4,9 @@
 Scraping   The   Pirate   Bay   is    easy,   they   don't   rely   on
 javascript-generated pages. We just have to:
 
-- get the html page (=dexador=: =(dex:get <url>)=)
-- parse the html into a data structure (=plump=: =(plump:parse <html>)=)
-- search  this  request  with   CSS  selectors  (=lquery=:  =(lquery:"
+- get the html page ([[http://quickdocs.org/dexador/][dexador]]: =(dex:get <url>)=)
+- parse the html into a data structure ([[https://shinmera.github.io/plump/][plump]]: =(plump:parse <html>)=)
+- search  this  request  with   CSS  selectors  ([[https://shinmera.github.io/lquery][lquery]]:  =(lquery:"
   <parsed-html> <selectors>)=)
 
 Let's go.
@@ -45,14 +45,106 @@ the CSS class =Title=, which gives:
 (defparameter *selectors* ".Title")
 #+END_SRC
 
+Install our dependencies:
+
+#+BEGIN_EXPORT latex
+(ql:quickload '("dexador" "plump" "lquery"))
+#+END_EXPORT
+
+
+** Trying out at the REPL
+
+Let's try in the REPL:
+
+#+BEGIN_SRC lisp
+(defparameter html (dex:get *search-url*)) ;; returns the html
+(defparameter parsed (plump:parse html))   ;; returns a list of plump elements
+(defparameter results (lquery:$ parsed *selectors*)) ;; returns a list of stuff
+(setf results (lquery:$ parsed *selectors* (text)))  ;; returns text, i.e. the titles
+#+END_SRC
+
+A little explanation for the =lquery=  line: the last =(text)= part is
+an lquery thing to get the text representation of the node, instead of
+a lquery internal object.
+
+
+I  like to  check the  html content  of the  plump nodes.  We use  the
+=serialize= plump function (second function from its doc ;) ):
+
+#+BEGIN_SRC lisp
+CL-TORRENTS> (plump:serialize (first res))
+<th class="Title header ">
+<a href="https://piratebay.to/search/0/800/0/matrix/0/ATitle/1/">Title</a>
+</th>
+">"
+#+END_SRC
+
+err… not much in  it. Will have to check what is  the first element of
+the list.
+
+#+BEGIN_SRC lisp
+  CL-TORRENTS> (plump:serialize (second res))
+  <td class="Title">
+  <span class="ColorA">
+  <a href="https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
+     onclick="Javascript:OpenDetailPage('https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/'); return false;">Matrix FRENCH DVDRIP 1999 COOL
+  </a>
+  </span>
+  <br/>
+  <span class="ColorB VaA">Upload Date: 05.06.15
+  </span>
+  <span class="ColorB VaA">Size: 700,30 MB
+  </span>
+  <span class="ColorB"/>
+  </td>
+  ">"
+#+END_SRC
+
+allright, good, just  checking. It has the link to  the torrent's page
+inside the href of the "a" element, just as usual. We'll get to it.
+
+Note that we  can also inspect the results with  the mouse: left/right
+clicks  on the  elements printed  in the  REPL get  us into  the Slime
+inspector.
+
+** Putting it together in a function
+
+We came up with this function:
+
 #+BEGIN_SRC lisp
 (defun torrents (words)
   ""
   (let* ((html (dex:get *search-url*))
          (parsed (plump:parse html))
-         (res (lquery:$ parsed *selectors*)))
+         (res (lquery:$ parsed *selectors* (text))))
     res))
 #+END_SRC
+
+and if  you prefer a  threading macro /  pipes, no problem,  but we'll
+load another external library:
+
+# TODO: arrow-macros has more cool stuff
+
+#+BEGIN_EXPORT latex
+(ql:quickload "cl-arrows")
+;; and we import its symbols:
+(use-package "cl-arrows")
+#+END_EXPORT
+
+#+BEGIN_SRC lisp
+(-<>> *search-url*
+  (dex:get)
+  (plump:parse)
+  (lquery:$ <> *selectors* (text)))
+#+END_SRC
+
+[[https://github.com/nightfly19/cl-arrows][cl-arrows]] defines  a few  threading macros. The  classic one  would be
+=->=,  which inserts  the  result  of the  preceding  form as  _first_
+argument, =->>= that  puts it _last_, which is what  we wanted for the
+two  forms but  not for  the last  one, with  lquery, which  needs the
+parsed  html as  first argument.   So we  use =-<>>=:  the arrow  will
+populate  the  _last_  argument,  except when  it  encounters  a  =<>=
+placeholder. =-<>>= has a little name, "Diamond Spear".
 
 ** Creating a new project
 
@@ -144,9 +236,8 @@ names. We have to register here =dexador= and the others:
 
 ** Searching with our keywords
 
-Until now we only tried things out  with a given full search url. It's
-time to  write what's necessary to  insert our search terms  into this
-search url.
+Until now  we only tried  things out with a  given search url,  set in
+stone. It's time to insert our own search terms into this search url.
 
 We'll put a ={KEYWORDS}= placeholder into the url:
 
@@ -156,11 +247,8 @@ We'll put a ={KEYWORDS}= placeholder into the url:
 
 which we will replace with a =+=-separated list of keywords.
 
-
-We basically  want to  put a =+=  in between each  word of  our search
-request (which  is a  string).  With  a little  look at  the [[https://lispcookbook.github.io/cl-cookbook/strings.html]["strings"
-cookbook  page]],  we'll  go  with  the  little  [[https://github.com/vindarel/cl-str][str]]  library  (our  lib
-actually):
+With a little  look at the [[https://lispcookbook.github.io/cl-cookbook/strings.html]["strings" cookbook page]],  we'll go with the
+little [[https://github.com/vindarel/cl-str][str]] library (our lib actually):
 
 #+BEGIN_SRC lisp
 (ql:quickload "str")
@@ -173,7 +261,7 @@ Let's try:
 ;; => WORDS
 (str:words words)
 ;; => ("matrix" "trilogy")
-(str:join "+" *) ;; the * : REPL shortcut to insert the last prompt
+(str:join "+" *) ;; the * is a REPL shortcut to insert the previous result. + inserts the previous input.
 ;; => "matrix+trilogy"
 #+END_SRC
 
@@ -193,6 +281,8 @@ and voilà. We put this at the beginning of our search function and we get:
     res))
 #+END_SRC
 
+Let's try:
+
 #+BEGIN_SRC lisp
 (torrents "matrix trilogy")
 #("
@@ -211,7 +301,166 @@ Title
 
 Cool !
 
-This leads us to commit one. It was very easy !
+We can commit  this, have a break  and enjoy how things  are going. It
+was very easy !
+
+Of course, we need  to get more stuff out of  this, like the torrent's
+magnet link.
+
+** Getting more torrent information
+
+With =plump:serialize=  we could check  what html is inside  our plump
+node:
+
+#+BEGIN_SRC lisp
+  (plump:serialize (second res))
+  <td class="Title">
+  <span class="ColorA">
+  <a href="https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/" onclick="Javascript:OpenDetailPage('https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/'); return false;">Matrix FRENCH DVDRIP 1999 COOL
+  </a>
+  </span>
+  <br/>
+  <span class="ColorB VaA">Upload Date: 05.06.15
+  </span>
+  <span class="ColorB VaA">Size: 700,30 MB
+  </span>
+  <span class="ColorB"/>
+  </td>
+#+END_SRC
+
+and we want to get the href with the torrent's url.
+
+We know how to access the =a=:
+
+#+BEGIN_SRC lisp
+(defparameter *elt* (second res))
+(lquery:$ *elt* "a" (text))
+;; => #("Matrix FRENCH DVDRIP 1999 COOL")
+#+END_SRC
+
+it returns a plump node.
+
+Let's try getting the href:
+
+#+BEGIN_SRC lisp
+(lquery:$ *elt* "a[href]" (text))
+;; => #("Matrix FRENCH DVDRIP 1999 COOL")
+#+END_SRC
+
+this still returns the plump node.
+
+With  the REPL  autocompletion and  then a  check at  the doc  we find
+=lquery-funcs:attr= to extract attributes:
+
+#+BEGIN_SRC lisp
+(lquery-funcs:attr (lquery:$ *elt* "a") "href")
+;; => #("https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/")
+#+END_SRC
+
+Ok.
+
+But watch out,  the =#(…)= denotes a vector. We  get its first element
+with
+
+#+BEGIN_SRC lisp
+(aref * 0)
+#+END_SRC
+
+(see the [[https://lispcookbook.github.io/cl-cookbook/data-structures.html][Cookbook's Data Structures page]]).
+
+We put this in a function:
+
+#+BEGIN_SRC lisp
+(defun detail-page-url (node)
+  "Extract the link of the details page. `node': plump node, containing the url."
+  (let* ((href-vector (lquery-funcs:attr (lquery:$ node "a") "href"))
+         (href (aref href-vector 0)))
+    href))
+#+END_SRC
+
+which we can test (either write it  at the REPL either write it in the
+project and compile, =C-c C-c= in Slime):
+
+#+BEGIN_SRC lisp
+(mapcar #'detail-page-url res)  ;; #' shorthand for function
+;; =>
+("https://piratebay.to/search/0/800/0/matrix/0/ATitle/1/"
+ "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
+ "https://piratebay.to/torrent/2156107/The Matrix Reloaded (2003) FullHD, Dual Audio: English + Spa/"
+ "https://piratebay.to/torrent/1885366/The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 Du/"
+[…]
+#+END_SRC
+
+*** To the magnet link
+
+We have the torrent's details page, we  know how to request it, now we
+want to get the magnet link.
+
+#+BEGIN_SRC lisp
+(mapcar (lambda (it)
+          (lquery-funcs:attr it "href"))
+        (coerce (lquery:$ * "a") 'list))
+;; =>
+(NIL NIL NIL NIL NIL NIL NIL "https://piratebay.to/" "https://piratebay.to/"
+ […]
+ "http://imdb.com/title/tt1778413/" "https://piratebay.to/profile/Anonym"
+ "https://piratebay.to/Downloader.php?ID=2289391&Filename=Matrix+FRENCH+DVDRIP+1999+COOL"
+ "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5" "http://"
+ […]
+ "https://twitter.com/piratebayto" "https://www.facebook.com/thepiratebayto"
+ "http://bitcoin.org" "bitcoin:1FX2wz8NiWPdtCGSrzn7j3NAg4VKqGovto" "/")
+#+END_SRC
+
+We  saw  what  I  consider  CL oddities  and  quirks  here,  for  sure
+frustrating stuff  for the  (impatient) beginner.  =mapcar=  expects a
+list and  lquery returns a vector,  so we had to  transform the result
+with =coerce=.  Also  the name =mapcar= is a bit  outated, even if the
+other map functions in the family  can be useful.  There is =map= that
+takes its output type has first  parameter: =(map 'list …)=. There are
+fixes.
+
+We could  use [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=, which works on  vectors too.
+
+Still with cl21, we can write shorter lambdas, with the shorthand =lm=
+or with:
+
+#+BEGIN_SRC lisp
+(map ^(lquery-funcs:attr % "href") …) ;; with more arguments, use %1, %2,…
+#+END_SRC
+
+Cl21 defines and  rewrites a lot of stuff to  offer shorter and sanier
+ways of doing (this,  hash-tables, regexps,…), towards more functional
+programming, and more generics (functions that work on many types, not
+one function  per type). It still  is a CL  library, so we can  use it
+alongside the usual CL in our project.
+
+It is written  by a super productive and innovative  CL hacker and has
+600+ stars  on github.  Nevertheless, it wasn't  touched in  two years
+and, as it lacks docstrings and  direction, we can be surprised by the
+new implementation of some functions. No  need to say the community is
+divided on this subject.
+
+Filtering:
+
+#+BEGIN_SRC lisp
+(remove-if-not (lambda (it)
+                 (str:starts-with? "magnet" it))
+               *)
+#+END_SRC
+
+Here, I  used again a short  verb from an external  library for string
+manipulation. The CL way would be something like:
+
+#+BEGIN_SRC lisp
+(string= "magnet-foo" "magnet" :start1 0 :end1 (length "magnet"))
+T
+#+END_SRC
+
+and yet we must handle nils, differences of length,… so boring.
+
+** Conclusion
+
+This leads us to the end of part one. It was very easy !
 
 We now want or need more:
 
