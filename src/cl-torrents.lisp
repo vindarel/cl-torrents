@@ -10,7 +10,9 @@
 (defparameter *search-url* "https://piratebay.to/search/?FilterStr={KEYWORDS}&ID=&Limit=800&Letter=&Sorting=DSeeder"
   "Base search url. KEYWORDS to be replaced by the search terms (a string with +-separated words).")
 
-(defparameter *selectors* ".Title")
+(defparameter *selectors* "tbody tr")
+
+(defparameter *prefilter-selector* "tbody" "Call before we extract the search results.")
 
 (defvar *last-search* nil "Remembering the last search (should be an hash-map).")
 
@@ -21,20 +23,18 @@
          (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
          (req (dex:get *search-url*))
          (html (plump:parse req))
-         (res (lquery:$ html *selectors*))
+         (nodes (search-prefilter-results html))
+         (res (lquery:$ nodes *selectors*))
          (res-list (coerce res 'list)))
     (setf *last-search* res-list)
     (display-results res-list)))
 
-(defun search-prefilter-results (nodes)
-  "Restrict what we'll search the results on (only a tbody,…)."
-  (lquery:$ nodes *prefilter-selector*))
 
 (defun result-title (node)
   "Return the title of a search result."
-  (first (coerce
-          (lquery:$ node "a" (text))
-          'list)))
+  (aref
+   (lquery:$ node ".Title a" (text))
+   0))
 
 (defun display-results (&optional (results *last-search*))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,…"
