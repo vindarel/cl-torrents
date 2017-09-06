@@ -24,7 +24,24 @@
          (res (lquery:$ html *selectors*))
          (res-list (coerce res 'list)))
     (setf *last-search* res-list)
-    res-list))
+    (display-results res-list)))
+
+(defun search-prefilter-results (nodes)
+  "Restrict what we'll search the results on (only a tbody,…)."
+  (lquery:$ nodes *prefilter-selector*))
+
+(defun result-title (node)
+  "Return the title of a search result."
+  (first (coerce
+          (lquery:$ node "a" (text))
+          'list)))
+
+(defun display-results (&optional (results *last-search*))
+  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,…"
+  (mapcar (lambda (it)
+            (format t "~a: ~a~%" (+ 1 (position it *last-search*)) (result-title it)))
+          (reverse results))
+  t)
 
 (defun detail-page-url (node)
   "Extract the link of the details page. `node': plump node, containing the url."
@@ -36,7 +53,7 @@
 ;; (mapcar #'detail-page-url (torrents "matrix"))
 
 (defun find-magnet-link (parsed)
-  "Extract the magnet link."
+  "Extract the magnet link. `parsed': plump:parse result."
   (let* ((hrefs (mapcar (lambda (it)
                           (lquery-funcs:attr it "href"))
                         (coerce (lquery:$ parsed "a") 'list)))
