@@ -1,6 +1,7 @@
 (in-package :cl-user)
 (defpackage cl-torrents
-  (:use :cl))
+  (:use :cl)
+  (:export :torrents))
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 

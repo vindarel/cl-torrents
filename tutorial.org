@@ -458,6 +458,104 @@ T
 
 and yet we must handle nils, differences of length,… so boring.
 
+
+** First test - end to end test
+
+We wouldn't be called a developper if we didn't write any test.
+
+Our favorite test framework (which we found on the [[https://github.com/CodyReichert/awesome-cl][Awesome CL list]]) is
+[[https://github.com/fukamachi/prove][Prove]].
+
+*** Unit testing solutions
+
+Since we do webscraping, the result  from the network calls are likely
+to be  different each time.  That's not cool  for unit tests.  We must
+find a way to fake the result  of =dex:get= and return the same thing,
+always.
+
+That's the  goal of [[https://github.com/tsikov/vcr/][vcr]]:
+
+#+BEGIN_QUOTE
+Store and replay results of http calls for easier testing of external services.
+#+END_QUOTE
+
+You  recall what's  a Videocassette  Recorder,  right ?   You give  it
+something to record and it can play it back.  It's a common concept in
+testing,  there are  popular libraries  on other  ecosystems (  in the
+Python world for  instance).  Well, vcr isn't on  Quicklisp yet (which
+is ok, we can clone  it on =~/.quicklisp/local-projects/= or use [[https://github.com/fukamachi/qlot][Qlot]])
+and it's very new, so there might be bugs.
+
+We might also save a piece of html in the testing directory and have a
+call to =dex:get= return that. Coming from the "blob languages" world,
+we  looked for  a mocking  library.  There are,  like [[https://github.com/Chream/mockingbird/][Mockingbird]]  and
+[[https://github.com/Ferada/cl-mock][Cl-mock]]:
+
+#+BEGIN_QUOTE
+This package provides some useful stubbing and mocking macros for unit
+testing.  Used  when specified  functions  in  a  test should  not  be
+computed but should instead return a provided constant value.
+#+END_QUOTE
+
+They also  provide ways to check  if a given function  was called, how
+many  times, etc.   However, *for  simple  mocking we  can simply  use
+closures*. Great feature of the language.
+
+All that  being said, we'll write  the simplest test at  the moment :)
+We'll simply  call our search function  and check it didn't  error out
+and had some results in.
+
+The file =t/cl-torrents.lisp= looks like this:
+
+#+BEGIN_SRC lisp
+(in-package :cl-user)
+(defpackage cl-torrents-test
+  (:use :cl
+        :cl-torrents  ;; => import our exported functions in cl-torrents.lisp
+        :prove))      ;; => import all Prove verbs (like python's "from prove import *")
+(in-package :cl-torrents-test)
+
+;; NOTE: To run this test file, execute `(asdf:test-system :cl-torrents)' in your Lisp.
+
+(plan nil)  ;; optional Prove setting.
+
+;; blah blah blah.
+
+(finalize)
+#+END_SRC
+
+We add:
+
+#+BEGIN_SRC lisp
+(ok (torrents "matrix"))
+#+END_SRC
+
+we compile it (=C-c C-c=) and it runs the test in the REPL.
+
+
+*** Exporting functions
+
+We need  to export symbols  in order to use  them from the  outside of
+their source  file, in order  to use them directly  (=use-package=) or
+with =(my-package:my-function)=. If we don't export them, we can still
+access them with a double colon: =(my-package::my-function)=.
+
+Our package definition contains this:
+
+#+BEGIN_SRC lisp
+(defpackage cl-torrents
+  (:use :cl))
+#+END_SRC
+
+We add it an =export= clause:
+
+#+BEGIN_SRC lisp
+(defpackage cl-torrents
+  (:use :cl)
+  (:export :torrents))
+#+END_SRC
+
+
 ** Conclusion
 
 This leads us to the end of part one. It was very easy !

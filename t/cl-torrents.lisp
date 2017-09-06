@@ -11,4 +11,6 @@
 
 ;; blah blah blah.
 
+(ok (torrents "matrix"))
+
 (finalize)
