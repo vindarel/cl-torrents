@@ -6,19 +6,28 @@ javascript-generated pages. We just have to:
 
 - get the html page ([[http://quickdocs.org/dexador/][dexador]]: =(dex:get <url>)=)
 - parse the html into a data structure ([[https://shinmera.github.io/plump/][plump]]: =(plump:parse <html>)=)
-- search  this  request  with   CSS  selectors  ([[https://shinmera.github.io/lquery][lquery]]:  =(lquery:"
-  <parsed-html> <selectors>)=)
+- search   with  CSS   selectors  ([[https://shinmera.github.io/lquery][lquery]]:   =(lquery:"  <parsed-html>
+  <selectors>)=)
 
 Let's go.
+
+Install our dependencies right away:
+
+#+BEGIN_EXPORT latex
+(ql:quickload '("dexador" "plump" "lquery"))
+#+END_EXPORT
 
 To begin  with, we do  a search on the  website and we  copy-paste the
 url. We get one like this:
 
 #+BEGIN_SRC lisp
-(defparameter *search-url* "https://piratebay.to/search/?FilterStr=matrix&ID=&Limit=800&Letter=&Sorting=DSeeder" "base search url. KEYWORDS to be replaced.")
+(defparameter *search-url* "https://piratebay.to/search/?FilterStr=matrix&ID=&Limit=800&Letter=&Sorting=DSeeder"
+    "the url to search matrix.")
 #+END_SRC
 
-it has our search term in it (=matrix=) along with url parameters.
+It has our search term in it (=matrix=) along with url parameters.
+
+It also sorts the results by number of seeders for us :) (=&Sorting=DSeeder=).
 
 We will use CSS selectors to extract information from the web page, so
 we can use  our browser's developer tools to inspect  the structure of
@@ -45,12 +54,8 @@ the CSS class =Title=, which gives:
 (defparameter *selectors* ".Title")
 #+END_SRC
 
-Install our dependencies:
-
-#+BEGIN_EXPORT latex
-(ql:quickload '("dexador" "plump" "lquery"))
-#+END_EXPORT
-
+If  you are  not accostumed  to CSS  selectors, I  like this  webpage:
+https://codingsec.net/2016/12/select-specific-text-css-using-selectors/.
 
 ** Trying out at the REPL
 
@@ -67,41 +72,86 @@ A little explanation for the =lquery=  line: the last =(text)= part is
 an lquery thing to get the text representation of the node, instead of
 a lquery internal object.
 
-
 I  like to  check the  html content  of the  plump nodes.  We use  the
-=serialize= plump function (second function from its doc ;) ):
+=serialize= plump function (the second function from the doc ;) ):
 
 #+BEGIN_SRC lisp
-CL-TORRENTS> (plump:serialize (first res))
+CL-TORRENTS> (plump:serialize (first results))
+#+END_SRC
+
+and BAM, error:
+
+#+BEGIN_QUOTE
+The value #(
+... all the content of results here ...
+)
+is not of type LIST
+…
+#+END_QUOTE
+
+pfff. Sorry for  this inconvenience. Indeed, lquery  returns a vector,
+not a list (we  can see that with =#()= that denotes  a vector), so we
+can not use =first= but have to use =(aref <vector> 0)= instead, or we
+have to =coerce= the result to a list.
+
+Personnally  I find  this stupid  and frustrating,  particularly being
+used in Python  to access lots of data structures  in the same manner.
+If    you    feel    like    fixing   this,    have    a    look    at
+[CL21](https://lispcookbook.github.io/cl-cookbook/cl21.html),  "Common
+Lisp for  the 21st century"  which, amongst other  features, redefines
+some  functions to  make them  generic (that  work on  lists, vectors,
+hashmaps,…). CL21  is a CL library,  meaning we can of  course use the
+others CL libraries with  it, or that we can use  cl21 alongside CL in
+only in some places but not in all our project (like in only one file,
+one "package"). I  chose to not present you this  lib at the beginning
+but I might do so later on.
+
+Allright so, back to printing the html content of our first result:
+
+#+BEGIN_SRC text
+CL-TORRENTS> (plump:serialize (aref results 0))
 <th class="Title header ">
 <a href="https://piratebay.to/search/0/800/0/matrix/0/ATitle/1/">Title</a>
 </th>
 ">"
 #+END_SRC
 
-err… not much in  it. Will have to check what is  the first element of
-the list.
+gosh, there  is not much in  it.  I was  too quick in defining  my CSS
+selector.  This  first result should  not be catched by  our selector,
+because it is not a link to a torrent but only the header of the table
+(see "Title header" and the =th= ?).
+
+But that's not  all. I also want  to scrape the number  of seeders and
+leechers and  the =.Title= selector  doesn't include them  (this I see
+with the browser's web inspector). If I select the including =tr= I'll
+get all the data,  and I must ensure to select  those =tr= from inside
+the body  of the table,  =tbody=.  So I'll  use a first  selector that
+will return a list of elements of the table:
 
 #+BEGIN_SRC lisp
-  CL-TORRENTS> (plump:serialize (second res))
-  <td class="Title">
-  <span class="ColorA">
-  <a href="https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
-     onclick="Javascript:OpenDetailPage('https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/'); return false;">Matrix FRENCH DVDRIP 1999 COOL
-  </a>
-  </span>
-  <br/>
-  <span class="ColorB VaA">Upload Date: 05.06.15
-  </span>
-  <span class="ColorB VaA">Size: 700,30 MB
-  </span>
-  <span class="ColorB"/>
-  </td>
-  ">"
+(setf *selectors* "tbody tr")
 #+END_SRC
 
-allright, good, just  checking. It has the link to  the torrent's page
-inside the href of the "a" element, just as usual. We'll get to it.
+and then for each result I'll get the title and the number of seeders.
+
+So I can scrape again my search results with the new selector:
+
+#+BEGIN_SRC lisp
+(setf results (lquery:$ parsed *selectors* (text)))
+#+END_SRC
+
+this should print interesting stuff, like our torrents titles and even
+strings like =S: 16L: 1= which are indeed our seeders and leechers.
+
+I check the html content:
+
+#+BEGIN_SRC lisp
+  CL-TORRENTS> (plump:serialize (aref res 0))
+  ;todo: insert here html content with seeders too.
+#+END_SRC
+
+allright, good. It has the link  to the torrent's page inside the href
+of the "a" element, as well as the seeders count.
 
 Note that we  can also inspect the results with  the mouse: left/right
 clicks  on the  elements printed  in the  REPL get  us into  the Slime
@@ -122,8 +172,6 @@ We came up with this function:
 
 and if  you prefer a  threading macro /  pipes, no problem,  but we'll
 load another external library:
-
-# TODO: arrow-macros has more cool stuff
 
 #+BEGIN_EXPORT latex
 (ql:quickload "cl-arrows")
@@ -148,7 +196,12 @@ placeholder. =-<>>= has a little name, "Diamond Spear".
 
 ** Creating a new project
 
- We use =cl-project=:
+   Before we write more functions we  should create a new project. For
+   this  I  use a  skeleton  generator  which  will create  the  right
+   =defsystem=, =defpackage= and so for us.
+
+ I use  =cl-project=, which  also generates a  tests skeleton  (in the
+ contrary of =quick-project=):
 
  #+BEGIN_SRC lisp
  (ql:quickload "cl-project")
@@ -157,43 +210,8 @@ placeholder. =-<>>= has a little name, "Diamond Spear".
 
  Note that it  may be easier for  you sometimes if you  create your new
  Common  Lisp  projects  into =~/.quicklisp/local-projects=  (known  by
- Quicklisp) or =~/.local/share/common-lisp/= (known by ASDF).
-
-** Loading the project
-
-Open the  =.asdf= file at  the project root  and compile and  load the
-file. In  Slime, it's  with =C-c  C-k= (=slime-compile-and-load-file=,
-see also the Emacs menu).
-
-Now we can load the project at the REPL:
-
-#+BEGIN_SRC lisp
-(asdf:make "cl-torrents"
-; compiling file "/home/vince/projets/cl-torrents/src/cl-torrents.lisp" (written 28 AUG 2017 10:21:07 PM):
-; compiling (IN-PACKAGE :CL-USER)
-; compiling (DEFPACKAGE CL-TORRENTS ...)
-; compiling (IN-PACKAGE :CL-TORRENTS)
-; compiling (DEFPARAMETER *SEARCH-URL* ...)
-; compiling (DEFPARAMETER *SELECTORS* ...)
-; compiling (DEFUN TORRENTS ...)
-
-; /home/vince/.cache/common-lisp/sbcl-1.3.19-linux-x64/home/vince/projets/cl-torrents/src/cl-torrents-tmp5GEXGEG5.fasl written
-; compilation finished in 0:00:00.029
-; compilation unit finished
-T
-#+END_SRC
-
-And now we can use our function with the project prefix:
-
-#+BEGIN_SRC lisp
-(cl-torrents:torrents "matrix")
-#+END_SRC
-
-or import our package and call our functions directly:
-
-#+BEGIN_SRC lisp
-(in-package :cl-torrents)
-#+END_SRC
+ Quicklisp)  or =~/.local/share/common-lisp/=  (known by  ASDF). Doing
+ so, you will be able to =ql:quickload= your project right away.
 
 ** Adding our dependencies
 
@@ -234,6 +252,51 @@ names. We have to register here =dexador= and the others:
                :lquery)
 #+END_SRC
 
+and =cl-arrows= if you wish.
+
+** Loading the project
+
+Open the  =.asdf= file and  compile and load  it. In Slime,  it's with
+=C-c C-k= (=slime-compile-and-load-file=, see also the Emacs menu).
+
+Now we can load the project at the REPL and install its dependencies:
+
+#+BEGIN_SRC lisp
+(asdf:make "cl-torrents" ;; or ql:quickload
+; compiling file "/home/vince/projets/cl-torrents/src/cl-torrents.lisp" (written 28 AUG 2017 10:21:07 PM):
+; compiling (IN-PACKAGE :CL-USER)
+; compiling (DEFPACKAGE CL-TORRENTS ...)
+; compiling (IN-PACKAGE :CL-TORRENTS)
+; compiling (DEFPARAMETER *SEARCH-URL* ...)
+; compiling (DEFPARAMETER *SELECTORS* ...)
+; compiling (DEFUN TORRENTS ...)
+
+; /home/vince/.cache/common-lisp/sbcl-1.3.19-linux-x64/home/vince/projets/cl-torrents/src/cl-torrents-tmp5GEXGEG5.fasl written
+; compilation finished in 0:00:00.029
+; compilation unit finished
+T
+#+END_SRC
+
+And now we can use our function at the REPL.
+
+We go into our package so that we can call our functions directly:
+
+#+BEGIN_SRC lisp
+(in-package :cl-torrents)
+#+END_SRC
+
+We could import the functions from our package and call them directly,
+but we need to =export= them and we'll see that shortly.
+
+We could  call them  with the  project prefix, but  we need  a doublon
+colon because  our functions  are not exported  yet (so  they're kinda
+private,  but not  strictly,  like  with a  method  starting with  the
+underscore =_= in Python).
+
+#+BEGIN_SRC lisp
+(cl-torrents::torrents "matrix")
+#+END_SRC
+
 ** Searching with our keywords
 
 Until now  we only tried  things out with a  given search url,  set in
@@ -242,7 +305,8 @@ stone. It's time to insert our own search terms into this search url.
 We'll put a ={KEYWORDS}= placeholder into the url:
 
 #+BEGIN_SRC lisp
-(defparameter *search-url* "https://piratebay.to/search/?FilterStr={KEYWORDS}&ID=&Limit=800&Letter=&Sorting=DSeeder" "base search url. KEYWORDS to be replaced.")
+(defparameter *search-url* "https://piratebay.to/search/?FilterStr={KEYWORDS}&ID=&Limit=800&Letter=&Sorting=DSeeder"
+    "base search url. {KEYWORDS} to be replaced by + separated words.")
 #+END_SRC
 
 which we will replace with a =+=-separated list of keywords.
@@ -251,7 +315,7 @@ With a little  look at the [[https://lispcookbook.github.io/cl-cookbook/strings.
 little [[https://github.com/vindarel/cl-str][str]] library (our lib actually):
 
 #+BEGIN_SRC lisp
-(ql:quickload "str")
+(ql:quickload "str") ;; not needed if you loaded the asdf with the right dependencies.
 #+END_SRC
 
 Let's try:
@@ -302,7 +366,7 @@ Title
 Cool !
 
 We can commit  this, have a break  and enjoy how things  are going. It
-was very easy !
+was very easy, except one or two gotchas :)
 
 Of course, we need  to get more stuff out of  this, like the torrent's
 magnet link.
@@ -555,19 +619,32 @@ We add it an =export= clause:
   (:export :torrents))
 #+END_SRC
 
+We could also mark the functions to export with a decorator à-la Python,
+like this:
+
+#+BEGIN_SRC lisp
+@export
+(defun torrents (…)
+    …)
+#+END_SRC
+
+which  is quite  elegant and  can be  handy. This  is doable  with the
+[[https://github.com/m2ym/cl-annot][cl-annot]] library, and it also requires a little Slime configuration.
 
 ** Conclusion
 
-This leads us to the end of part one. It was very easy !
+This leads us to the end of part one.
 
 We now want or need more:
 
-- getting more content: the magnet links, each torrent's page
-- downloading the torrent files ?
-- error handling (network errors, unexpected errors)
+- getting more content (seeders)
+- downloading the torrent file ?
+- error handling (network errors or timeout, unexpected errors)
 - scraping other sites, asynchronously  (the asynchronous part will be
   straightforward, there's  a library for  that and it's  one function
   change)
 - some tests
 - some cache
 - a command line tool
+- some more functionnality (getting many magnet links at once)
+- …
