@@ -36,10 +36,28 @@
    (lquery:$ node ".Title a" (text))
    0))
 
-(defun display-results (&optional (results *last-search*))
-  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,…"
+(defun result-peers-or-leechers (node index)
+  "Return the number of peers (int) of a search result (node: a plump node).
+index 0 => peers, index 1 => leechers."
+  (let ((res (aref (lquery:$ node ".Seeder .ColorC" (text)) ;; returns seeders and leechers.
+                   index)))
+    (parse-integer res)))
+
+(defun result-peers (node)
+  (result-peers-or-leechers node 0))
+
+(defun result-leechers (node)
+  (result-peers-or-leechers node 1))
+
+(defun display-results (&optional (results *last-search*) (stream t))
+  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,..."
   (mapcar (lambda (it)
-            (format t "~a: ~a~%" (+ 1 (position it *last-search*)) (result-title it)))
+            ;; do not rely on *last-search*.
+            (format stream "~3@a: ~65a ~3@a/~3@a~%"
+                    (position it *last-search*)
+                    (result-title it)
+                    (result-peers it)
+                    (result-leechers it)))
           (reverse results))
   t)
 
