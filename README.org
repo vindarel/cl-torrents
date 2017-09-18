@@ -5,6 +5,8 @@ scraping.
 
 And a tutorial !
 
+Published with https://github.com/fniessen/org-html-themes.
+
 ** Usage
 
    (torrents "your search")

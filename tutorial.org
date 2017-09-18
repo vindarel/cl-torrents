@@ -1,3 +1,24 @@
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:nil tex:t
+#+HTML_DOCTYPE: xhtml-strict
+#+HTML_CONTAINER: div
+#+DESCRIPTION: Scraping the Pirate Bay in Common Lisp
+#+KEYWORDS: common lisp web-scraping pirate-bay
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX:
+#+HTML_HEAD:
+#+HTML_HEAD_EXTRA:
+#+SUBTITLE:
+#+INFOJS_OPT:
+#+CREATOR: <a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 9.0.3)
+#+LATEX_HEADER:
+
+#+AUTHOR: vindarel
+
+#+SETUPFILE: theme-readtheorg.setup
+
 
 * Step 1 - first start
 
@@ -13,9 +34,9 @@ Let's go.
 
 Install our dependencies right away:
 
-#+BEGIN_EXPORT latex
+#+BEGIN_SRC lisp
 (ql:quickload '("dexador" "plump" "lquery"))
-#+END_EXPORT
+#+END_SRC
 
 To begin  with, we do  a search on the  website and we  copy-paste the
 url. We get one like this:
