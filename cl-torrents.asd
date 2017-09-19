@@ -14,6 +14,7 @@
   :depends-on (:str
                :dexador
                :plump
+               :mockingbird
                :lquery)
   :components ((:module "src"
                 :components
