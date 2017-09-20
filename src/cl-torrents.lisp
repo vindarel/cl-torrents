@@ -80,10 +80,14 @@ index 0 => peers, index 1 => leechers."
                                 hrefs)))
     (first magnet)))
 
+(defun request-details (url)
+  "Get the html page of the given url. Mocked in unit tests."
+  (dex:get url))
+
 (defun magnet-link-from (node)
   "Extract the magnet link from a `torrent' result."
   (let* ((url (detail-page-url node))
-         (html (dex:get url))
+         (html (request-details url))
          (parsed (plump:parse html)))
     (find-magnet-link parsed)))
 
