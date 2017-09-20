@@ -33,11 +33,22 @@
 ;; stubs: network calls return our known recorded html pages..
 (with-dynamic-stubs ((dex:get htmlpage)
                      (cl-torrents::request-details resultpage))
-  (ok (torrents "matrix") "torrent search ok")
+
+  (ok (with-output-to-string (out)
+        (torrents "matrix" out)) "torrent search ok")
+
   (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
       "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
       :test #'equalp
       "details-page-url returns the right url.")
-  (ok (str:starts-with? "magnet" (magnet 0)) "magnet <i> returns the the magnet link from search result."))
+
+  (ok (str:starts-with? "magnet" (magnet 0)) "magnet <i> returns the the magnet link from search result.")
+
+  (ok (str:starts-with? "198: Arturia"
+                        ;; don't display the large output during the test.
+                        (with-output-to-string (out)
+                          (cl-torrents::display-results cl-torrents::*last-search* out)))
+      "Outputs results, reverse order.")
+  )
 
 (finalize)
