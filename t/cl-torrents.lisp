@@ -34,6 +34,10 @@
 (with-dynamic-stubs ((dex:get htmlpage)
                      (cl-torrents::request-details resultpage))
   (ok (torrents "matrix") "torrent search ok")
-  (ok (str:starts-with? "magnet" (magnet 0)) "We get the magnet link from search result 0"))
+  (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
+      "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
+      :test #'equalp
+      "details-page-url returns the right url.")
+  (ok (str:starts-with? "magnet" (magnet 0)) "magnet <i> returns the the magnet link from search result."))
 
 (finalize)
