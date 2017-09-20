@@ -51,4 +51,23 @@
       "Outputs results, reverse order.")
   )
 
+;; We can do the same with a macro, in order to isolate tests and to
+;; factorize with-dynamic-stubs.
+(defmacro with-mocked-search-results (body)
+  `(with-dynamic-stubs ((dex:get htmlpage)
+                        (cl-torrents::request-details resultpage))
+     ,body))
+
+;; Now we can run tests one by one.
+(with-mocked-search-results
+    (ok (with-output-to-string (out)
+          (torrents "foo" out))
+        "search ok"))
+
+(with-mocked-search-results
+    (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
+        "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
+        :test #'equalp
+        "details-page-url returns the right url."))
+
 (finalize)
