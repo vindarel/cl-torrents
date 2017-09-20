@@ -25,10 +25,10 @@
 ;;
 
 ;; Load the search result html from a file.
-(defparameter htmlpage (file-to-string #p"search-matrix.html"))
+(defparameter htmlpage (file-to-string #p"t/assets/search-matrix.html"))
 
 ;; Load the request to a details page.
-(defparameter resultpage (file-to-string #p"t/search-matrix-result0.html"))
+(defparameter resultpage (file-to-string #p"t/assets/search-matrix-result0.html"))
 
 ;; stubs: network calls return our known recorded html pages..
 (with-dynamic-stubs ((dex:get htmlpage)
