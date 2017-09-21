@@ -27,8 +27,7 @@
          (res (lquery:$ nodes *selectors*))
          (res-list (coerce res 'list)))
     (setf *last-search* res-list)
-    (display-results res-list)))
-
+    (display-results res-list stream)))
 
 (defun result-title (node)
   "Return the title of a search result."
