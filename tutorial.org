@@ -20,7 +20,7 @@
 #+SETUPFILE: theme-readtheorg.setup
 
 
-* Step 1 - first start
+* Part 1
 
 Scraping   The   Pirate   Bay   is    easy,   they   don't   rely   on
 javascript-generated pages. We just have to:
@@ -100,7 +100,7 @@ I  like to  check the  html content  of the  plump nodes.  We use  the
 CL-TORRENTS> (plump:serialize (first results))
 #+END_SRC
 
-and BAM, error:
+but we get an error:
 
 #+BEGIN_QUOTE
 The value #(
@@ -110,24 +110,27 @@ is not of type LIST
 …
 #+END_QUOTE
 
-pfff. Sorry for  this inconvenience. Indeed, lquery  returns a vector,
+Sorry for  the inconvenience. Indeed, lquery  returns a vector,
 not a list (we  can see that with =#()= that denotes  a vector), so we
 can not use =first= but have to use =(aref <vector> 0)= instead, or we
 have to =coerce= the result to a list.
 
 (see the [[https://lispcookbook.github.io/cl-cookbook/data-structures.html][Cookbook's Data Structures page]]).
 
-Personnally  I find  this stupid  and frustrating,  particularly being
-used in Python  to access lots of data structures  in the same manner.
-If    you    feel    like    fixing   this,    have    a    look    at
-[CL21](https://lispcookbook.github.io/cl-cookbook/cl21.html),  "Common
-Lisp for  the 21st century"  which, amongst other  features, redefines
-some  functions to  make them  generic (that  work on  lists, vectors,
-hashmaps,…). CL21  is a CL library,  meaning we can of  course use the
-others CL libraries with  it, or that we can use  cl21 alongside CL in
-only in some places but not in all our project (like in only one file,
-one "package"). I  chose to not present you this  lib at the beginning
-but I might do so later on.
+Personnally I find this frustrating, particularly being used in Python
+to access  lots of data  structures in the  same manner.  If  you feel
+like  fixing this,  have a  look at  [[https://lispcookbook.github.io/cl-cookbook/cl21.html][CL21]], "Common  Lisp for  the 21st
+century" which,  amongst other  features, redefines some  functions to
+make them generic (that work on lists, vectors, hashmaps,…). CL21 is a
+CL library, meaning we can of  course use the others CL libraries with
+it, or that  we can use cl21  alongside CL in only in  some places but
+not in all our project (like in only one file, one "package").
+
+It is written  by a super productive and innovative  CL hacker and has
+600+ stars  on github.  Nevertheless, it wasn't  touched in  two years
+and, as it lacks docstrings and  direction, we can be surprised by the
+new implementation of some functions. No  need to say the community is
+divided on this subject.
 
 Allright so, back to printing the html content of our first result:
 
@@ -596,8 +599,8 @@ in the result, there's our magnet link.
 We  saw what  I consider  CL  oddities and  quirks here,  than can  be
 frustrating for the (impatient) beginner.  =mapcar= expects a list and
 lquery  returns a  vector,  so we  had to  transform  the result  with
-=coerce=.  Also the name =mapcar= is  a bit outated, even if the other
-map functions in the family can  be useful.  There is =map= that takes
+=coerce=.  Also  the name =mapcar= is  unusual, even if the  other map
+functions in  the family can be  useful.  There is a  =map= that takes
 its output type has first parameter: =(map 'list …)=.
 
 We could use  [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=, which works  on vectors too so  no need of
@@ -611,18 +614,6 @@ or simply =%= for the first one:
 ;; todo: (lquery:$ … (attr :href)) cf cookbook
 (map ^(lquery-funcs:attr % "href") …)
 #+END_SRC
-
-Cl21 defines and  rewrites a lot of stuff to  offer shorter and sanier
-ways of doing (this,  hash-tables, regexps,…), towards more functional
-programming, and more generics (functions that work on many types, not
-one function  per type). It still  is a CL  library, so we can  use it
-alongside the usual CL in our project.
-
-It is written  by a super productive and innovative  CL hacker and has
-600+ stars  on github.  Nevertheless, it wasn't  touched in  two years
-and, as it lacks docstrings and  direction, we can be surprised by the
-new implementation of some functions. No  need to say the community is
-divided on this subject.
 
 We filter the list above to extract the magnet link:
 
