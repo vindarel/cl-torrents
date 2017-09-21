@@ -18,8 +18,16 @@
 
 (plan nil)
 
+;;
+;; These tests do network access: end-to-end tests.
+;;
 
-(ok (torrents "matrix"))
+(ok (torrents "matrix") "The search works without problems.")
+
+(let ((results (torrents "matrix" nil)))
+  (ok (str:starts-with? "http" (detail-page-url (first results))) "Requesting details.")
+  )
+
 ;;
 ;; Unit tests.
 ;;
@@ -29,6 +37,7 @@
 
 ;; Load the request to a details page.
 (defparameter resultpage (file-to-string #p"t/assets/search-matrix-result0.html"))
+
 
 ;; stubs: network calls return our known recorded html pages..
 (with-dynamic-stubs ((dex:get htmlpage)
@@ -49,6 +58,17 @@
                         (with-output-to-string (out)
                           (cl-torrents::display-results cl-torrents::*last-search* out)))
       "Outputs results, reverse order.")
+
+  (is 205
+      (cl-torrents::result-peers (elt cl-torrents::*last-search* 0))
+      :test #'equalp
+      "nb of peers.")
+
+  (is 7
+      (cl-torrents::result-leechers (elt cl-torrents::*last-search* 0))
+      :test #'equalp
+      "nb of leechers.")
+
   )
 
 ;; We can do the same with a macro, in order to isolate tests and to
