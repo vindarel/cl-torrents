@@ -16,12 +16,16 @@
 
 (defvar *last-search* nil "Remembering the last search (should be an hash-map).")
 
-(defun torrents (words)
+(defun request (url)
+  "Wrapper around dex:get. Fetch an url."
+  (dex:get url))
+
+(defun torrents (words &optional (stream t))
   "Search torrents."
   (let* ((terms (str:words words))
          (query (str:join "+" terms))
          (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
-         (req (dex:get *search-url*))
+         (req (request *search-url*))
          (html (plump:parse req))
          (nodes (search-prefilter-results html))
          (res (lquery:$ nodes *selectors*))
