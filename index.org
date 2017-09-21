@@ -1,0 +1,78 @@
+#+AUTHOR: vindarel
+
+#+SETUPFILE: theme-readtheorg.setup
+
+TLDR: see the [[file:tutorial.html][tutorial]] !
+
+* cl-torrents
+
+** Usage
+
+  This is a  little tool for the  lisp REPL to search  for torrents on
+  the Pirate Bay (piratebay.to):
+
+#+BEGIN_SRC text
+(torrents "matrix")
+  [...]
+  6: The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]
+  5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
+  4: The Matrix Trilogy (1999-2003) BDRip 1080p Dual Audio [ Hind
+  3: The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3
+  2: The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 Du
+  1: The Matrix Reloaded (2003) FullHD, Dual Audio: English + Spa
+  0: Matrix FRENCH DVDRIP 1999 COOL
+#+END_SRC
+
+  We get a magnet link with:
+
+#+BEGIN_SRC lisp
+(magnet 0)
+;; "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
+#+END_SRC
+
+  It could be more featureful. But our goal was to write a tutorial to
+  show you diverse Common Lisp topics.
+
+** Tutorial
+
+   Writing this little  web scraper is not  difficult. Nevertheless, I
+   had  to  spend some  time  to  find  out  the right  libraries  and
+   resources.   It is  also  not  trivial at  first  to  start a  Lisp
+   project. So this tutorial is a mix of -we hope- useful stuff:
+
+- web scraping,
+- trying out things at the REPL,
+- creating and loading a project,
+- basic data structures and gotchas,
+- some useful libraries,
+- unit tests, with mocks,
+- where to find documentation,
+- …
+
+  it could be  more (building executables, sharing  our software, more
+  settings, working with a local copy of TPB…). In the meanwhile, read
+
+  the [[file:tutorial.html][tutorial]] !
+
+* Resources
+
+  Don't miss these good resources:
+
+- http://lisp-lang.org/
+- https://github.com/CodyReichert/awesome-cl
+- https://lispcookbook.github.io/cl-cookbook/
+
+
+* Setting up a Common Lisp environment
+
+  The  easiest solution  of all  is to  try [[https://portacle.github.io/][Portacle]],  a portable  and
+  multiplatform   CL    environment   shipping:    Emacs25   (slightly
+  customized), SBCL, Quicklisp, Slime and Git.
+
+  Otherwise:
+
+: apt install sbcl
+
+   and install Quicklisp (two commands) and Slime for Emacs (in MELPA,
+   with  package.el) or  try  Atom-slime  or Vim package.  See the  good
+   resources.
