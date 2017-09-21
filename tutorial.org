@@ -115,6 +115,8 @@ not a list (we  can see that with =#()= that denotes  a vector), so we
 can not use =first= but have to use =(aref <vector> 0)= instead, or we
 have to =coerce= the result to a list.
 
+(see the [[https://lispcookbook.github.io/cl-cookbook/data-structures.html][Cookbook's Data Structures page]]).
+
 Personnally  I find  this stupid  and frustrating,  particularly being
 used in Python  to access lots of data structures  in the same manner.
 If    you    feel    like    fixing   this,    have    a    look    at
@@ -362,18 +364,19 @@ and voilà. We put this at the beginning of our search function and we get:
          (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
          (req (dex:get *search-url*))
          (html (plump:parse req))
-         (res (lquery:$ html *selectors* (text))))
-    res))
+         (res (lquery:$ html *selectors* (text)))
+         (res-list (coerce res 'list))))
+
+    res-list))
 #+END_SRC
+
+In the end we prefer to return a list, rather than a vector.
 
 Let's try:
 
 #+BEGIN_SRC lisp
 (torrents "matrix trilogy")
-#("
-Title
-"
-  "Matrix FRENCH DVDRIP 1999 COOLUpload Date: 05.06.15 Size: 700,30 MB"
+#("Matrix FRENCH DVDRIP 1999 COOLUpload Date: 05.06.15 Size: 700,30 MB"
   "The Matrix Reloaded (2003) FullHD, Dual Audio: English + SpaUpload Date: 12.04.15 Size: 8,51 GB"
   "The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 DuUpload Date: 12.02.15 Size: 12,86 GB"
   "The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3Upload Date: 15.09.15 Size: 23,29 GB"
@@ -391,6 +394,113 @@ was very easy, except one or two gotchas :)
 
 Of course, we need  to get more stuff out of  this, like the torrent's
 magnet link.
+
+** Formatting output
+
+   Our  =torrents= function  prints  out intelligable  output, but  we
+   don't control  it yet. We want  to iterate over the  search results
+   and print exactly what we want.
+
+   So first  we need to  extract the title,  with the CSS  selector we
+   found at the beginning.
+
+#+BEGIN_SRC lisp
+(defun result-title (node)
+  "Return the title of a search result."
+  (aref
+   (lquery:$ node ".Title a" (text))
+   0))
+#+END_SRC
+
+    When we iterate over the result list:
+
+#+BEGIN_SRC lisp
+(defun display-results (&optional (results *last-search*) (stream t))
+  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,..."
+  (mapcar (lambda (it)
+            ;; do not rely on *last-search*.
+            (format stream "~a~%" (result-title it)))
+          results)
+  t)
+#+END_SRC
+
+    it prints something like:
+
+#+BEGIN_SRC text
+Matrix FRENCH DVDRIP 1999 COOL
+The Matrix Reloaded (2003) FullHD, Dual Audio: English + Spa
+The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 Du
+The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3
+The Matrix Trilogy (1999-2003) BDRip 1080p Dual Audio [ Hind
+Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
+...
+#+END_SRC
+
+    What we have in  mind is to print the index of  the result next to
+    it, and for convenience to print the first result last, so that it
+    stays to the bottom and it's easier to see from the prompt.
+
+    We have  a quick look at  the [[https://lispcookbook.github.io/cl-cookbook/strings.html#string-formatting][Cookbook for string  formatting]] (the
+    simplest directive is =~a=, for aesthetics, and justifying text on
+    the left is with =~@a=). =~%= is the newline.
+
+#+BEGIN_SRC lisp
+(defun display-results (&optional (results *last-search*) (stream t))
+  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,..."
+  (mapcar (lambda (it)
+            (format stream "~3@a: ~65a ~%"
+                    (position it *last-search*) ;; <-- find the position of the result in the list
+                    (result-title it)))  ;; <-- we reverse the list
+          (reverse results))
+
+          t)
+#+END_SRC
+
+Here we use another global  variable that we introduced eventually. In
+the end of  our =torrents= function, we add this:
+
+#+BEGIN_SRC lisp
+    (setf *last-search* res-list)
+#+END_SRC
+
+so that our search results are saved in this variable which we define:
+
+#+BEGIN_SRC
+(defvar *last-search* nil
+    "Remembering the last search (should be an hash-map).")
+#+END_SRC
+
+and we can easily access this result list elsewhere.
+
+
+So, we get this formatting:
+
+#+BEGIN_SRC text
+198: Arturia - Matrix-12 V v1.1.0.522 OS X [PitcHsHiFTeR][dada]
+197: Arturia - Matrix-12 V v1 1 0 522 R2 AU AAX VST VST3 ST OS X
+196: Native Instruments - Maschine Expansion Golden Kingdom HYBRI
+195: Arturia - Matrix 12-V v1.0.1.9 OS X [HEXWARS][dada]
+194: PPPD-374 Ikuchichi Beauty Salon That Just Busty Beauty Is In
+193: THE MATRIX TRILOGY: Complete Collection - DVDRip
+...
+ 10: Matrix Reloaded (2003)Blu-Ray 720p Dublado PT-BR - mo93438
+  9: Matrix Revolutions (2003)Blu-Ray 720p Dublado PT-BR - mo9343
+  8: Die Matrix Trilogie - 1 bis 3 - KOMPLETT
+  7: The Matrix Reloaded (2003) BRRip [Dual Audio] [Hindi+Eng] 50
+  6: The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]
+  5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
+  4: The Matrix Trilogy (1999-2003) BDRip 1080p Dual Audio [ Hind
+  3: The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3
+  2: The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 Du
+  1: The Matrix Reloaded (2003) FullHD, Dual Audio: English + Spa
+  0: Matrix FRENCH DVDRIP 1999 COOL
+T
+#+END_SRC
+
+    The indexes are  aligned on 3 digits on the  right with =~3@a= and
+    titles are truncated at 65 characters,  nice :) It will be easy to
+    add more information on the right side (seeders, leechers).
+
 
 ** Getting more torrent information
 
@@ -413,26 +523,18 @@ node:
   </td>
 #+END_SRC
 
-and we want to get the href with the torrent's url.
+We want to get  the torrent's page, the url in  the firts =href=. From
+this page we'll be able to access to the magnet link.
 
 We know how to access the =a=:
 
 #+BEGIN_SRC lisp
-(defparameter *elt* (second res))
+(defparameter *elt* (first res))
 (lquery:$ *elt* "a" (text))
 ;; => #("Matrix FRENCH DVDRIP 1999 COOL")
 #+END_SRC
 
 it returns a plump node.
-
-Let's try getting the href:
-
-#+BEGIN_SRC lisp
-(lquery:$ *elt* "a[href]" (text))
-;; => #("Matrix FRENCH DVDRIP 1999 COOL")
-#+END_SRC
-
-this still returns the plump node.
 
 With  the REPL  autocompletion and  then a  check at  the doc  we find
 =lquery-funcs:attr= to extract attributes:
@@ -442,16 +544,7 @@ With  the REPL  autocompletion and  then a  check at  the doc  we find
 ;; => #("https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/")
 #+END_SRC
 
-Ok.
-
-But watch out,  the =#(…)= denotes a vector. We  get its first element
-with
-
-#+BEGIN_SRC lisp
-(aref * 0)
-#+END_SRC
-
-(see the [[https://lispcookbook.github.io/cl-cookbook/data-structures.html][Cookbook's Data Structures page]]).
+Ok. But watch out again, the result is a vector (of one element).
 
 We put this in a function:
 
@@ -481,6 +574,8 @@ project and compile, =C-c C-c= in Slime):
 We have the torrent's details page, we  know how to request it, now we
 want to get the magnet link.
 
+We experiment, and get a /list/ of the links inside this page:
+
 #+BEGIN_SRC lisp
 (mapcar (lambda (it)
           (lquery-funcs:attr it "href"))
@@ -496,21 +591,25 @@ want to get the magnet link.
  "http://bitcoin.org" "bitcoin:1FX2wz8NiWPdtCGSrzn7j3NAg4VKqGovto" "/")
 #+END_SRC
 
-We  saw  what  I  consider  CL oddities  and  quirks  here,  for  sure
-frustrating stuff  for the  (impatient) beginner.  =mapcar=  expects a
-list and  lquery returns a vector,  so we had to  transform the result
-with =coerce=.  Also  the name =mapcar= is a bit  outated, even if the
-other map functions in the family  can be useful.  There is =map= that
-takes its output type has first  parameter: =(map 'list …)=. There are
-fixes.
+in the result, there's our magnet link.
 
-We could  use [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=, which works on  vectors too.
+We  saw what  I consider  CL  oddities and  quirks here,  than can  be
+frustrating for the (impatient) beginner.  =mapcar= expects a list and
+lquery  returns a  vector,  so we  had to  transform  the result  with
+=coerce=.  Also the name =mapcar= is  a bit outated, even if the other
+map functions in the family can  be useful.  There is =map= that takes
+its output type has first parameter: =(map 'list …)=.
+
+We could use  [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=, which works  on vectors too so  no need of
+the =coerce=.
 
 Still with cl21, we can write shorter lambdas, with the shorthand =lm=
-or with:
+or with the =^= reader  macro and accessing arguments with =%1=... =%n=
+or simply =%= for the first one:
 
 #+BEGIN_SRC lisp
-(map ^(lquery-funcs:attr % "href") …) ;; with more arguments, use %1, %2,…
+;; todo: (lquery:$ … (attr :href)) cf cookbook
+(map ^(lquery-funcs:attr % "href") …)
 #+END_SRC
 
 Cl21 defines and  rewrites a lot of stuff to  offer shorter and sanier
@@ -525,7 +624,7 @@ and, as it lacks docstrings and  direction, we can be surprised by the
 new implementation of some functions. No  need to say the community is
 divided on this subject.
 
-Filtering:
+We filter the list above to extract the magnet link:
 
 #+BEGIN_SRC lisp
 (remove-if-not (lambda (it)
@@ -542,6 +641,77 @@ T
 #+END_SRC
 
 and yet we must handle nils, differences of length,… so boring.
+
+We end up with  the following functions:
+
+
+#+BEGIN_SRC lisp
+(defun magnet-link-from (node)
+  "Extract the magnet link from a `torrent' result."
+  (let* ((url (detail-page-url node))
+         (html (request-details url))
+         (parsed (plump:parse html)))
+    (find-magnet-link parsed)))
+#+END_SRC
+
+
+- extract the magnet link from an  html (the page of a torrent's page)
+  parsed with plump.
+
+#+BEGIN_SRC lisp
+(defun find-magnet-link (parsed)
+  "Extract the magnet link. `parsed': plump:parse result."
+  (let* ((hrefs (mapcar (lambda (it)
+                          (lquery-funcs:attr it "href"))
+                        (coerce (lquery:$ parsed "a") 'list)))
+         (magnet (remove-if-not (lambda (it)
+                                  (str:starts-with? "magnet" it))
+                                hrefs)))
+    (first magnet)))
+#+END_SRC
+
+- this one gets  a plump node (from the search  results), extracts the
+  url of  the torrent's page and  calls our function above  to extract
+  the magnet link:
+
+#+BEGIN_SRC lisp
+(defun magnet-link-from (node)
+  "Extract the magnet link from a `torrent' result."
+  (let* ((url (detail-page-url node))
+         (html (dex:get url))
+         (parsed (plump:parse html)))
+    (find-magnet-link parsed)))
+#+END_SRC
+
+- finally we need an easy way to call the function above and give it a
+  reference to a search result.
+
+#+BEGIN_SRC lisp
+(defun magnet (index)
+  "Search the magnet from last search's `index''s result."
+  (magnet-link-from (elt *last-search* index)))
+#+END_SRC
+
+And we simply use it like so: given an output like
+
+#+BEGIN_SRC text
+...
+  5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
+  4: The Matrix Trilogy (1999-2003) BDRip 1080p Dual Audio [ Hind
+  3: The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3
+  2: The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 Du
+  1: The Matrix Reloaded (2003) FullHD, Dual Audio: English + Spa
+  0: Matrix FRENCH DVDRIP 1999 COOL
+T
+#+END_SRC
+
+    We request the magnet link with:
+
+#+BEGIN_SRC lisp
+CL-TORRENTS> (magnet 0)
+"magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
+#+END_SRC
+
 
 ** Exporting functions
 
@@ -562,7 +732,8 @@ We add it an =export= clause:
 #+BEGIN_SRC lisp
 (defpackage cl-torrents
   (:use :cl)
-  (:export :torrents))
+  (:export :torrents
+           :magnet))
 #+END_SRC
 
 We could also mark the functions to export with a decorator à-la Python,
@@ -804,6 +975,10 @@ We now want or need more:
   straightforward, there's  a library for  that and it's  one function
   change)
 - some cache
+- continuous integration,
+- regular testing against the website,
+- searching from a local Pirate Bay dump,
+- sharing this program (standalone executable ? Roswell ?),
 - some more functionnality (getting many magnet links at once)
 - a command line tool ?
 - …
