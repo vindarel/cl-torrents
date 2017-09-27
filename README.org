@@ -64,7 +64,7 @@ when there can be more than a hundred results).
 - some useful libraries,
 - unit tests, with mocks,
 - where to find documentation,
-- …
+- ...
 
   It  will  eventually  tackel  more  topics  and  features  (building
   executables,  sharing our  software, more  settings, working  with a
