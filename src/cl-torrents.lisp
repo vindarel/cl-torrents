@@ -14,7 +14,15 @@
 
 (defparameter *prefilter-selector* "tbody" "Call before we extract the search results.")
 
-(defvar *last-search* nil "Remembering the last search (should be an hash-map).")
+(defparameter *last-search* nil "Remembering the last search (should be an hash-map).")
+
+(defparameter *nb-results* 50 "Maximum number of search results to display.")
+
+(defun sublist (l start end)
+  "Select a sublist when end can be superior to the size of the list. Wrapper around subseq that fails with 'bouncing indices bad error'."
+  (subseq l start (if (> end (length l))
+                      (length l)
+                      end)))
 
 (defun request (url)
   "Wrapper around dex:get. Fetch an url."
@@ -53,7 +61,7 @@ index 0 => peers, index 1 => leechers."
   (result-peers-or-leechers node 1))
 
 (defun display-results (&optional (results *last-search*) (stream t))
-  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,..."
+  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; do not rely on *last-search*.
             (format stream "~3@a: ~65a ~3@a/~3@a~%"
@@ -61,7 +69,7 @@ index 0 => peers, index 1 => leechers."
                     (result-title it)
                     (result-peers it)
                     (result-leechers it)))
-          (reverse results))
+          (reverse (sublist results 0 *nb-results*)))
   t)
 
 (defun detail-page-url (node)

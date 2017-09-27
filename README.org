@@ -42,6 +42,13 @@ and load it:
   It could be more featureful. But our goal was to write a tutorial to
   show you diverse Common Lisp topics.
 
+** Settings
+
+Maximum number  of results  to print (50  by default  for convenience,
+when there can be more than a hundred results).
+
+: (setf *nb-results* 50)
+
 ** Tutorial
 
    Writing   a   little   web   scraper   like   this   one   is   not

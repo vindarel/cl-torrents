@@ -46,6 +46,14 @@
   (ok (with-output-to-string (out)
         (torrents "matrix" out)) "torrent search ok")
 
+  (is 6 ;; 5 + 1 newline
+      (length
+       (str:lines
+        (let ((cl-torrents::*nb-results* 5))
+          (with-output-to-string (out)
+            (torrents "matrix" out)))))
+      "set the max nb of displayed results.")
+
   (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
       "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
       :test #'equalp
@@ -55,8 +63,9 @@
 
   (ok (str:starts-with? "198: Arturia"
                         ;; don't display the large output during the test.
-                        (with-output-to-string (out)
-                          (cl-torrents::display-results cl-torrents::*last-search* out)))
+                        (let ((cl-torrents::*nb-results* 1000))
+                          (with-output-to-string (out)
+                            (cl-torrents::display-results cl-torrents::*last-search* out))))
       "Outputs results, reverse order.")
 
   (is 205
