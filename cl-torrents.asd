@@ -18,7 +18,8 @@
                :lquery)
   :components ((:module "src"
                 :components
-                ((:file "cl-torrents"))))
+                ((:file "cl-torrents")
+                 (:file "utils"))))
   :description ""
   :long-description
   #.(with-open-file (stream (merge-pathnames

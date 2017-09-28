@@ -18,12 +18,6 @@
 
 (defparameter *nb-results* 50 "Maximum number of search results to display.")
 
-(defun sublist (l start end)
-  "Select a sublist when end can be superior to the size of the list. Wrapper around subseq that fails with 'bouncing indices bad error'."
-  (subseq l start (if (> end (length l))
-                      (length l)
-                      end)))
-
 (defun request (url)
   "Wrapper around dex:get. Fetch an url."
   (dex:get url))
