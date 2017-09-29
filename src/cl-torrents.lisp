@@ -2,7 +2,8 @@
 (defpackage cl-torrents
   (:use :cl)
   (:export :torrents
-           :magnet))
+           :magnet
+           :main))
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
@@ -98,3 +99,6 @@ index 0 => peers, index 1 => leechers."
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
   (magnet-link-from (elt *last-search* index)))
+
+(defun main (&rest argv)
+  (torrents "matrix"))
