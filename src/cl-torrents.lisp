@@ -81,12 +81,25 @@ index 0 => peers, index 1 => leechers."
 (defun display-results (&optional (results *last-search*) (stream t))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
-            ;; do not rely on *last-search*.
-            (format stream "~3@a: ~65a ~3@a/~3@a~%"
+            ;; xxx: do not rely on *last-search*.
+            ;; I want to color the output.
+            ;; Adding color characters for the terminal augments the string length.
+            ;; We want a string padding for the title of 65 chars.
+            ;; We must add to the padding the length of the extra color markers,
+            ;; thus we must compute it and format the format string before printing the title.
+            (let* ((title (result-title it))
+                   (title-colored (colorize-all-keywords title))
+                   (title-padding (+ 65
+                                     (- (length title-colored)
+                                        (length title))))
+                   ;; ~~ prints a ~ so here ~~~aa with title-padding gives ~65a or ~75a.
+                   (format-string (format nil "~~3@a: ~~~aa ~~3@a/~~3@a~~%" title-padding)))
+
+              (format stream format-string
                     (position it *last-search*)
-                    (colorize-all-keywords (result-title it))
+                    title-colored
                     (result-peers it)
-                    (result-leechers it)))
+                    (result-leechers it))))
           (reverse (sublist results 0 *nb-results*)))
   t)
 
