@@ -32,6 +32,8 @@ and load it:
   0: Matrix FRENCH DVDRIP 1999 COOL
 #+END_SRC
 
+  For each result title, your keywords are colored in blue.
+
   Get a magnet link with:
 
 #+BEGIN_SRC lisp

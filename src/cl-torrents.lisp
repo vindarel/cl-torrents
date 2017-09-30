@@ -17,6 +17,8 @@
 
 (defparameter *last-search* nil "Remembering the last search (should be an hash-map).")
 
+(defparameter *keywords* '() "List of keywords given as input by the user.")
+
 (defparameter *nb-results* 50 "Maximum number of search results to display.")
 
 (defun request (url)
@@ -33,6 +35,7 @@
          (res (lquery:$ html *selectors*))
          (res-list (coerce res 'list)))
     (setf *last-search* res-list)
+    (setf *keywords* terms)
     (display-results res-list stream)))
 
 (defun result-title (node)
@@ -40,6 +43,27 @@
   (aref
    (lquery:$ node ".Title a" (text))
    0))
+
+(defun colorize-keyword-in-string (title keyword)
+  "Colorize the given keyword in the title.
+Keep the letters' possible mixed up or down case."
+  ;; It colorizes only the first occurence of the word.
+  (let ((start (search keyword (string-downcase title) :test #'equalp)))
+    (if (numberp start)
+      (let* ((end (+ start (length keyword)))
+             (sub (subseq title start end)) ;; that way we keep original case of each letter
+             (colored-sub (cl-ansi-text:blue sub)))
+        (str:replace-all sub colored-sub title))
+      title)))
+
+(defun colorize-all-keywords (title &key (keywords *keywords*))
+  "Colorize all the user's search keywords in the given title."
+  (let ((new title))
+    (loop for word in keywords
+       do (progn
+            (setf new (colorize-keyword-in-string new word))))
+    new)
+  )
 
 (defun result-peers-or-leechers (node index)
   "Return the number of peers (int) of a search result (node: a plump node).
@@ -60,7 +84,7 @@ index 0 => peers, index 1 => leechers."
             ;; do not rely on *last-search*.
             (format stream "~3@a: ~65a ~3@a/~3@a~%"
                     (position it *last-search*)
-                    (result-title it)
+                    (colorize-all-keywords (result-title it))
                     (result-peers it)
                     (result-leechers it)))
           (reverse (sublist results 0 *nb-results*)))

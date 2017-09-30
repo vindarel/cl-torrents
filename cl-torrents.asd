@@ -15,6 +15,7 @@
                :dexador
                :plump
                :mockingbird
+               :cl-ansi-text
                :lquery)
   :components ((:module "src"
                 :components
