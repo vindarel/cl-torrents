@@ -32,17 +32,26 @@ and load it:
   0: Matrix FRENCH DVDRIP 1999 COOL
 #+END_SRC
 
-  For each result title, your keywords are colored in blue.
+  To help finding the most  relevant results (the website sometimes is
+  a bit relaxed  with our search terms), each keyword  is printed in a
+  different color:
 
-  Get a magnet link with:
+#+BEGIN_EXPORT html
+<img src='img-colored-results.png', title='Colored results :)' </img>
+#+END_EXPORT
+
+
+  We get a magnet link with:
 
 #+BEGIN_SRC lisp
 (magnet 0)
 ;; "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
 #+END_SRC
 
-  It could be more featureful. But our goal was to write a tutorial to
-  show you diverse Common Lisp topics.
+  And voilà :)
+
+  We may add more features, eventually.  Our goal is rather to write a
+  tutorial to show you diverse Common Lisp topics.
 
 ** Settings
 

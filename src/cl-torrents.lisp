@@ -21,6 +21,18 @@
 
 (defparameter *nb-results* 50 "Maximum number of search results to display.")
 
+(defparameter *colors* '(
+                         cl-ansi-text:blue
+                         cl-ansi-text:green
+                         cl-ansi-text:yellow
+                         cl-ansi-text:cyan
+                         cl-ansi-text:magenta
+                         cl-ansi-text:red
+                         ))
+
+(defvar *keywords-colors* nil
+  "alist associating a keyword with a color. See `keyword-color-pairs'.")
+
 (defun request (url)
   "Wrapper around dex:get. Fetch an url."
   (dex:get url))
@@ -36,6 +48,7 @@
          (res-list (coerce res 'list)))
     (setf *last-search* res-list)
     (setf *keywords* terms)
+    (setf *keywords-colors* (keyword-color-pairs terms))
     (display-results res-list stream)))
 
 (defun result-title (node)
@@ -44,24 +57,47 @@
    (lquery:$ node ".Title a" (text))
    0))
 
-(defun colorize-keyword-in-string (title keyword)
+(defun colorize-keyword-in-string (title keyword color-f)
   "Colorize the given keyword in the title.
-Keep the letters' possible mixed up or down case."
+Keep the letters' possible mixed up or down case.
+`color-f': color function (cl-ansi-text)."
   ;; It colorizes only the first occurence of the word.
   (let ((start (search keyword (string-downcase title) :test #'equalp)))
     (if (numberp start)
       (let* ((end (+ start (length keyword)))
              (sub (subseq title start end)) ;; that way we keep original case of each letter
-             (colored-sub (cl-ansi-text:blue sub)))
+             (colored-sub (funcall color-f sub)))
         (str:replace-all sub colored-sub title))
       title)))
 
-(defun colorize-all-keywords (title &key (keywords *keywords*))
-  "Colorize all the user's search keywords in the given title."
+;; closure to loop over the list of available colors.
+(let ((index 0))
+  (defun next-color ()
+    "At each call, return the next color of the list -and start over. Uses *colors*."
+    (let* ((nb-colors (length *colors*))
+           (color (elt *colors* index)))
+      (incf index)
+      (if (>= index nb-colors)
+          (setf index 0))
+      color))
+
+  (defun reset-color ()
+    (setf index 0))
+  )
+
+(defun keyword-color-pairs (&optional (keywords *keywords*))
+  "Associate each keyword with a different color and return a list of pairs."
+  (mapcar (lambda (it)
+            `(,it . ,(NEXT-COLOR)))
+          keywords))
+
+(defun colorize-all-keywords (title kw-color)
+  "Colorize all the user's search keywords in the given title.
+`kw-color': list of pairs with a keyword and a color (function)."
   (let ((new title))
-    (loop for word in keywords
+    (loop for (word . color) in kw-color
        do (progn
-            (setf new (colorize-keyword-in-string new word))))
+            (setf new (colorize-keyword-in-string new word color))))
     new)
   )
 
@@ -88,7 +124,7 @@ index 0 => peers, index 1 => leechers."
             ;; We must add to the padding the length of the extra color markers,
             ;; thus we must compute it and format the format string before printing the title.
             (let* ((title (result-title it))
-                   (title-colored (colorize-all-keywords title))
+                   (title-colored (colorize-all-keywords title *keywords-colors*))
                    (title-padding (+ 65
                                      (- (length title-colored)
                                         (length title))))
