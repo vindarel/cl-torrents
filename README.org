@@ -36,9 +36,10 @@ and load it:
   a bit relaxed  with our search terms), each keyword  is printed in a
   different color:
 
-#+BEGIN_EXPORT html
-<img src='img-colored-results.png', title='Colored results :)' </img>
-#+END_EXPORT
+#+html: <p align="center"><img src="img-colored-results.png" /></p>
+
+  (you need  to enable ansi  colors in Slime,  see [[https://github.com/enriquefernandez/slime-repl-ansi-color][slime-repl-ansi-on]].
+  Disable this feature with =(setf cl-ansi-text:*enabled* nil)=)
 
 
   We get a magnet link with:
