@@ -26,6 +26,7 @@
   #.(with-open-file (stream (merge-pathnames
                              #p"README.org"
                              (or *load-pathname* *compile-file-pathname*))
+                            :external-format :utf-8
                             :if-does-not-exist nil
                             :direction :input)
       (when stream
