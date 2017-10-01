@@ -973,3 +973,303 @@ We now want or need more:
 - some more functionnality (getting many magnet links at once)
 - a command line tool ?
 - …
+
+* Moving functions into their own package
+
+  We have  written a  few helpers  functions to  treat with  colors of
+  keywords.  As we were trying out  things, we wrote those in our main
+  file.  But we'd  like them  to go  into their  own "utils"  file and
+  package.
+
+  (If you want to see the helper functions, go to the next section.)
+
+** Dealing with symbol conflicts. shadowing-import, uninterning.
+
+   We move them in a new =src/utils.lisp= file.
+
+   Our =utils.lisp=  file declares  a new  =cl-torrents.utils= package,
+   exporting what's needed:
+
+#+BEGIN_SRC lisp
+(in-package :cl-user)
+(defpackage cl-torrents.utils
+  (:use :cl)
+  (:export :sublist
+           :helper-function-one))
+
+(in-package :cl-torrents.utils)
+#+END_SRC
+
+  We add this file to the =.asd=:
+
+#+BEGIN_SRC lisp
+  :components ((:module "src"
+                :components
+                ((:file "utils")  ;; <= added
+                 (:file "cl-torrents"))))
+#+END_SRC
+
+  And on the other side  into =cl-torrents.lisp=, either we =:use= all
+  the =export='ed utilities:
+
+#+BEGIN_SRC lisp
+  (:use :cl
+        :cl-torrents.utils)
+#+END_SRC
+
+  either we import  explicitely what we need (and we'll  do that as it
+  is more explicit, although a bit redondant):
+
+#+BEGIN_SRC lisp
+(defpackage cl-torrents
+  (:use :cl)
+  (:import-from :cl-torrents.utils
+                :colorize-all-keywords
+                :keyword-color-pairs
+                :sublist)
+  …
+#+END_SRC
+
+  And then, as we =quickload=  cl-torrents with its new organization,
+  we get trapped trapped into the debugger:
+
+#+BEGIN_SRC text
+IMPORT CL-TORRENTS.UTILS::KEYWORD-COLOR-PAIRS causes
+name-conflicts in #<PACKAGE "CL-TORRENTS"> between the following
+symbols:
+  CL-TORRENTS.UTILS::KEYWORD-COLOR-PAIRS,
+  CL-TORRENTS::KEYWORD-COLOR-PAIRS
+   [Condition of type SB-EXT:NAME-CONFLICT]
+See also:
+  Common Lisp Hyperspec, 11.1.1.2.5 [:section]
+
+Restarts:
+ 0: [SHADOWING-IMPORT-IT] Shadowing-import CL-TORRENTS.UTILS::KEYWORD-COLOR-PAIRS, uninterning KEYWORD-COLOR-PAIRS.
+ 1: [DONT-IMPORT-IT] Don't import CL-TORRENTS.UTILS::KEYWORD-COLOR-PAIRS, keeping KEYWORD-COLOR-PAIRS.
+ 2: [RESOLVE-CONFLICT] Resolve conflict.
+ 3: [RETRY] Retry compiling #<CL-SOURCE-FILE "cl-torrents" "src" "cl-torrents">.
+ 4: [ACCEPT] Continue, treating compiling #<CL-SOURCE-FILE "cl-torrents" "src" "cl-torrents"> as having been successful.
+ 5: [RETRY] Retry ASDF operation.
+ […]
+#+END_SRC
+
+  Fortunately there's nothing to be afraid  of, it is pretty clear. We
+  have a name conflict between those two symbols:
+
+#+BEGIN_SRC text
+  CL-TORRENTS.UTILS::KEYWORD-COLOR-PAIRS,
+  CL-TORRENTS::KEYWORD-COLOR-PAIRS
+#+END_SRC
+
+- the first one being our new function into its new =cl-torrents.utils= package,
+- the  second being  the  old  one, that  was  into cl-torrents'  main
+  file. The function has been moved, but the symbol is still around !
+
+  We need  to give priority  to the new  symbol, and that's  just what
+  offers    the   first    restart    n° =0=,    to   "shadow    import
+  CL-TORRENTS.UTILS::KEYWORD-COLOR-PAIRS,                  uninterning
+  KEYWORD-COLOR-PAIRS.". "uninterning"  is getting rid of  the symbol,
+  shadowing-import is this  process to import a symbol  that hides one
+  already present.
+
+  We can press =0= and… we get  the same messages.  This time, for the
+  other function that was being called directly in our main lisp code.
+  We  don't get  this  debugger for  the "intermediate" functions  like
+  =next-color=, the ones that are called only by the two main ones.
+
+  It was quick for two warnings. Still,  we could use a way to see and
+  accept everything in a row.
+
+** The helper functions. Ansi colors. Closures. Looping over a plist.
+
+   This was fun  to do. Our goal  was to colorize each  keyword with a
+   different color, like so:
+
+#+html: <p align='center'><img src='img-colored-results.png' /></p>
+
+  This helps seeing the most  relevant results, because sometimes the
+  Pirate Bay  website (at  least this copy)  returns not  very related
+  results.
+
+  We have  the list of searched  keywords in =*keywords*=. We  want to
+  associate each one with a different color.
+
+  We use the  [[https://github.com/pnathan/cl-ansi-text][cl-ansi-text]] library, on Quicklisp. It  offers to either
+  colorize strings like this:
+
+#+BEGIN_SRC lisp
+(with-color (:red)
+    (princ "Gets printed red..."))
+#+END_SRC
+
+  where =:red= is a CL symbol, or with functions:
+
+#+BEGIN_SRC lisp
+(import 'cl-ansi-text:yellow)
+(yellow "Yellow string")
+#+END_SRC
+
+   we'll prefer this method as we are treating with text.
+
+   We are  dealing with ansi colors  in the terminal (either  Slime or
+   the terminal).  So what  this does  is adding  an extra  prefix and
+   suffix to our string:
+
+#+BEGIN_SRC lisp
+(yellow "yellow"
+;; "[33myellow[0m"
+#+END_SRC
+
+  We have to remember this.
+
+   We define the available colors into a variable:
+
+#+BEGIN_SRC lisp
+(defparameter *colors* '(
+                         cl-ansi-text:blue
+                         cl-ansi-text:green
+                         cl-ansi-text:yellow
+                         cl-ansi-text:cyan
+                         cl-ansi-text:magenta
+                         cl-ansi-text:red
+                         )
+  "Functions to colorize text.")
+#+END_SRC
+
+  There  are 6  of them.  Now we  want a  way to  give each  keyword a
+  different color. And if we have  more than 6 keywords, we cycle over
+  the list. We want  a function to cycle through a  list… but it would
+  not start at 0 everytime… that reminds me of closures !
+
+#+BEGIN_SRC lisp
+;; closure to loop over the list of available colors.
+(let ((index 0))
+  (defun next-color ()
+    "At each call, return the next color of the list -and start over. Uses *colors*."
+    (let* ((nb-colors (length *colors*))
+           (color (elt *colors* index)))
+      (incf index)
+      (if (>= index nb-colors)
+          (setf index 0))
+      color))
+
+  (defun reset-color ()
+    (setf index 0))
+  )
+#+END_SRC
+
+  The function =next-color=  uses the =index= that  is defined outside
+  of it  (and which is  still not global,  but internal to  this =let=
+  only). So every  time we call =next-color=, =index= is  where it had
+  been  left.  Cool  !  I'd  have  used a  class for  this in  another
+  language I guess.
+
+  We define a function to associate a color to a keyword:
+
+#+BEGIN_SRC lisp
+(defun keyword-color-pairs (&optional (keywords *keywords*))
+  "Associate each keyword with a different color and return a list of pairs."
+  (mapcar (lambda (it)
+            `(,it . ,(next-color)))
+          keywords))
+#+END_SRC
+
+  A good use of backquotes and comas.
+
+  We have a function to colorize  a keyword inside a given string with
+  a color:
+
+#+BEGIN_SRC lisp
+(defun colorize-keyword-in-string (title keyword color-f)
+  "Colorize the given keyword in the title.
+Keep the letters' possible mixed up or down case.
+`color-f': color function (cl-ansi-text)."
+  ;; It colorizes only the first occurence of the word.
+  ;;
+  ;; We begin by looking if the string contains our keyword. "search" returns the index.
+  (let ((start (search keyword (string-downcase title) :test #'equalp))) ;; case insensitive
+    (if (numberp start)
+      ;; if "start" is not nil, we get the position of the last letter of the keyword in the string.
+      (let* ((end (+ start (length keyword)))
+             ;; and we extract the substring.
+             ;; In doing so we keep the original case of each letter.
+             (sub (subseq title start end))
+             ;; We all our color function.
+             (colored-sub (funcall color-f sub)))
+        ;; We replace the substring with the colored substring, and return it.
+        (str:replace-all sub colored-sub title))
+      title)))
+#+END_SRC
+
+  And we do the same for all keywords. Looping over a plist is easy:
+
+: (loop for (word . color) in keywords-color
+:    do (...
+
+#+BEGIN_SRC lisp
+(defun colorize-all-keywords (title kw-color)
+  "Colorize all the user's search keywords in the given title.
+`kw-color': list of pairs with a keyword and a color (function)."
+  (let ((new title))
+    (loop for (word . color) in kw-color
+       do (progn
+            (setf new (colorize-keyword-in-string new word color))))
+    new)
+  )
+#+END_SRC
+
+  (anyone have a functional version, with =reduce= maybe ?)
+
+  Now we're happy, we run a search query again and… damn, everything's
+  is colorized but  the seeders and leechers are not  aligned any more
+  :( Indeed, we print our search results with a format string:
+
+: (format stream "~3@a: ~65a ~3@a/~3@a~%" index title-colored seeders leechers)
+
+  See the fixed 65 ? But  our colored titles have different sizes, due
+  to the ansi prefixes and suffixes :(
+
+** Formatting a format string
+
+   No big deal ! We have to  adapt this "65", by adding the difference
+   of length between the normal title and the colored one.
+
+#+BEGIN_SRC lisp
+            (let* ((title (result-title it))
+                   (title-colored (colorize-all-keywords title *keywords-colors*))
+                   (title-padding (+ 65
+                                     (- (length title-colored)
+                                        (length title))))
+#+END_SRC
+
+   But how  can we insert a  variable in lieu  of "65" ? If  we insert
+   another  =~a=,  it  will  print  the number  but  it  will  not  be
+   interpreted  as an  option of  the format  directive… we  will then
+   format the format string.
+
+   In the following, =~~= is the  directive to print a =~=, so =~~~aa=
+   with  the padding  as argument  will  render as  =~65a= (or  =~75a=
+   depending on the new length).
+
+#+BEGIN_SRC lisp
+(defun display-results (&optional (results *last-search*) (stream t))
+  "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
+  (mapcar (lambda (it)
+            (let* ((title (result-title it))
+                   (title-colored (colorize-all-keywords title *keywords-colors*))
+                   (title-padding (+ 65
+                                     (- (length title-colored)
+                                        (length title))))
+                   ;; ~~ prints a ~ so here ~~~aa with title-padding gives ~65a or ~75a.
+                   (format-string (format nil "~~3@a: ~~~aa ~~3@a/~~3@a~~%" title-padding)))
+
+              (format stream format-string
+                    (position it *last-search*)
+                    title-colored
+                    (result-peers it)
+                    (result-leechers it))))
+           (reverse (sublist results 0 *nb-results*)))
+  t)
+#+END_SRC
+
+To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a1965d61cd330d0b202b9659bf6963a4f8abb32/src/cl-torrents.lisp#L117][=display-results=]] on the repository.
