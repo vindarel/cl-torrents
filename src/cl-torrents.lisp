@@ -1,6 +1,7 @@
 (in-package :cl-user)
 (defpackage cl-torrents
-  (:use :cl)
+  (:use :cl
+        :cl-torrents.utils)
   (:export :torrents
            :magnet
            :main))
@@ -28,7 +29,8 @@
                          cl-ansi-text:cyan
                          cl-ansi-text:magenta
                          cl-ansi-text:red
-                         ))
+                         )
+  "Functions to colorize text.")
 
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")

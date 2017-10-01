@@ -1,9 +1,9 @@
 (in-package :cl-user)
-(defpackage cl-torrents
+(defpackage cl-torrents.utils
   (:use :cl)
   (:export :sublist))
 
-(in-package :cl-torrents)
+(in-package :cl-torrents.utils)
 
 
 (defun sublist (l start end)
