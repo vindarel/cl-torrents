@@ -953,6 +953,57 @@ we can see how it gets expanded like this:
 
 Easy :)
 
+*** make test
+
+    We must be  able to run tests  from the terminal for  at least two
+    reasons:
+ - given the moving  state of our Lisp image during  development it is
+   possible we get to a state that does not reflect the app at startup
+   (for  example,  given  that  a =defparameter=  symbol  doesn't  get
+   re-evaluated  with =C-c  C-c=, are  you not  tempted to  =setf= its
+   value for testing ?)
+ - Continuous Integration
+ - I find it handy (that's not a solid reason though).
+
+   We have a  look at Prove's page and  we see that we can  run a test
+   file with
+
+: (prove:run #P"myapp/tests/my-test.lisp")
+
+   Then we need to think about the  steps needed when we arrive into a
+   new SBCL repl.
+
+- we need to find our system definition.
+
+: (load #P"cl-torrents.asd")
+
+- we need  to make all its symbols and  dependencies available in the
+   image.
+
+: (ql:quickload "cl-torrents")  ;; given we have Quicklisp installed and started with SBCL.
+
+- run the test suite.
+
+- quit the REPL.
+
+   That gives this make target:
+
+#+BEGIN_SRC lisp
+test:
+	sbcl --load cl-torrents.asd \
+	     --eval '(ql:quickload :cl-torrents)' \
+	     --eval '(prove:run #P"t/cl-torrents.lisp")' \
+	     --eval '(quit)'
+#+END_SRC
+
+#+html: <p align='center'><img src='img-running-tests.png' /></p>
+
+We can also have a look at [[https://github.com/fukamachi/prove/blob/master/roswell/run-prove.ros][the run-prove Roswell utility]].
+
+Finally, Continuous Integration is well explained here:
+
+- [[http://lisp-lang.org/learn/continuous-integration][http://lisp-lang.org/learn/continuous-integration]]
+
 ** Conclusion
 
 This leads us to the end of part one.
@@ -1426,3 +1477,9 @@ Keep the letters' possible mixed up or down case.
 #+END_SRC
 
 To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a1965d61cd330d0b202b9659bf6963a4f8abb32/src/cl-torrents.lisp#L117][=display-results=]] on the repository.
+
+* Conclusion
+
+  That the end of our tutorial (for now ?).
+
+  You can comment on the repository: https://github.com/vindarel/cl-torrents
