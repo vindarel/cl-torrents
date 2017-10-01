@@ -19,14 +19,14 @@
 (plan nil)
 
 ;;
-;; These tests do network access: end-to-end tests.
+;; These tests do network access: end-to-end tests. To put in their own module.
 ;;
 
-(ok (torrents "matrix") "The search works without problems.")
+;; (ok (torrents "matrix") "The search works without problems.")
 
-(let ((results (torrents "matrix" nil)))
-  (ok (str:starts-with? "http" (detail-page-url (first results))) "Requesting details.")
-  )
+;; (let ((results (torrents "matrix" nil)))
+;;   (ok (str:starts-with? "http" (cl-torrents::detail-page-url (first results))) "Requesting details.")
+;;   )
 
 ;;
 ;; Unit tests.
@@ -57,7 +57,7 @@
   (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
       "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
       :test #'equalp
-      "details-page-url returns the right url.")
+      "detail-page-url returns the right url.")
 
   (ok (str:starts-with? "magnet" (magnet 0)) "magnet <i> returns the the magnet link from search result.")
 
@@ -97,6 +97,6 @@
     (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
         "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
         :test #'equalp
-        "details-page-url returns the right url."))
+        "detail-page-url returns the right url."))
 
 (finalize)
