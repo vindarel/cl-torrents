@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage cl-torrents
-  (:use :cl
-        :cl-torrents.utils)
+  (:use :cl)
+  (:import-from :cl-torrents.utils
+                :sublist)
   (:export :torrents
            :magnet
            :main))
