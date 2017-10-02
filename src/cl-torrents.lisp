@@ -2,6 +2,8 @@
 (defpackage cl-torrents
   (:use :cl)
   (:import-from :cl-torrents.utils
+                :colorize-all-keywords
+                :keyword-color-pairs
                 :sublist)
   (:export :torrents
            :magnet
@@ -22,16 +24,6 @@
 (defparameter *keywords* '() "List of keywords given as input by the user.")
 
 (defparameter *nb-results* 50 "Maximum number of search results to display.")
-
-(defparameter *colors* '(
-                         cl-ansi-text:blue
-                         cl-ansi-text:green
-                         cl-ansi-text:yellow
-                         cl-ansi-text:cyan
-                         cl-ansi-text:magenta
-                         cl-ansi-text:red
-                         )
-  "Functions to colorize text.")
 
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
@@ -63,50 +55,6 @@
   (aref
    (lquery:$ node ".Title a" (text))
    0))
-
-(defun colorize-keyword-in-string (title keyword color-f)
-  "Colorize the given keyword in the title.
-Keep the letters' possible mixed up or down case.
-`color-f': color function (cl-ansi-text)."
-  ;; It colorizes only the first occurence of the word.
-  (let ((start (search keyword (string-downcase title) :test #'equalp)))
-    (if (numberp start)
-      (let* ((end (+ start (length keyword)))
-             (sub (subseq title start end)) ;; that way we keep original case of each letter
-             (colored-sub (funcall color-f sub)))
-        (str:replace-all sub colored-sub title))
-      title)))
-
-;; closure to loop over the list of available colors.
-(let ((index 0))
-  (defun next-color ()
-    "At each call, return the next color of the list -and start over. Uses *colors*."
-    (let* ((nb-colors (length *colors*))
-           (color (elt *colors* index)))
-      (incf index)
-      (if (>= index nb-colors)
-          (setf index 0))
-      color))
-
-  (defun reset-color ()
-    (setf index 0))
-  )
-
-(defun keyword-color-pairs (&optional (keywords *keywords*))
-  "Associate each keyword with a different color and return a list of pairs."
-  (mapcar (lambda (it)
-            `(,it . ,(NEXT-COLOR)))
-          keywords))
-
-(defun colorize-all-keywords (title kw-color)
-  "Colorize all the user's search keywords in the given title.
-`kw-color': list of pairs with a keyword and a color (function)."
-  (let ((new title))
-    (loop for (word . color) in kw-color
-       do (progn
-            (setf new (colorize-keyword-in-string new word color))))
-    new)
-  )
 
 (defun result-peers-or-leechers (node index)
   "Return the number of peers (int) of a search result (node: a plump node).
@@ -148,6 +96,7 @@ index 0 => peers, index 1 => leechers."
 
 (defun detail-page-url (node)
   "Extract the link of the details page. `node': plump node, containing the url."
+  ;; ;TODO: see (lquery:$ … (attr :href)) cf cookbook
   (let* ((href-vector (lquery-funcs:attr (lquery:$ node "a") "href"))
          (href (aref href-vector 0)))
     href))
