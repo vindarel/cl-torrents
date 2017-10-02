@@ -42,7 +42,11 @@
 
 (defun torrents (words &optional (stream t))
   "Search torrents."
-  (let* ((terms (str:words words))
+  (let* ((terms (if (listp words)
+                    words
+                    ;; The main gives words as a list,
+                    ;; the user at the Slime REPL one string.
+                    (str:words words)))
          (query (str:join "+" terms))
          (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
          (req (request *search-url*))
@@ -174,7 +178,9 @@ index 0 => peers, index 1 => leechers."
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
+  ;; yeah, we could give more than one index at once.
   (magnet-link-from (elt *last-search* index)))
 
-(defun main (&rest argv)
-  (torrents "matrix"))
+(defun main ()
+  "Get command line arguments with SBCL."
+  (torrents (subseq sb-ext:*posix-argv* 1)))

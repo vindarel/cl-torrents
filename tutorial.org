@@ -1027,7 +1027,7 @@ We now want or need more:
 
 * Building self-contained executables
 
-** SBCL
+** SBCL. Command line arguments.
 
    So far  we used the  =torrents= command  in our Slime  REPL. That's
    fine and  well, but what if  we want to distribute  our software to
@@ -1052,16 +1052,42 @@ We now want or need more:
    [[http://www.sbcl.org/manual/index.html#Extensions][SBCL extensions]]  (many of them are  made implementation-portable in
    other libraries).
 
-   We  define a  dumb main  function.  It doesn't  parse command  line
-   arguments yet:
+   We  have  to  define  a  main function  that  accepts  keywords  as
+   arguments (we won't parse command line options just yet).
+
+   The [[https://lispcookbook.github.io/cl-cookbook/os.html#accessing-the-command-line-arguments][Cookbook]] has us covered  once again and, double coincidence, we
+   rely  on  SBCL's  =sb-ext=  to  access the  list  of  command  line
+   arguments with =sb-ext:*posix-argv*= (this  is not portable yet but
+   Roswell  fixes that,  follow  the  recipe). It  returns  a list  of
+   arguments,  the first  one being  the  name of  the executable,  as
+   usual.
+
+   That gives:
 
 #+BEGIN_SRC lisp
 (defun main ()
-  (torrents "matrix"))
+  "Get command line arguments with SBCL."
+  (torrents (subseq sb-ext:*posix-argv* 1)))
 #+END_SRC
 
-   A caveat  is that we  must run this  function in another  REPL than
-   Slime.
+   Here we give  a list to =torrents=  so you may want to  change it a
+   bit  to accept  both  lists and  a string  (from  the user  calling
+   directly =(torrents "foo bar")= in Slime):
+
+#+BEGIN_SRC lisp
+(defun torrents (words &optional (stream t))
+  "Search torrents."
+  (let* ((terms (if (listp words)
+                    words
+                    ;; The main gives words as a list,
+                    ;; the user at the Slime REPL one string.
+                    (str:words words)))
+#+END_SRC
+
+   Cool we have basic command line arguments !
+
+   Another thing to know about =save-lisp-and-die= is that we must run
+   this function in another REPL than Slime.
 
    So, let's launch an SBCL repl at our project root:
 
@@ -1350,8 +1376,8 @@ Restarts:
 (let ((index 0))
   (defun next-color ()
     "At each call, return the next color of the list -and start over. Uses *colors*."
-    (let* ((nb-colors (length *colors*))
-           (color (elt *colors* index)))
+    (let ((nb-colors (length *colors*))
+          (color (elt *colors* index)))
       (incf index)
       (if (>= index nb-colors)
           (setf index 0))
@@ -1425,7 +1451,7 @@ Keep the letters' possible mixed up or down case.
   (anyone have a functional version, with =reduce= maybe ?)
 
   Now we're happy, we run a search query again and… damn, everything's
-  is colorized but  the seeders and leechers are not  aligned any more
+  colorized but  the seeders and leechers are not  aligned any more
   :( Indeed, we print our search results with a format string:
 
 : (format stream "~3@a: ~65a ~3@a/~3@a~%" index title-colored seeders leechers)
