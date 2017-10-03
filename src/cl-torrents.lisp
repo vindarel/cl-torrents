@@ -33,7 +33,7 @@
   "Wrapper around dex:get. Fetch an url."
   (dex:get url))
 
-(defun torrents (words &optional (stream t))
+(defun torrents (words &key (stream t) (nb-results *nb-results*))
   "Search torrents."
   (let* ((terms (if (listp words)
                     words
@@ -49,7 +49,7 @@
     (setf *last-search* res-list)
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
-    (display-results res-list stream)))
+    (display-results :results res-list :stream stream :nb-results nb-results)))
 
 (defun result-title (node)
   "Return the title of a search result."
@@ -70,7 +70,7 @@ index 0 => peers, index 1 => leechers."
 (defun result-leechers (node)
   (result-peers-or-leechers node 1))
 
-(defun display-results (&optional (results *last-search*) (stream t))
+(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; xxx: do not rely on *last-search*.
@@ -92,7 +92,7 @@ index 0 => peers, index 1 => leechers."
                     title-colored
                     (result-peers it)
                     (result-leechers it))))
-          (reverse (sublist results 0 *nb-results*)))
+          (reverse (sublist results 0 nb-results)))
   t)
 
 (defun detail-page-url (node)
