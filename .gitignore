@@ -6,3 +6,5 @@
 *.x86f
 *~
 .#*
+
+t/assets/*html
