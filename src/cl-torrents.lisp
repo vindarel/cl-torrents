@@ -4,6 +4,7 @@
   (:import-from :cl-torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
+                :exit
                 :sublist)
   (:export :torrents
            :magnet
@@ -132,4 +133,36 @@ index 0 => peers, index 1 => leechers."
 
 (defun main ()
   "Get command line arguments with SBCL."
-  (torrents (subseq sb-ext:*posix-argv* 1)))
+
+  ;; Define the cli args.
+  (opts:define-opts
+    (:name :help
+     :description "print this help text"
+     :short #\h
+     :long "help")
+    (:name :verbose
+     :description "verbose output"
+     :short #\v
+     :long "verbose")
+    (:name :nb-results
+           :description "set the maximum number of results to print."
+           :short #\n
+           :long "nb"
+           :arg-parser #'parse-integer))
+
+  (multiple-value-bind (options free-args)
+      ;; opts:get-opts returns the list of options, as parsed,
+      ;; and the remaining free args as second value.
+      ;; There is no error handling yet (specially for options not having their argument).
+      (opts:get-opts)
+
+    (if (getf options :help)
+        (progn
+          (opts:describe
+           :prefix "CL-torrents. Usage:"
+           :args "[keywords]")
+          (exit)))
+    (if (getf options :nb-results)
+        (setf *nb-results* (getf options :nb-results)))
+
+    (torrents free-args)))

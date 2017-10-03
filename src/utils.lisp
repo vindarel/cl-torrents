@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage cl-torrents.utils
   (:use :cl)
-  (:export :sublist))
+  (:export :sublist
+           :exit))
 
 (in-package :cl-torrents.utils)
 
@@ -72,3 +73,15 @@ Keep the letters' possible mixed up or down case.
             (setf new (colorize-keyword-in-string new word color))))
     new)
   )
+
+(defun exit (&optional (status 0))
+  "Exit from Lisp. Return `status' (0 by default)."
+  ;; PRed upstream.
+  #+sbcl      (sb-ext:exit :code status)
+  #+cmu       (unix:unix-exit status)
+  #+ccl       (ccl:quit status)
+  #+ecl       (ext:quit status)
+  #+clisp     (ext:exit status)
+  #+abcl      (extensions:exit :status status)
+  #+allegro   (excl:exit status :quiet t)
+  #+lispworks (lispworks:quit :status status))

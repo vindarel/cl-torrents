@@ -16,6 +16,7 @@
                :plump
                :mockingbird
                :cl-ansi-text
+               :unix-opts ;; with alias opts
                :lquery)
   :components ((:module "src"
                 :components

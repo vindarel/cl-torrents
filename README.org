@@ -18,6 +18,11 @@ and load it:
 
 ** Usage
 
+   We can  use this little app  both in a  Lisp REPL (Slime) and  in a
+   terminal.
+
+*** Lisp REPL
+
    Search for torrents:
 
 #+BEGIN_SRC text
@@ -54,6 +59,22 @@ and load it:
   We may add more features, eventually.  Our goal is rather to write a
   tutorial to show you diverse Common Lisp topics.
 
+*** Command line
+
+#+BEGIN_SRC text
+$ torrents -h
+CL-torrents. Usage:
+
+Available options:
+  -h, --help               print this help text
+  -v, --verbose            verbose output
+  -n, --nb ARG             set the maximum number of results to print.
+#+END_SRC
+
+: $ torrents -n 1 matrix french 1999 cool
+
+#+html: <p align='center'><img src='img-cli.png' /></p>
+
 ** Settings
 
 Maximum number  of results  to print (50  by default  for convenience,
@@ -71,16 +92,16 @@ when there can be more than a hundred results).
 
 - web scraping,
 - trying out things at the REPL,
+- where to find documentation,
 - creating and loading a project,
 - basic data structures and gotchas,
 - some useful libraries,
-- unit tests, with mocks,
-- where to find documentation,
+- unit tests, with mocks, running tests from the shell,
+- creating executables, command line arguments,
 - ...
 
-  It  will  eventually  tackel  more  topics  and  features  (building
-  executables,  sharing our  software, more  settings, working  with a
-  local copy of TPB…) but in the meanwhile, read
+  It will eventually  tackle more topics and  features (more settings,
+  working with a local copy of TPB…) but in the meanwhile, read
 
   the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
 
