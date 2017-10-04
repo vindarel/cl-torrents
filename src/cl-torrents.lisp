@@ -132,7 +132,7 @@ index 0 => peers, index 1 => leechers."
   (magnet-link-from (elt *last-search* index)))
 
 (defun main ()
-  "Get command line arguments with SBCL."
+  "Parse command line arguments (portable way) and call the program."
 
   ;; Define the cli args.
   (opts:define-opts

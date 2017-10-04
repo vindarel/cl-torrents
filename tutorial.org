@@ -1027,7 +1027,7 @@ We now want or need more:
 
 * Building self-contained executables
 
-** SBCL. Command line arguments.
+** SBCL.
 
    So far  we used the  =torrents= command  in our Slime  REPL. That's
    fine and  well, but what if  we want to distribute  our software to
@@ -1084,7 +1084,8 @@ We now want or need more:
                     (str:words words)))
 #+END_SRC
 
-   Cool we have basic command line arguments !
+   Cool we  have basic command line  arguments ! We'll parse  them for
+   real shortly.
 
    Another thing to know about =save-lisp-and-die= is that we must run
    this function in another REPL than Slime.
@@ -1203,6 +1204,128 @@ though.
 # TODO !
 
 https://common-lisp.net/project/ecl/static/ecldoc/Extensions.html#Executable
+
+** Parsing command line arguments
+
+   We   saw   earlier   that    SBCL   stores   the   arguments   into
+   =sb-ext:*posix-argv*=.  The first  thing  is that  it differs  from
+   implementations, so we want a library to handle the differences for
+   us.
+
+   We also want to parse them.
+
+   A  quick  look  at  the [[https://github.com/CodyReichert/awesome-cl#scripting][awesome-cl#scripting]]  list  and  we'll  try
+   [[https://github.com/mrkkrp/unix-opts][unix-opts]].
+
+: (ql:quickload "unix-opts")
+
+   We can call it with its =opts= alias (nickname).
+
+   =unix-opts=    allows    to     declare    the    arguments    with
+   =opts:define-opts=:
+
+#+BEGIN_SRC lisp
+(opts:define-opts
+    (:name :help
+           :description "print this help text"
+           :short #\h
+           :long "help")
+    (:name :nb-results
+           :description "maximum number of results to print."
+           :short #\n
+           :long "nb"
+           :arg-parser #'parse-integer)
+    (:name :magnet
+           :description "get the magnet link of the given search result."
+           :short #\m
+           :long "magnet"
+           :arg-parser #'parse-integer))
+#+END_SRC
+
+   Here =:arg-parser= is a built-in CL function.
+
+   We  parse and  get  them with  =opts:get-opts=,  which returns  two
+   values: the first  is the list of valid options  and the second the
+   remaining free arguments. We then must use =multiple-value-bind= to
+   catch everything:
+
+#+BEGIN_SRC lisp
+  (multiple-value-bind (options free-args)
+      ;; opts:get-opts returns the list of options, as parsed,
+      ;; and the remaining free args as second value.
+      ;; There is no error handling yet (specially for options not having their argument).
+      (opts:get-opts)
+      ...
+#+END_SRC
+
+    We can  explore this by giving  a list of strings  (as options) to
+    =get-opts=:
+
+#+BEGIN_SRC lisp
+(multiple-value-bind (options free-args)
+                   (opts:get-opts '("hello" "-h" "-n" "1"))
+                 (format t "Options: ~a~&" options)
+                 (format t "free args: ~a~&" free-args))
+Options: (HELP T NB-RESULTS 1)
+free args: (hello)
+NIL
+#+END_SRC
+
+   If we  put an unknown option,  we get into the  debugger. We'll see
+   error handling later on.
+
+
+   So =options= is a [[https://lispcookbook.github.io/cl-cookbook/data-structures.html#plist][property list]],  i.e. a list that alternates a key
+   and a value. It helps me to see that it looks like this:
+
+#+BEGIN_SRC text
+[o|o]---[o|o]---[o|o]---[o|/]
+ |       |       |       |
+FOO     "foo"   BAR     "bar"
+#+END_SRC
+
+   We can use =getf=  and =setf= with plists, so that's  how we do our
+   logic. Below we print the help with =opts:describe= and then =exit=
+   (portable way).
+
+#+BEGIN_SRC lisp
+  (multiple-value-bind (options free-args)
+      ;; No error handling yet (for unknown options or one not having its argument).
+      (opts:get-opts)
+
+    (if (getf options :help)
+        (progn
+          (opts:describe
+           :prefix "CL-torrents. Usage:"
+           :args "[keywords]")
+          (exit))) ;; <= exit takes an optional return status.
+    (if (getf options :nb-results)
+        (setf *nb-results* (getf options :nb-results)))
+
+    (torrents free-args)
+
+    (if (getf options :magnet)
+        ;; if we had caching we wouldn't have to search for torrents first.
+        (progn
+          (format t "~a~&" (magnet (getf options :magnet)))
+          (exit))))
+#+END_SRC
+
+   The  example in  the unix-opts  repository suggests  a macro  to do
+   slightly better. And there is no error handling yet.
+
+   Here we are. We can build programs that run both in the REPL (well,
+   that's obvious) and in the terminal.
+
+   If you like this and want more shiny stuff:
+
+- [[https://github.com/mrkkrp/cl-ansi-term][cl-ansi-term]]  - print  colorized  text,  horizontal lines,  progress
+  bars, list,  tables,… [[https://github.com/mrkkrp/shtookovina][shtookovina]] by  the same author is  an example
+  command-line app that makes good use of it.
+- [[https://github.com/mrkkrp/cl-readline][cl-readine]] -  bindings to  the GNU Readline  library (Emacs  and Vim
+  input modes, history, basic expansion,…).
+- the Awesome-cl/scripting link above.
+
 
 * Moving functions into their own package
 
