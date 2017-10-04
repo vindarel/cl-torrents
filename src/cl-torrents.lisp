@@ -137,18 +137,20 @@ index 0 => peers, index 1 => leechers."
   ;; Define the cli args.
   (opts:define-opts
     (:name :help
-     :description "print this help text"
-     :short #\h
-     :long "help")
-    (:name :verbose
-     :description "verbose output"
-     :short #\v
-     :long "verbose")
+           :description "print this help text"
+           :short #\h
+           :long "help")
     (:name :nb-results
-           :description "set the maximum number of results to print."
+           :description "maximum number of results to print."
            :short #\n
            :long "nb"
+           :arg-parser #'parse-integer)
+    (:name :magnet
+           :description "get the magnet link of the given search result."
+           :short #\m
+           :long "magnet"
            :arg-parser #'parse-integer))
+
 
   (multiple-value-bind (options free-args)
       ;; opts:get-opts returns the list of options, as parsed,
@@ -165,4 +167,10 @@ index 0 => peers, index 1 => leechers."
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))
 
-    (torrents free-args)))
+    (torrents free-args)
+
+    (if (getf options :magnet)
+        ;; if we had caching we wouldn't have to search for torrents first.
+        (progn
+          (format t "~a~&" (magnet (getf options :magnet)))
+          (exit)))))

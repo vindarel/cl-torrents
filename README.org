@@ -54,6 +54,8 @@ and load it:
 ;; "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
 #+END_SRC
 
+  or the option =-m <index>=.
+
   And voilà :)
 
   We may add more features, eventually.  Our goal is rather to write a
