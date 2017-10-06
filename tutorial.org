@@ -1010,20 +1010,25 @@ This leads us to the end of part one.
 
 We now want or need more:
 
-- getting more content (seeders, leechers)
+- getting more content (seeders, leechers) (done in the app)
 - downloading the torrent file ?
-- error handling (network errors or timeout, unexpected errors)
-- scraping other sites, asynchronously  (the asynchronous part will be
+- *error handling* (network errors or timeout, unexpected errors)
+- scraping other sites, *asynchronously*  (the asynchronous part will be
   straightforward, there's  a library for  that and it's  one function
-  change)
-- some cache
-- continuous integration,
-- regular testing against the website,
-- searching from a local Pirate Bay dump,
-- sharing this program (standalone executable ? Roswell ?),
-- some more functionnality (getting many magnet links at once)
-- a command line tool ?
+  change.  See the [[https://lispcookbook.github.io/cl-cookbook/web-scraping.html#async-requests][Cookbook tutorial]].)
+- searching into a local Pirate Bay dump,
+- some *cache*
+- *continuous integration* (see the Cookbook),
+- regular testing  against the website (straightforward  and to couple
+  with the CI),
+- sharing this program: a *standalone executable* ? using Roswell ?,
+- a *command line tool*
 - …
+
+We'll  carry on  by building  a self-contained  executable, using  the
+advantages of  a couple Lisp  implementations, and in the  doing we'll
+parse command line arguments.
+
 
 * Building self-contained executables
 
@@ -1242,7 +1247,7 @@ https://common-lisp.net/project/ecl/static/ecldoc/Extensions.html#Executable
            :arg-parser #'parse-integer))
 #+END_SRC
 
-   Here =:arg-parser= is a built-in CL function.
+   Here =parse-integer= is a built-in CL function.
 
    We  parse and  get  them with  =opts:get-opts=,  which returns  two
    values: the first  is the list of valid options  and the second the
