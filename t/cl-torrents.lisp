@@ -44,14 +44,14 @@
                      (cl-torrents::request-details resultpage))
 
   (ok (with-output-to-string (out)
-        (torrents "matrix" out)) "torrent search ok")
+        (torrents "matrix" :stream out)) "torrent search ok")
 
   (is 6 ;; 5 + 1 newline
       (length
        (str:lines
         (let ((cl-torrents::*nb-results* 5))
           (with-output-to-string (out)
-            (torrents "matrix" out)))))
+            (torrents "matrix" :stream out)))))
       "set the max nb of displayed results.")
 
   (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
@@ -65,7 +65,7 @@
                         ;; don't display the large output during the test.
                         (let ((cl-torrents::*nb-results* 1000))
                           (with-output-to-string (out)
-                            (cl-torrents::display-results cl-torrents::*last-search* out))))
+                            (cl-torrents::display-results :results cl-torrents::*last-search* :stream out))))
       "Outputs results, reverse order.")
 
   (is 205
@@ -90,7 +90,7 @@
 ;; Now we can run tests one by one.
 (with-mocked-search-results
     (ok (with-output-to-string (out)
-          (torrents "foo" out))
+          (torrents "foo" :stream out))
         "search ok"))
 
 (with-mocked-search-results

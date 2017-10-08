@@ -1018,7 +1018,6 @@ We now want or need more:
   change.  See the [[https://lispcookbook.github.io/cl-cookbook/web-scraping.html#async-requests][Cookbook tutorial]].)
 - searching into a local Pirate Bay dump,
 - some *cache*
-- *continuous integration* (see the Cookbook),
 - regular testing  against the website (straightforward  and to couple
   with the CI),
 - sharing this program: a *standalone executable* ? using Roswell ?,
@@ -1026,8 +1025,8 @@ We now want or need more:
 - …
 
 We'll  carry on  by building  a self-contained  executable, using  the
-advantages of  a couple Lisp  implementations, and in the  doing we'll
-parse command line arguments.
+advantages of a  couple Lisp implementations and  parsing command line
+arguments.
 
 
 * Building self-contained executables
