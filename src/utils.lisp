@@ -22,6 +22,7 @@
 list. Wrapper around subseq that fails with 'bouncing indices bad
 error'."
   ;; PR to fix this in CL21.
+  ;; see substring coming in cl-str: https://github.com/vindarel/cl-str#substring-start-end-s---new-in-03
   (subseq l start (if (> end (length l))
                       (length l)
                       end)))
