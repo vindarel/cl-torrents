@@ -11,3 +11,9 @@ test:
 	     --eval '(ql:quickload :cl-torrents)' \
 	     --eval '(prove:run #P"t/cl-torrents.lisp")' \
 	     --eval '(quit)'
+
+test-end2end:
+	sbcl --load cl-torrents.asd \
+	     --eval '(ql:quickload :cl-torrents)' \
+	     --eval '(prove:run #P"t/end2end.lisp")' \
+	     --eval '(quit)'

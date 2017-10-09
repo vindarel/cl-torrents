@@ -19,16 +19,6 @@
 (plan nil)
 
 ;;
-;; These tests do network access: end-to-end tests. To put in their own module.
-;;
-
-;; (ok (torrents "matrix") "The search works without problems.")
-
-;; (let ((results (torrents "matrix" nil)))
-;;   (ok (str:starts-with? "http" (cl-torrents::detail-page-url (first results))) "Requesting details.")
-;;   )
-
-;;
 ;; Unit tests.
 ;;
 
