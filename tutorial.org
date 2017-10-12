@@ -1000,9 +1000,22 @@ test:
 
 We can also have a look at [[https://github.com/fukamachi/prove/blob/master/roswell/run-prove.ros][the run-prove Roswell utility]].
 
-Finally, Continuous Integration is well explained here:
+Continuous Integration is well explained here:
 
 - [[http://lisp-lang.org/learn/continuous-integration][http://lisp-lang.org/learn/continuous-integration]]
+
+
+We'll finish with  a note on Prove. It  is easy to use and  the doc is
+ok,  but  we  were  surprised  that the  tests  output  are  not  very
+informative (we don't have an example  right now though).  So we might
+as  well either  try [[https://github.com/fukamachi/rove][Fukamashi's  Rove]], "intended  to be  Prove's next
+major release",  either try [[https://github.com/Shinmera/parachute][Shinmera's Parachute]],  which we discovered
+only recently.   Parachute also  has includes basic  fixtures support,
+test suite dependencies, conditionals, time  limits (also in Prove ?),
+silent output, and interactive reports.
+
+On a positive note, kuddos to Mockingbird it was very helpful.
+
 
 ** Conclusion
 
