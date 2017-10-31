@@ -21,7 +21,8 @@
   :components ((:module "src"
                 :components
                 ((:file "utils")
-                 (:file "cl-torrents"))))
+                 (:file "cl-torrents")
+                 (:file "kat"))))
   :description ""
   :long-description
   #.(with-open-file (stream (merge-pathnames

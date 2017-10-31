@@ -3,7 +3,10 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 * cl-torrents
 
   This is a  little tool for the  lisp REPL or the  terminal to search
-  for torrents on the Pirate Bay (piratebay.to):
+  for torrents.
+
+  We currently scrape the  Pirate Bay ([[https://piratebay.to/][piratebay.to]])  and Kickass
+  Torrents ([[https://katcr.co][katcr.co]]).
 
 ** Installation
 
@@ -118,7 +121,7 @@ when there can be more than a hundred results).
   Don't miss these good resources:
 
 - http://lisp-lang.org/
-- [[https://github.com/CodyReichert/awesome-cl][awesome-cl]]
+- [[Https://github.com/CodyReichert/awesome-cl][Awesome-cl]]
 - [[https://lispcookbook.github.io/cl-cookbook/][the Common Lisp Cookbook]]
 - http://quickdocs.org/
 
