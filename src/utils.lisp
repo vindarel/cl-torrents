@@ -77,7 +77,7 @@ Keep the letters' possible mixed up or down case.
 
 (defun exit (&optional (status 0))
   "Exit from Lisp. Return `status' (0 by default)."
-  ;; PRed upstream.
+  ;; PRed upstream => merged, waiting for Quicklisp november update.
   #+sbcl      (sb-ext:exit :code status)
   #+cmu       (unix:unix-exit status)
   #+ccl       (ccl:quit status)
