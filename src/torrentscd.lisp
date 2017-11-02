@@ -1,6 +1,8 @@
 (in-package :cl-user)
 (defpackage torrentcd
   (:use :cl)
+  (:import-from :cl-torrents.utils
+                :join-for-query)
   (:import-from :alexandria
                 :flatten)
   )
@@ -45,7 +47,7 @@
 
 (defun torrents (words)
   "Return a list of alists with title, href, and seeders."
-  (let* ((query (build-query-from-entry words))
+  (let* ((query (join-for-query words))
          (req (request query))
          (parsed (parse req))
          (results (query parsed)))
@@ -55,7 +57,3 @@
                    (:seeders . ,(result-seeders node)))
                  )
          results)))
-
-(defun build-query-from-entry (entry)
-  "From a string (space-separated words), return a +-separated string."
-  (str:join "+" (str:words entry)))

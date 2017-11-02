@@ -4,6 +4,7 @@
   (:import-from :alexandria
                 :flatten)
   (:import-from :cl-torrents.utils
+                :join-for-query
                 :sublist)
   (:export :torrents)
   )
@@ -35,10 +36,6 @@
   ;; (break)
   (lquery:$ parsed *results-selector*))
 
-(defun build-query-from-entry (entry)
-  "From a string (space-separated words), return a +-separated string."
-  (str:join "+" (str:words entry)))
-
 (defun result-title (node)
   (elt (lquery:$ node ".cellMainLink" (text)) 0))
 
@@ -51,7 +48,7 @@
 
 (defun torrents (words)
   "Return a list of..."
-  (let* ((query (build-query-from-entry words))
+  (let* ((query (join-for-query words))
          (url (str:replace-all "{}" query *search-url*))
          (req (request url))
          (parsed (parse req))

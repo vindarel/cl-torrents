@@ -27,6 +27,10 @@ error'."
                       (length l)
                       end)))
 
+(defun join-for-query (entry)
+  "From a string (space-separated words), return a +-separated string."
+  (str:join "+" (str:words entry)))
+
 ;;;
 ;;; Colorize keywords in strings.
 ;;;
