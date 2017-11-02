@@ -22,6 +22,7 @@
                 :components
                 ((:file "utils")
                  (:file "cl-torrents")
+                 (:file "torrentscd")
                  (:file "kat"))))
   :description ""
   :long-description

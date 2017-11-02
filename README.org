@@ -5,8 +5,11 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
   This is a  little tool for the  lisp REPL or the  terminal to search
   for torrents.
 
-  We currently scrape the  Pirate Bay ([[https://piratebay.to/][piratebay.to]])  and Kickass
-  Torrents ([[https://katcr.co][katcr.co]]).
+  We currently scrape:
+
+- the  Pirate Bay ([[https://piratebay.to/][piratebay.to]])
+- Kickass Torrents ([[https://katcr.co][katcr.co]])
+- Torrent.cd ([[https://torrent.cd/][torrent.cd]]).
 
 ** Installation
 
