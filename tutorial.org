@@ -91,7 +91,9 @@ Let's try in the REPL:
 
 A little explanation for the =lquery=  line: the last =(text)= part is
 an lquery thing to get the text representation of the node, instead of
-a lquery internal object.
+a  lquery internal  object.  Likewise  we'll be  able  to call  =(attr
+:href)=  or  =(html)=, which  are  self-explanatory.  If you  want  CL
+symbols there, use =(inline (...))=.
 
 I  like to  check the  html content  of the  plump nodes.  We use  the
 =serialize= plump function (the second function from the doc ;) ):
