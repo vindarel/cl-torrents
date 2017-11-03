@@ -543,7 +543,7 @@ With  the REPL  autocompletion and  then a  check at  the doc  we find
 =lquery-funcs:attr= to extract attributes:
 
 #+BEGIN_SRC lisp
-(lquery-funcs:attr (lquery:$ *elt* "a") "href")
+(lquery:$ *elt* "a" (attr :href))
 ;; => #("https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/")
 #+END_SRC
 
@@ -554,9 +554,8 @@ We put this in a function:
 #+BEGIN_SRC lisp
 (defun detail-page-url (node)
   "Extract the link of the details page. `node': plump node, containing the url."
-  (let* ((href-vector (lquery-funcs:attr (lquery:$ node "a") "href"))
-         (href (aref href-vector 0)))
-    href))
+  (let ((href-vector (lquery:$ node "a" (attr :href))))
+     (aref href-vector 0)))
 #+END_SRC
 
 which we can test (either write it  at the REPL either write it in the
@@ -581,7 +580,7 @@ We experiment, and get a /list/ of the links inside this page:
 
 #+BEGIN_SRC lisp
 (mapcar (lambda (it)
-          (lquery-funcs:attr it "href"))
+          (lquery:$ it (attr  :href)))
         (coerce (lquery:$ * "a") 'list))
 ;; =>
 (NIL NIL NIL NIL NIL NIL NIL "https://piratebay.to/" "https://piratebay.to/"
@@ -611,8 +610,7 @@ or with the =^= reader  macro and accessing arguments with =%1=... =%n=
 or simply =%= for the first one:
 
 #+BEGIN_SRC lisp
-;; todo: (lquery:$ … (attr :href)) cf cookbook
-(map ^(lquery-funcs:attr % "href") …)
+(map ^(lquery:$ % (attr :href)) …)
 #+END_SRC
 
 We filter the list above to extract the magnet link:
