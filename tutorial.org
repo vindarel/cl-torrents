@@ -562,7 +562,7 @@ which we can test (either write it  at the REPL either write it in the
 project and compile, =C-c C-c= in Slime):
 
 #+BEGIN_SRC lisp
-(mapcar #'detail-page-url res)  ;; #' shorthand for function
+(mapcar #'detail-page-url res)  ;; #' is shorthand for function
 ;; =>
 ("https://piratebay.to/search/0/800/0/matrix/0/ATitle/1/"
  "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
@@ -597,20 +597,19 @@ in the result, there's our magnet link.
 
 We  saw what  I consider  CL  oddities and  quirks here,  than can  be
 frustrating for the (impatient) beginner.  =mapcar= expects a list and
-lquery  returns a  vector,  so we  had to  transform  the result  with
-=coerce=.  Also  the name =mapcar= is  unusual, even if the  other map
-functions in  the family can be  useful.  There is a  =map= that takes
-its output type has first parameter: =(map 'list …)=.
+lquery  returns a  vector. So either we  transform  the result to a list  with
+=coerce=, either we use =(map 'list  ...)=.  Also the name =mapcar= is
+unusual.
 
-We could use  [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=, which works  on vectors too so  no need of
-the =coerce=.
+We  could use  [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=,  which works  on vectors  too so  no more
+questions, it will work.
 
 Still with cl21, we can write shorter lambdas, with the shorthand =lm=
 or with the =^= reader  macro and accessing arguments with =%1=... =%n=
 or simply =%= for the first one:
 
 #+BEGIN_SRC lisp
-(map ^(lquery:$ % (attr :href)) …)
+(map ^(lquery:$ % (attr :href)) ...)
 #+END_SRC
 
 We filter the list above to extract the magnet link:
