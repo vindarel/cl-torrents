@@ -24,8 +24,9 @@
   "Wrapper around dex:get. Fetch an url."
   (dex:get url))
 
-(defun torrents (words)
+(defun torrents (words &key (stream t))
   "Search torrents."
+  (format stream "searching on the Pirate Bay…")
   (let* ((terms (if (listp words)
                     words
                     ;; The main gives words as a list,
@@ -35,13 +36,15 @@
          (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
          (req (request *search-url*))
          (html (plump:parse req))
-         (res (lquery:$ html *selectors*)))
-    (map 'list (lambda (node)
-                 `((:title . ,(result-title node))
-                   (:href . ,(result-href node))
-                   (:leechers . ,(result-leechers node))
-                   (:seeders . ,(result-peers node))))
-         res)))
+         (res (lquery:$ html *selectors*))
+         (toret (map 'list (lambda (node)
+                             `((:title . ,(result-title node))
+                               (:href . ,(result-href node))
+                               (:leechers . ,(result-leechers node))
+                               (:seeders . ,(result-peers node))))
+                     res)))
+    (format stream " found ~a results.~&" (length res))
+    toret))
 
 (defun result-title (node)
   "Return the title of a search result."
