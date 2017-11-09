@@ -21,6 +21,7 @@
   :components ((:module "src"
                 :components
                 ((:file "utils")
+                 (:file "tpb")
                  (:file "cl-torrents")
                  (:file "torrentscd")
                  (:file "kat"))))
