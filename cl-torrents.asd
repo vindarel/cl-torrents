@@ -11,12 +11,15 @@
   :version "0.1"
   :author ""
   :license ""
-  :depends-on (:str
+  :depends-on (
                :dexador
                :plump
+               :str
+               :lparallel
                :mockingbird
                :cl-ansi-text
                :unix-opts ;; with alias opts
+               :alexandria
                :lquery)
   :components ((:module "src"
                 :components

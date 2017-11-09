@@ -23,6 +23,8 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
+(setf lparallel:*kernel* (lparallel:make-kernel 2))
+
 (defun torrents (words &key (stream t) (nb-results *nb-results*))
   "Search on the different websites."
   (let ((terms (if (listp words)
@@ -36,6 +38,18 @@
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* res)
     (display-results :results res :stream stream :nb-results nb-results)))
+
+(defun async-torrents (words)
+  "Call the scrapers in parallel."
+  ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
+  (let* ((res (mapcan (lambda (fun)
+                        (lparallel:pfuncall fun words))
+                      '(tpb::torrents kat::torrents torrentcd::torrents)))
+         (sorted (sort res (lambda (a b)
+                             ;; maybe a quicker way, to just give the key ?
+                             (< (assoc-value a :seeders)
+                                (assoc-value b :seeders))))))
+    sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
