@@ -23,7 +23,7 @@
                 ((:file "utils")
                  (:file "tpb")
                  (:file "cl-torrents")
-                 (:file "torrentscd")
+                 (:file "torrentcd")
                  (:file "kat"))))
   :description ""
   :long-description
