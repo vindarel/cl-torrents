@@ -53,7 +53,7 @@
                    (format-string (format nil "~~3@a: ~~~aa ~~3@a/~~3@a~~%" title-padding)))
 
               (format stream format-string
-                    (position it *last-search*)
+                    (position it results)
                     title-colored
                     (assoc-value it :seeders)
                     (assoc-value it :leechers)
