@@ -44,7 +44,7 @@
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (let* ((res (mapcan (lambda (fun)
                         (lparallel:pfuncall fun words))
-                      '(tpb::torrents kat::torrents torrentcd::torrents)))
+                      '(tpb:torrents kat:torrents torrentcd:torrents)))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
                              (< (assoc-value a :seeders)
