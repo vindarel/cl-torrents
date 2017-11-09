@@ -23,14 +23,15 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
-(defun torrents (words &key (stream t) (nb-results *nb-results*))
-  "Search on the different websites."
+(defun torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
+  "Search on the different websites.
+- `log-stream': a stream for logging messages. Used to discard them in tests, where we only want to get the result of `display-results'."
   (let ((terms (if (listp words)
                    words
                    ;; The main function gives words as a list,
                    ;; the user at the REPL a string.
                    (str:words words)))
-        (res (tpb::torrents words)))
+        (res (tpb::torrents words :stream log-stream)))
         ;; (res (torrentcd::torrents words))) ;; next: async call and merge of the various scrapers.
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))

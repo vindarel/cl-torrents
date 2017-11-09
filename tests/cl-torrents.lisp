@@ -37,14 +37,14 @@
                      (cl-torrents::request-details resultpage))
 
   (ok (with-output-to-string (out)
-        (torrents "matrix" :stream out)) "torrent search ok")
+        (torrents "matrix" :stream out :log-stream nil)) "torrent search ok")
 
   (is 6 ;; 5 + 1 newline
       (length
        (str:lines
         (let ((cl-torrents::*nb-results* 5))
           (with-output-to-string (out)
-            (torrents "matrix" :stream out)))))
+            (torrents "matrix" :stream out :log-stream nil)))))
       "set the max nb of displayed results.")
 
   (is (assoc-value (elt cl-torrents::*last-search* 0) :href)
@@ -84,7 +84,7 @@
 ;; Now we can run tests one by one.
 (with-mocked-search-results
     (ok (with-output-to-string (out)
-          (torrents "foo" :stream out))
+          (torrents "foo" :stream out :log-stream nil))
         "search ok"))
 
 (with-mocked-search-results
