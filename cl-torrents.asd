@@ -25,9 +25,9 @@
                 :components
                 ((:file "utils")
                  (:file "tpb")
-                 (:file "cl-torrents")
                  (:file "torrentcd")
-                 (:file "kat"))))
+                 (:file "kat")
+                 (:file "cl-torrents"))))
   :description ""
   :long-description
   #.(with-open-file (stream (merge-pathnames
