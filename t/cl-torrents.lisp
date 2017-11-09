@@ -3,7 +3,10 @@
   (:use :cl
         :cl-torrents
         :mockingbird
-        :prove))
+        :prove)
+  (:import-from :alexandria
+                :assoc-value ;; get the val of an alist alone, not the (key val) couple.
+                ))
 (in-package :cl-torrents-test)
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :cl-torrents)' in your Lisp.
@@ -44,12 +47,13 @@
             (torrents "matrix" :stream out)))))
       "set the max nb of displayed results.")
 
-  (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
+  (is (assoc-value (elt cl-torrents::*last-search* 0) :href)
       "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
       :test #'equalp
-      "detail-page-url returns the right url.")
+      "we get the right href.")
 
-  (ok (str:starts-with? "magnet" (magnet 0)) "magnet <i> returns the the magnet link from search result.")
+  (ok (str:starts-with? "magnet" (magnet 0))
+      "magnet <i> returns the the magnet link from search result.")
 
   (ok (str:starts-with? "198: Arturia"
                         ;; don't display the large output during the test.
@@ -59,12 +63,12 @@
       "Outputs results, reverse order.")
 
   (is 205
-      (cl-torrents::result-peers (elt cl-torrents::*last-search* 0))
+      (assoc-value (elt cl-torrents::*last-search* 0) :seeders)
       :test #'equalp
       "nb of peers.")
 
   (is 7
-      (cl-torrents::result-leechers (elt cl-torrents::*last-search* 0))
+      (assoc-value (elt cl-torrents::*last-search* 0) :leechers)
       :test #'equalp
       "nb of leechers.")
 
@@ -84,7 +88,7 @@
         "search ok"))
 
 (with-mocked-search-results
-    (is (cl-torrents::detail-page-url (elt cl-torrents::*last-search* 0))
+    (is (assoc-value (elt cl-torrents::*last-search* 0) :href)
         "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
         :test #'equalp
         "detail-page-url returns the right url."))

@@ -18,12 +18,7 @@
 
 (defparameter *prefilter-selector* "tbody" "Call before we extract the search results.")
 
-(defparameter *last-search* nil "Remembering the last search (should be an hash-map).")
 
-(defparameter *keywords* '() "List of keywords given as input by the user.")
-
-(defvar *keywords-colors* nil
-  "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
 (defun request (url)
   "Wrapper around dex:get. Fetch an url."
@@ -44,6 +39,7 @@
     (map 'list (lambda (node)
                  `((:title . ,(result-title node))
                    (:href . ,(result-href node))
+                   (:leechers . ,(result-leechers node))
                    (:seeders . ,(result-peers node))))
          res)))
 
