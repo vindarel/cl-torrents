@@ -1,6 +1,8 @@
 (in-package :cl-user)
 (defpackage cl-torrents
   (:use :cl)
+  ;; see also Quickutil to import only the utility we need.
+  ;; http://quickutil.org/lists/
   (:import-from :alexandria
                 :assoc-value ;; get the val of an alist alone, not the (key val) couple.
                 :flatten)
