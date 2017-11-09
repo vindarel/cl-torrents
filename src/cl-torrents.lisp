@@ -23,8 +23,6 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
-(setf lparallel:*kernel* (lparallel:make-kernel 2))
-
 (defun torrents (words &key (stream t) (nb-results *nb-results*))
   "Search on the different websites."
   (let ((terms (if (listp words)
@@ -106,6 +104,10 @@
 
 (defun main ()
   "Parse command line arguments (portable way) and call the program."
+
+  ;; if not inside a function, can not build an executable (can not
+  ;; save core with multiple threads running).
+  (setf lparallel:*kernel* (lparallel:make-kernel 2))
 
   ;; Define the cli args.
   (opts:define-opts
