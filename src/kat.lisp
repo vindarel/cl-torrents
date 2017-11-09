@@ -44,7 +44,7 @@
 
 (defun result-seeders (node)
   ;; could be a better selector.
-  (elt (lquery:$ node ".ttable_col2" (text)) 1))
+  (parse-integer (elt (lquery:$ node ".ttable_col2" (text)) 1)))
 
 (defun torrents (words)
   "Return a list of..."
