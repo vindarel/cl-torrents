@@ -143,7 +143,15 @@
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))
 
-    (torrents free-args)
+
+    ;; This is the only way I found
+    ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
+    ;; trivial-signal didn't work (see issue #3)
+    (handler-case
+        (torrents free-args)
+      (sb-sys:interactive-interrupt () (progn
+                                         (format *error-output* "Aborting.~&")
+                                         (exit))))
 
     (if (getf options :magnet)
         ;; if we had caching we wouldn't have to search for torrents first.

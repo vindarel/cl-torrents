@@ -1221,6 +1221,8 @@ though.
 
 https://common-lisp.net/project/ecl/static/ecldoc/Extensions.html#Executable
 
+# https://stackoverflow.com/questions/46520876/building-an-executable-with-ecl-missing-dependency-or-can-not-find-make-build-i
+
 ** Parsing command line arguments
 
    We   saw   earlier   that    SBCL   stores   the   arguments   into
@@ -1342,6 +1344,12 @@ FOO     "foo"   BAR     "bar"
   input modes, history, basic expansion,…).
 - the Awesome-cl/scripting link above.
 
+** Final words
+
+   As said  before, we didn't do  error handling yet, and  this can be
+   annoying in the shell: on an  error, including an user's =C-c=,
+   we get a  stacktrace and we are dropped into  the Lisp debugger. We
+   fix this below.
 
 * Moving functions into their own package
 
@@ -1642,6 +1650,61 @@ Keep the letters' possible mixed up or down case.
 #+END_SRC
 
 To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a1965d61cd330d0b202b9659bf6963a4f8abb32/src/cl-torrents.lisp#L117][=display-results=]] on the repository.
+
+* Error handling
+** Catching a user's C-c termination signal
+
+   Let's try a =C-c= and read the stacktrace:
+
+#+BEGIN_EXPORT ascii
+$ ./torrents matrix
+^Csearching on the Pirate Bay…                                 <== C-c
+debugger invoked on a SB-SYS:INTERACTIVE-INTERRUPT in thread   <== condition name
+#<THREAD "main thread" RUNNING {1003156A03}>:
+  Interactive interrupt at #x7FFFF6C6C170.
+
+Type HELP for debugger help, or (SB-EXT:EXIT) to exit from SBCL.
+
+restarts (invokable by number or by possibly-abbreviated name):
+  0: [CONTINUE     ] Return from SB-UNIX:SIGINT.               <== it was a SIGINT indeed
+  1: [RETRY-REQUEST] Retry the same request.
+#+END_EXPORT
+
+   The  condition   signaled  is   named  after   our  implementation:
+   =sb-sys:interactive-interrupt=. We  just have to surround  our code
+   with a try/catch or rather, with =handler-case=:
+
+#+BEGIN_SRC lisp
+(handler-case
+    (torrents free-args)
+  (sb-sys:interactive-interrupt () (progn
+                                     (format *error-output* "Abort.~&")
+                                     (exit))))
+#+END_SRC
+
+    This code won't  work with ECL or another  implementation. We know
+    about [[https://github.com/guicho271828/trivial-signal/issues][trivial-signal]], but we were  not satisfied with our test (it
+    didn't work, see issue #3).
+
+    This will be good for now,  but in case we found portable examples
+    on other projects. We could something like (thanks [[https://github.com/fukamachi/clack/blob/master/src/clack.lisp#L36][Clack]]):
+
+#+BEGIN_SRC lisp
+(handler-case
+    <main>
+  (#+sbcl sb-sys:interactive-interrupt
+   #+ccl  ccl:interrupt-signal-condition
+   #+clisp system::simple-interrupt-condition
+   #+ecl ext:interactive-interrupt
+   #+allegro excl:interrupt-signal
+   ()
+   <exit>))
+#+END_SRC
+
+   here =#+=, you know, includes the line at compile time depending on
+   the  implementation.  There's  also =#-=.   Actually =#+=  looks at
+   symbols in the =*features*= list.  We can also combine symbols with
+   =and=, =or= and =not=.
 
 * Conclusion
 
