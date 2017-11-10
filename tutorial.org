@@ -1656,7 +1656,7 @@ To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a
 
    Let's try a =C-c= and read the stacktrace:
 
-#+BEGIN_EXPORT ascii
+#+BEGIN_SRC text
 $ ./torrents matrix
 ^Csearching on the Pirate Bay…                                 <== C-c
 debugger invoked on a SB-SYS:INTERACTIVE-INTERRUPT in thread   <== condition name
@@ -1668,9 +1668,9 @@ Type HELP for debugger help, or (SB-EXT:EXIT) to exit from SBCL.
 restarts (invokable by number or by possibly-abbreviated name):
   0: [CONTINUE     ] Return from SB-UNIX:SIGINT.               <== it was a SIGINT indeed
   1: [RETRY-REQUEST] Retry the same request.
-#+END_EXPORT
+#+END_SRC
 
-   The  condition   signaled  is   named  after   our  implementation:
+   The  signaled   condition  is   named  after   our  implementation:
    =sb-sys:interactive-interrupt=. We  just have to surround  our code
    with a try/catch or rather, with =handler-case=:
 
@@ -1687,7 +1687,7 @@ restarts (invokable by number or by possibly-abbreviated name):
     didn't work, see issue #3).
 
     This will be good for now,  but in case we found portable examples
-    on other projects. We could something like (thanks [[https://github.com/fukamachi/clack/blob/master/src/clack.lisp#L36][Clack]]):
+    on other projects. We could do something like this (thanks [[https://github.com/fukamachi/clack/blob/master/src/clack.lisp#L36][Clack]]):
 
 #+BEGIN_SRC lisp
 (handler-case
