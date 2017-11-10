@@ -1316,7 +1316,7 @@ FOO     "foo"   BAR     "bar"
           (opts:describe
            :prefix "CL-torrents. Usage:"
            :args "[keywords]")
-          (exit))) ;; <= exit takes an optional return status.
+          (opts:exit))) ;; <= exit takes an optional return status.
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))
 
@@ -1326,7 +1326,7 @@ FOO     "foo"   BAR     "bar"
         ;; if we had caching we wouldn't have to search for torrents first.
         (progn
           (format t "~a~&" (magnet (getf options :magnet)))
-          (exit))))
+          (opts:exit))))
 #+END_SRC
 
    The  example in  the unix-opts  repository suggests  a macro  to do
@@ -1679,7 +1679,7 @@ restarts (invokable by number or by possibly-abbreviated name):
     (torrents free-args)
   (sb-sys:interactive-interrupt () (progn
                                      (format *error-output* "Abort.~&")
-                                     (exit))))
+                                     (opts:exit))))
 #+END_SRC
 
     This code won't  work with ECL or another  implementation. We know
