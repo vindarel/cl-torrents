@@ -43,7 +43,9 @@
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (let* ((res (mapcan (lambda (fun)
                         (lparallel:pfuncall fun words))
-                      '(tpb:torrents kat:torrents torrentcd:torrents)))
+                      '(tpb:torrents
+                        kat:torrents
+                        torrentcd:torrents)))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
                              (< (assoc-value a :seeders)
@@ -76,26 +78,18 @@
           (reverse (sublist results 0 nb-results)))
   t)
 
-(defun find-magnet-link (parsed)
-  "Extract the magnet link. `parsed': plump:parse result."
-  (let* ((hrefs (mapcar (lambda (it)
-                          (lquery-funcs:attr it "href"))
-                        (coerce (lquery:$ parsed "a") 'list)))
-         (magnet (remove-if-not (lambda (it)
-                                  (str:starts-with? "magnet" it))
-                                hrefs)))
-    (first magnet)))
-
 (defun request-details (url)
   "Get the html page of the given url. Mocked in unit tests."
   (dex:get url))
 
 (defun magnet-link-from (alist)
   "Extract the magnet link from a `torrent' result."
-  (let* ((url (assoc-value alist :href))
-         (html (request-details url))
-         (parsed (plump:parse html)))
-    (find-magnet-link parsed)))
+  (if (equal (assoc-value alist :source) :tpb)
+      (let* ((url (assoc-value alist :href))
+             (html (request-details url))
+             (parsed (plump:parse html)))
+        (tpb:find-magnet-link parsed))
+      (format t "Got other source than TPB: ~a~&" (assoc-value alist :source))))
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."

@@ -651,9 +651,7 @@ We end up with  the following functions:
 #+BEGIN_SRC lisp
 (defun find-magnet-link (parsed)
   "Extract the magnet link. `parsed': plump:parse result."
-  (let* ((hrefs (mapcar (lambda (it)
-                          (lquery-funcs:attr it "href"))
-                        (coerce (lquery:$ parsed "a") 'list)))
+  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
          (magnet (remove-if-not (lambda (it)
                                   (str:starts-with? "magnet" it))
                                 hrefs)))

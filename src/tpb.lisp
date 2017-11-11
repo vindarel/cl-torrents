@@ -7,6 +7,7 @@
                 :exit
                 :sublist)
   (:export :torrents
+           :find-magnet-link
            :magnet))
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :tpb)
@@ -69,3 +70,12 @@ index 0 => peers, index 1 => leechers."
 
 (defun result-leechers (node)
   (result-peers-or-leechers node 1))
+
+(defun find-magnet-link (parsed)
+  "Extract the magnet link. `parsed': plump:parse result."
+  (format t "find-magnet-link tpb… ~a~&" parsed)
+  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
+         (magnet (remove-if-not (lambda (it)
+                                  (str:starts-with? "magnet" it))
+                                hrefs)))
+    (first magnet)))
