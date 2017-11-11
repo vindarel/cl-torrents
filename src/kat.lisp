@@ -6,7 +6,8 @@
   (:import-from :cl-torrents.utils
                 :join-for-query
                 :sublist)
-  (:export :torrents)
+  (:export :torrents
+           :find-magnet-link)
   )
 (in-package :kat)
 
@@ -17,6 +18,8 @@
 
 ;; ;TODO: include and print with the other results from TPB.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *base-url* "http://katcr.co")
 
 (defparameter *search-url* "https://katcr.co/new/search-torrents.php?search={}&sort=seeders&order=desc"
   "Base url for a search. Sorted by seeders")
@@ -65,10 +68,18 @@
                  ;;         (lquery:$ node ".cellMainLink" (attr :href)))
                  ;;   ))
                              `((:title . ,(result-title node))
-                               (:href . ,(result-href node))
+                               (:href . ,(str:concat *base-url* "/new/" (result-href node)))
                                (:seeders . ,(result-seeders node))
                                (:source . :kat))
                              )
                      results)))
     (format stream " found ~a results." (length toret))
     toret))
+
+(defun find-magnet-link (parsed)
+  "parsed: plump node."
+  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
+         (magnet (remove-if-not (lambda (it)
+                                  (str:starts-with? "magnet" it))
+                                hrefs)))
+    (first magnet)))

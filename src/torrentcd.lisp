@@ -5,7 +5,8 @@
                 :join-for-query)
   (:import-from :alexandria
                 :flatten)
-  (:export :torrents)
+  (:export :torrents
+           :find-magnet-link)
   )
 (in-package :torrentcd)
 
@@ -14,6 +15,8 @@
 
 (defparameter *search-url* "https://torrent.cd/torrents/search/"
   "Base url for a search. A POST request is necessary to get sorted results by seeds")
+
+(defparameter *base-url* "http://torrent.cd")
 
 (defun request (search &optional (url *search-url*))
 ()  "Request to torrent.cd. POST request in order to get results sorted by seeders."
@@ -55,10 +58,18 @@
          (results (query parsed))
          (toret (map 'list (lambda (node)
                              `((:title . ,(result-title node))
-                               (:href . ,(result-href node))
+                               (:href . ,(str:concat *base-url* (result-href node)))
                                (:seeders . ,(result-seeders node))
                                (:source . :torrentcd))
                              )
                      results)))
     (format stream " found ~a results." (length toret))
     toret))
+
+(defun find-magnet-link (parsed)
+  "parsed: plump node."
+  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
+         (magnet (remove-if-not (lambda (it)
+                                  (str:starts-with? "magnet" it))
+                                hrefs)))
+    (first magnet)))

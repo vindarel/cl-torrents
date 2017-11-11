@@ -84,12 +84,15 @@
 
 (defun magnet-link-from (alist)
   "Extract the magnet link from a `torrent' result."
-  (if (equal (assoc-value alist :source) :tpb)
-      (let* ((url (assoc-value alist :href))
-             (html (request-details url))
-             (parsed (plump:parse html)))
-        (tpb:find-magnet-link parsed))
-      (format t "Got other source than TPB: ~a~&" (assoc-value alist :source))))
+  (let* ((url (assoc-value alist :href))
+         (html (request-details url))
+         (parsed (plump:parse html))
+         (source (assoc-value alist :source)))
+    (case source
+      (:tpb (tpb:find-magnet-link parsed))
+      (:kat (kat:find-magnet-link parsed))
+      (:torrentcd (torrentcd:find-magnet-link parsed))
+      (t (format t "Got an unknown source: ~a~&" (assoc-value alist :source))))))
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
