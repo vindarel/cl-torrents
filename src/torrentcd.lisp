@@ -42,6 +42,7 @@
 
 (defun result-seeders (node)
   (parse-integer (elt (lquery:$ node "td" (text))
+                      4)))
                       5)))
 
 (defun result-title (node)
