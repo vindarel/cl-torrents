@@ -20,7 +20,7 @@
 
 (defparameter *base-url* "http://katcr.co")
 
-(defparameter *search-url* "https://katcr.co/new/search-torrents.php?search={}&sort=seeders&order=desc"
+(defparameter *search-url* "http://katcr.co/new/search-torrents.php?search={}&sort=seeders&order=desc"
   "Base url for a search. Sorted by seeders")
 
 (defparameter *results-selector* "" "CSS selector to get a list of items inside the search results.")
@@ -77,5 +77,5 @@
                                (:source . :kat))
                              )
                      results)))
-    (format stream " found ~a results." (length toret))
+    (format stream " found ~a results.~&" (length toret))
     toret))
