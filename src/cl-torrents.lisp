@@ -10,6 +10,7 @@
                 :colorize-all-keywords
                 :keyword-color-pairs
                 :exit
+                :find-magnet-link
                 :sublist)
   (:export :torrents
            :magnet
@@ -86,13 +87,8 @@
   "Extract the magnet link from a `torrent' result."
   (let* ((url (assoc-value alist :href))
          (html (request-details url))
-         (parsed (plump:parse html))
-         (source (assoc-value alist :source)))
-    (case source
-      (:tpb (tpb:find-magnet-link parsed))
-      (:kat (kat:find-magnet-link parsed))
-      (:torrentcd (torrentcd:find-magnet-link parsed))
-      (t (format t "Got an unknown source: ~a~&" (assoc-value alist :source))))))
+         (parsed (plump:parse html)))
+    (find-magnet-link parsed)))
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."

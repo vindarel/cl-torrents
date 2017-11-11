@@ -5,8 +5,7 @@
                 :join-for-query)
   (:import-from :alexandria
                 :flatten)
-  (:export :torrents
-           :find-magnet-link)
+  (:export :torrents)
   )
 (in-package :torrentcd)
 
@@ -65,11 +64,3 @@
                      results)))
     (format stream " found ~a results." (length toret))
     toret))
-
-(defun find-magnet-link (parsed)
-  "parsed: plump node."
-  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
-         (magnet (remove-if-not (lambda (it)
-                                  (str:starts-with? "magnet" it))
-                                hrefs)))
-    (first magnet)))

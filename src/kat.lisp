@@ -6,8 +6,7 @@
   (:import-from :cl-torrents.utils
                 :join-for-query
                 :sublist)
-  (:export :torrents
-           :find-magnet-link)
+  (:export :torrents)
   )
 (in-package :kat)
 
@@ -51,7 +50,6 @@
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
-  (format stream "searching on Kat…")
   (let* ((query (join-for-query words))
          (url (str:replace-all "{}" query *search-url*))
          (req (request url))
@@ -75,11 +73,3 @@
                      results)))
     (format stream " found ~a results." (length toret))
     toret))
-
-(defun find-magnet-link (parsed)
-  "parsed: plump node."
-  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
-         (magnet (remove-if-not (lambda (it)
-                                  (str:starts-with? "magnet" it))
-                                hrefs)))
-    (first magnet)))

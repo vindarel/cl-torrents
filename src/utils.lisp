@@ -2,6 +2,7 @@
 (defpackage cl-torrents.utils
   (:use :cl)
   (:export :sublist
+           :find-magnet-link
            :exit))
 
 (in-package :cl-torrents.utils)
@@ -16,6 +17,15 @@
                          )
   "Functions to colorize text.")
 
+
+(defun find-magnet-link (parsed)
+  "parsed: plump node."
+  ;; It works for tpb, torrentcd and kat.
+  (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
+         (magnet (remove-if-not (lambda (it)
+                                  (str:starts-with? "magnet" it))
+                                hrefs)))
+    (first magnet)))
 
 (defun sublist (l start end)
   "Select a sublist when end can be superior to the size of the
@@ -62,6 +72,8 @@ Keep the letters' possible mixed up or down case.
              (colored-sub (funcall color-f sub)))
         (str:replace-all sub colored-sub title))
       title)))
+
+(defparameter *keywords* '() "List of keywords given as input by the user.")
 
 (defun keyword-color-pairs (&optional (keywords *keywords*))
   "Associate each keyword with a different color and return a list of pairs."
