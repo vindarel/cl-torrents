@@ -3,9 +3,10 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 * cl-torrents
 
   This is a  little tool for the  lisp REPL or the  terminal to search
-  for torrents.
+  for torrents and get magnet links.
 
-  We currently scrape:
+  We  currently scrape  the following  sites and  present the  results
+  sorted by seeders:
 
 - the  Pirate Bay ([[https://piratebay.to/][piratebay.to]])
 - Kickass Torrents ([[https://katcr.co][katcr.co]])
@@ -13,7 +14,9 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 
 ** Installation
 
-   This  is not  distributed with  Quicklisp (yet?).  Clone this  repo
+   We may (and should) provide an executable.
+
+   This  is not  distributed with  Quicklisp (or Roswell) (yet?).  Clone this  repo
    where Quicklisp can find it:
 
 : git clone git@github.com:vindarel/cl-torrents.git ~/quicklisp/local-projects/
@@ -21,6 +24,7 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 and load it:
 
 : (ql:quickload "cl-torrents")
+
 
 ** Usage
 
@@ -67,6 +71,7 @@ and load it:
   We may add more features, eventually.  Our goal is rather to write a
   tutorial to show you diverse Common Lisp topics.
 
+
 *** Command line
 
 #+BEGIN_SRC text
@@ -100,6 +105,7 @@ when there can be more than a hundred results).
    stuff:
 
 - web scraping,
+- async web scraping,
 - trying out things at the REPL,
 - where to find documentation,
 - creating and loading a project,
@@ -113,6 +119,17 @@ when there can be more than a hundred results).
   working with a local copy of TPB…) but in the meanwhile, read
 
   the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
+
+** Ideas, todos
+
+- cache
+- local copy of TPB
+- more command line options (specially verbosity)
+- open an url
+- download the torrent file
+- generate a json
+- ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
+- self-contained web app,...
 
 ** Theme
 

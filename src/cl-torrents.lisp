@@ -33,24 +33,29 @@
                    ;; the user at the REPL a string.
                    (str:words words)))
         (res (tpb::torrents words :stream log-stream)))
-        ;; (res (torrentcd::torrents words))) ;; next: async call and merge of the various scrapers.
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* res)
     (display-results :results res :stream stream :nb-results nb-results)))
 
 (defun async-torrents (words)
-  "Call the scrapers in parallel."
+  "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
-  (let* ((res (mapcan (lambda (fun)
-                        (lparallel:pfuncall fun words))
+  (let* ((terms (if (listp words)
+                    words
+                    (str:words words)))
+         (res (mapcan (lambda (fun)
+                        (lparallel:pfuncall fun terms))
                       '(tpb:torrents
                         kat:torrents
                         torrentcd:torrents)))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
-                             (< (assoc-value a :seeders)
+                             (> (assoc-value a :seeders)
                                 (assoc-value b :seeders))))))
+    (setf *keywords* terms)
+    (setf *keywords-colors* (keyword-color-pairs terms))
+    (setf *last-search* sorted)
     sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*))
@@ -68,7 +73,7 @@
                                      (- (length title-colored)
                                         (length title))))
                    ;; ~~ prints a ~ so here ~~~aa with title-padding gives ~65a or ~75a.
-                   (format-string (format nil "~~3@a: ~~~aa ~~3@a/~~3@a ~~a~~%" title-padding)))
+                   (format-string (format nil "~~3@a: ~~~aa ~~4@a/~~4@a ~~a~~%" title-padding)))
 
               (format stream format-string
                     (position it results)
@@ -93,7 +98,6 @@
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
-  ;TODO: for all scrapers.
   ;; yeah, we could give more than one index at once.
   (magnet-link-from (elt *last-search* index)))
 
@@ -142,7 +146,7 @@
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
     ;; trivial-signal didn't work (see issue #3)
     (handler-case
-        (torrents free-args)
+        (display-results :results (async-torrents free-args) :nb-results *nb-results*)
       (sb-sys:interactive-interrupt () (progn
                                          (format *error-output* "Aborting.~&")
                                          (exit))))

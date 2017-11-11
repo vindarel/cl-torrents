@@ -55,7 +55,7 @@
 (defun torrents (words &key (stream t))
   "Return a list of alists with title, href, and seeders."
   (format stream "searching torrent.cd…")
-  (let* ((query (join-for-query words))
+  (let* ((query (str:join "+" words))
          (req (request query))
          (parsed (parse req))
          (results (query parsed))
@@ -67,5 +67,5 @@
                                (:source . :torrentcd))
                              )
                      results)))
-    (format stream " found ~a results." (length toret))
+    (format stream " found ~a results.~&" (length toret))
     toret))
