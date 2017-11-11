@@ -43,6 +43,9 @@
 (defun result-seeders (node)
   (parse-integer (elt (lquery:$ node "td" (text))
                       4)))
+
+(defun result-leechers (node)
+  (parse-integer (elt (lquery:$ node "td" (text))
                       5)))
 
 (defun result-title (node)
@@ -60,6 +63,7 @@
                              `((:title . ,(result-title node))
                                (:href . ,(str:concat *base-url* (result-href node)))
                                (:seeders . ,(result-seeders node))
+                               (:leechers . ,(result-leechers node))
                                (:source . :torrentcd))
                              )
                      results)))
