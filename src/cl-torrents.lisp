@@ -68,13 +68,14 @@
                                      (- (length title-colored)
                                         (length title))))
                    ;; ~~ prints a ~ so here ~~~aa with title-padding gives ~65a or ~75a.
-                   (format-string (format nil "~~3@a: ~~~aa ~~3@a/~~3@a~~%" title-padding)))
+                   (format-string (format nil "~~3@a: ~~~aa ~~3@a/~~3@a ~~a~~%" title-padding)))
 
               (format stream format-string
                     (position it results)
                     title-colored
                     (assoc-value it :seeders)
                     (assoc-value it :leechers)
+                    (assoc-value it :source)
                     )))
           (reverse (sublist results 0 nb-results)))
   t)
