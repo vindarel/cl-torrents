@@ -1,6 +1,7 @@
 (in-package :cl-user)
 (defpackage cl-torrents
-  (:use :cl)
+  (:use :cl
+        :clache)
   ;; see also Quickutil to import only the utility we need.
   ;; http://quickutil.org/lists/
   (:import-from :alexandria
@@ -24,18 +25,39 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
+(defparameter *store* (progn
+                        (ensure-directories-exist #p"cache/")
+                        (make-instance 'file-store :directory #p"cache/"))
+  "Cache for results. The directory must exist.")
+
+(defun save-results (terms val store)
+  "Save results in cache."
+  (format t "Saving results for ~a.~&" terms)
+  (setcache terms val store))
+
+(defun get-cached-results (terms store)
+  (when (getcache terms store)
+    (progn
+      (format t "Got cached results for ~a.~&" terms)
+      (getcache terms store))))
+
+
 (defun torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
   "Search on the different websites.
 - `log-stream': a stream for logging messages. Used to discard them in tests, where we only want to get the result of `display-results'."
-  (let ((terms (if (listp words)
+  (let* ((terms (if (listp words)
                    words
                    ;; The main function gives words as a list,
                    ;; the user at the REPL a string.
                    (str:words words)))
-        (res (tpb::torrents words :stream log-stream)))
+        (joined (str:join "+" terms))
+        (res (if (get-cached-results joined *store*)
+                 (getcache joined *store*)
+                 (tpb::torrents words :stream log-stream))))
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* res)
+    (save-results terms res *store*)
     (display-results :results res :stream stream :nb-results nb-results)))
 
 (defun async-torrents (words)
@@ -44,11 +66,15 @@
   (let* ((terms (if (listp words)
                     words
                     (str:words words)))
-         (res (mapcan (lambda (fun)
-                        (lparallel:pfuncall fun terms))
-                      '(tpb:torrents
-                        kat:torrents
-                        torrentcd:torrents)))
+         (joined-terms (str:join "+" terms))
+         (res (if (get-cached-results joined-terms *store*)
+                  ;; the cache is mixed with "torrents" and "async-torrents": ok.
+                  (getcache joined-terms *store*)
+                  (mapcan (lambda (fun)
+                            (lparallel:pfuncall fun terms))
+                          '(tpb:torrents
+                            kat:torrents
+                            torrentcd:torrents))))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
                              (> (assoc-value a :seeders)

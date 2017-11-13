@@ -89,6 +89,8 @@ Available options:
 
 #+html: <p align='center'><img src='img-cli.png' /></p>
 
+Results are cached.
+
 ** Settings
 
 Maximum number  of results  to print (50  by default  for convenience,
@@ -122,7 +124,7 @@ when there can be more than a hundred results).
 
 ** Ideas, todos
 
-- cache
+- [X] cache (on files) v0.3
 - local copy of TPB
 - more command line options (specially verbosity)
 - open an url

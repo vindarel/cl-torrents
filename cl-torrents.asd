@@ -20,6 +20,7 @@
                :cl-ansi-text
                :unix-opts ;; with alias opts
                :alexandria
+               :clache
                :lquery)
   :components ((:module "src"
                 :components

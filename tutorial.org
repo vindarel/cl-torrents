@@ -1648,7 +1648,6 @@ Keep the letters' possible mixed up or down case.
 #+END_SRC
 
 To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a1965d61cd330d0b202b9659bf6963a4f8abb32/src/cl-torrents.lisp#L117][=display-results=]] on the repository.
-
 * Error handling
 ** Catching a user's C-c termination signal
 
@@ -1703,6 +1702,58 @@ restarts (invokable by number or by possibly-abbreviated name):
    the  implementation.  There's  also =#-=.   Actually =#+=  looks at
    symbols in the =*features*= list.  We can also combine symbols with
    =and=, =or= and =not=.
+
+* More features
+** Cache
+
+   We'd like  a cache system.  This was quick  and easy with the
+   [[https://github.com/html/clache/][Clache]] library.
+
+   We instantiate a  cache on the file system (a  file per item saved,
+   not on a DB):
+
+#+BEGIN_SRC lisp
+(defparameter *store* (progn
+                        (ensure-directories-exist #p"cache/")
+                        (make-instance 'file-store :directory #p"cache/"))
+  "Cache for results. The directory must exist.")
+#+END_SRC
+
+   this FS  storage is provided by  [[https://github.com/skypher/cl-store][cl-store]]. We could also  create an
+   in-memory cache, suitable for memoization.
+
+   Saving  something in  the  cache  and retrieving  it  is made  with
+   =(setcache key val store)= and =getcache key store=. We just create
+   wrapper  functions, to  print  a little  confirmation message,  and
+   because we might want to mock them in unit tests:
+
+#+BEGIN_SRC lisp
+(defun save-results (terms val store)
+  "Save results in cache."
+  (format t "Saving results for ~a.~&" terms)
+  (setcache terms val store))
+
+(defun get-cached-results (terms store)
+  (when (getcache terms store)
+    (progn
+      (format t "Got cached results for ~a.~&" terms)
+      (getcache terms store))))
+#+END_SRC
+
+   and we use it like this:
+
+#+BEGIN_SRC lisp
+;; in the middle of `torrents'.
+(if (get-cached-results joined *store*)
+                 (getcache joined *store*)
+                 (tpb::torrents words :stream log-stream))
+#+END_SRC
+
+    We re-build the project (=make build=), search for matrix once (we
+    wait a bit) and a second time: we hit the cache.
+
+    Quick and easy, tell me if I missed something !
+
 
 * Conclusion
 
