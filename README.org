@@ -1,5 +1,7 @@
 TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
 
+[[https://gitlab.com/vindarel/cl-torrents][file:https://gitlab.com/vindarel/cl-torrents/badges/master/pipeline.svg]]
+
 * cl-torrents
 
   This is a  little tool for the  lisp REPL or the  terminal to search
@@ -125,6 +127,7 @@ when there can be more than a hundred results).
 ** Ideas, todos
 
 - [X] cache (on files) v0.3
+- [X] CI
 - local copy of TPB
 - more command line options (specially verbosity)
 - open an url
