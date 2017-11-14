@@ -8,3 +8,6 @@ before_script:
 test:
   script:
     - make test
+  artifacts:
+    paths:
+      - torrents
