@@ -737,7 +737,7 @@ which  is quite  elegant and  can be  handy. This  is doable  with the
 [[https://github.com/m2ym/cl-annot][cl-annot]] library. It also requires a small Slime configuration.
 
 
-** Tests
+** Tests and CI
 
 We wouldn't be called a developper if we didn't write any test.
 
@@ -1013,6 +1013,76 @@ silent output, and interactive reports.
 
 On a positive note, kuddos to Mockingbird it was very helpful.
 
+*** Continuous Integration
+
+    Now that we have tests running  on the terminal, we'll want to run
+    them automatically. We  probably want to run them  on every commit
+    but we could choose only  on every tag, periodically (every sunday
+    night), or just manually with a command in a commit message.
+
+    We'll use [[https://docs.gitlab.com/ce/ci/README.html][Gitlab's CI]], which is free for public or private repos.
+
+    Gitab  CI works  with  Docker  images so  we'll  use the  existing
+    [[https://hub.docker.com/r/daewok/lisp-devel/][daewok/lisp-devel]] one.  It  includes SBCL, ECL, CCL  and ABCL, and
+    has Quicklisp  installed in  the home  (=/home/lisp/=), so  we can
+    =quickload= packages  right away.  It  also has a more  bare bones
+    option.
+
+    We used this example =.gitlab-ci.yml= successfully:
+
+#+BEGIN_SRC text
+image: daewok/lisp-devel
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y git-core
+  - git clone https://github.com/Chream/mockingbird ~/quicklisp/local-projects/
+
+test:
+  script:
+    - make test
+#+END_SRC
+
+- "image": we set which Docker image to use.
+- "test": just the name of our pipeline.
+- "script":  this is  the  recognized  section to  run  any script  we
+  want. If it exits with success,  our pipeline passes. So here we run
+  our own "make  test" command (Gitlab has cloned our  project and put
+  us at its root for us).
+- "before_script": our tests rely on a library that isn't on Quicklisp
+  yet, so  we clone  it into the  usual =~/quicklisp/local-projects/=.
+  We have to update apt's cache and install git beforehand.
+
+  And this  is it  ! You  know have  a working  continuous integration
+  stack.
+
+  But while we're  at it, let's see a couple  more Docker commands and
+  a way to test our CI commands locally.
+
+*** A couple Docker commands
+
+    We have a  Docker image ready to  use, so let's see how  to use it
+    ourselves. Run:
+
+: sudo service docker start
+: docker run --rm -it daewok/lisp-devel:latest bash
+
+   This will download what's needed  for the first time (around 400Mo)
+   and  then drop  you into  a bash  prompt. Now  you are  in a  fresh
+   Debian-based system  with Lisp  stuff installed.  You can  enter an
+   =sbcl= REPL  and install  Quicklisp libraries.  But you  don't have
+   access to your code outside of Docker. Mount it:
+
+: docker run --rm -it -v /path/to/local/code:/usr/local/share/common-lisp/source daewok/lisp-devel:latest bash
+
+   This will  put your local =/path/to/local/code/=  into Docker where
+   indicated.
+
+   Now  we can  test  things around.  I  don't know  how  to test  our
+   =.gitlab-ci.yml= straight away though.
+
+   Also see  the Lisp image's README,  they have more stuff  on how to
+   develop from our Emacs on the Lisp environment inside the image.
 
 ** Conclusion
 
