@@ -797,11 +797,11 @@ We now want or need more:
 - getting more content (seeders, leechers):  done in the app.
 - downloading the torrent file ?
 - *error handling* (network errors or timeout, unexpected errors, user
-  interrupts)
+  interrupts) (part 5),
 - scraping other sites, *asynchronously*  (the asynchronous part will be
   straightforward, there's  a library for  that and it's  one function
   change.  See the [[https://lispcookbook.github.io/cl-cookbook/web-scraping.html#async-requests][Cookbook tutorial]].)
-- some *cache* (part 6)
+- some *cache* (part 6),
 - unit tests,  "live" tests and  continuous integration: see  the next
   section.
 - building a *standalone executable*, parsing *command line arguments*: see part 3.
@@ -1872,6 +1872,86 @@ Keep the letters' possible mixed up or down case.
 
 To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a1965d61cd330d0b202b9659bf6963a4f8abb32/src/cl-torrents.lisp#L117][=display-results=]] on the repository.
 * Error handling
+** Dealing with malformed command line arguments
+
+   If you try to give a bad  argument on the command, you'll enter the
+   debugger.  Obviously, we  prefer to  print an  informative message,
+   print the help and exit.
+
+   =unix-opts=  will  throw  (or  rather  /signal/)  conditions  (hear
+   "exceptions" if you wish) on malformed options:
+
+- =opts:unknown-option=,
+- =opts:missing-arg=,
+- =opts:parser-failed=  and
+- =opts:missing-required-option=.
+
+   It also has a complete example. This library is really nice.
+
+   The general form of condition handling is to use =handler-bind=:
+
+#+BEGIN_SRC lisp
+(handler-bind ((one-condition #'its-handler)
+               (another-condition #'another-handler))
+   (some code))
+#+END_SRC
+
+    where we are in charge in  writing the =#'handlers=. They take the
+    =condition=  object as  argument.  We  give them  below. They  use
+    =opts:describe=  to  print  the help  message  and  =(opts:raw-arg
+    condition)=  to read  the  argument in  cause  from the  condition
+    object.
+
+    Yes, conditions are CLOS classes. When we create our owns,
+    we   can   define   different   slots,   etc.   The   article   on
+    [[https://z0ltan.wordpress.com/2016/08/06/conditions-and-restarts-in-common-lisp/][z0ltan.wordpress.com]] will tell you more.
+
+#+BEGIN_SRC lisp
+(defun unknown-option (condition)
+  (format t "~s option is unknown.~%" (opts:option condition))
+  (opts:describe
+   :args "[keywords]")
+  (exit))
+
+(defun missing-arg (condition)
+  (format t "Bad options: ~a needs an argument.~&" (opts:option condition))
+  (opts:describe
+   :args "[keywords]")
+  (exit))
+
+(defun arg-parser-failed (condition)
+  (format t "Error: could not parse ~a as argument of ~a~&."
+          (opts:raw-arg condition)
+          (opts:option condition))
+  (opts:describe
+   :args "[keywords]")
+  (exit))
+#+END_SRC
+
+   And so we surround the reading of the options with =handler-bind=:
+
+#+BEGIN_SRC lisp
+      (handler-bind ((opts:unknown-option #'unknown-option)
+                     (opts:missing-arg #'missing-arg)
+                     (opts:arg-parser-failed #'arg-parser-failed)
+                     ;; (opts:missing-required-option #'...) ;; => in upcoming version
+        (opts:get-opts)) ;; <= this will signal conditions, if any.
+#+END_SRC
+
+   We can build and try:
+
+#+BEGIN_SRC text
+$ ./torrents -p foo
+"-p" option is unknown.
+
+Available options:
+  -h, --help               print this help text
+  -n, --nb ARG             maximum number of results to print.
+  -m, --magnet ARG         get the magnet link of the given search result.
+#+END_SRC
+
+   And all is well. We didn't catch everything though…
+
 ** Catching a user's C-c termination signal
 
    Let's try a =C-c= and read the stacktrace:
