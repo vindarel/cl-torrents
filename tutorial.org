@@ -1904,7 +1904,43 @@ To see the larger picture, see [[https://github.com/vindarel/cl-torrents/blob/0a
 
     Yes, conditions are CLOS classes. When we create our owns,
     we   can   define   different   slots,   etc.   The   article   on
-    [[https://z0ltan.wordpress.com/2016/08/06/conditions-and-restarts-in-common-lisp/][z0ltan.wordpress.com]] will tell you more.
+    [[https://z0ltan.wordpress.com/2016/08/06/conditions-and-restarts-in-common-lisp/][z0ltan.wordpress.com]]   will  tell   you  more,   and  looking   at
+    =unix-opts= code may help (just keep if it's too much for now).
+
+    This is  how it defines  a condition:  it first defines  a generic
+    =troublesome-option= class, that  inherits from =simple-error= and
+    has three slots, amongst which an =option= that will store the bad
+    one.  Then  it  defines   =unknown-option=,  which  inherits  from
+    =troublesome-option=.
+
+#+BEGIN_SRC lisp
+(define-condition troublesome-option (simple-error)
+  ((option
+    :initarg :option
+    :reader option))
+  (:report (lambda (c s) (format s "troublesome option: ~s" (option c))))
+  (:documentation "Generalization over conditions that have to do with some
+particular option."))
+
+(define-condition unknown-option (troublesome-option)
+  ()
+  (:report (lambda (c s) (format s "unknown option: ~s" (option c))))
+  (:documentation "This condition is thrown when parser encounters
+unknown (not previously defined with `define-opts') option."))
+#+END_SRC
+
+   Then, when it encounters an error,  it signals a condition and sets
+   its =option= slot like this:
+
+#+BEGIN_SRC lisp
+(error 'unknown-option
+   :option opt)
+#+END_SRC
+
+   See [[https://github.com/mrkkrp/unix-opts/blob/master/unix-opts.lisp#L83][the source]].
+
+   Anyway, these are our little  functions to display an helpful error
+   message and exit:
 
 #+BEGIN_SRC lisp
 (defun unknown-option (condition)
@@ -1950,7 +1986,7 @@ Available options:
   -m, --magnet ARG         get the magnet link of the given search result.
 #+END_SRC
 
-   And all is well. We didn't catch everything though…
+   And all is well. We didn't catch everything though
 
 ** Catching a user's C-c termination signal
 
