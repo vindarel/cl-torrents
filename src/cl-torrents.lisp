@@ -11,6 +11,10 @@
                 :colorize-all-keywords
                 :keyword-color-pairs
                 :exit
+                :arg-parser-failed
+                :unknown-option
+                :missing-arg
+                :when-option
                 :find-magnet-link
                 :sublist)
   (:export :torrents
@@ -155,8 +159,11 @@
   (multiple-value-bind (options free-args)
       ;; opts:get-opts returns the list of options, as parsed,
       ;; and the remaining free args as second value.
-      ;; There is no error handling yet (specially for options not having their argument).
-      (opts:get-opts)
+      (handler-bind ((opts:unknown-option #'unknown-option)
+                     (opts:missing-arg #'missing-arg)
+                     (opts:arg-parser-failed #'arg-parser-failed))
+                     ;; (opts:missing-required-option) ;; => upcoming version
+        (opts:get-opts))
 
     (if (getf options :help)
         (progn
