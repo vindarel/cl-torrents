@@ -736,8 +736,33 @@ like this:
 which  is quite  elegant and  can be  handy. This  is doable  with the
 [[https://github.com/m2ym/cl-annot][cl-annot]] library. It also requires a small Slime configuration.
 
+** Conclusion
 
-** Tests and CI
+This leads us to the end of part one.
+
+We now want or need more:
+
+- getting more content (seeders, leechers) (done in the app)
+- downloading the torrent file ?
+- *error handling* (network errors or timeout, unexpected errors)
+- scraping other sites, *asynchronously*  (the asynchronous part will be
+  straightforward, there's  a library for  that and it's  one function
+  change.  See the [[https://lispcookbook.github.io/cl-cookbook/web-scraping.html#async-requests][Cookbook tutorial]].)
+- searching into a local Pirate Bay dump,
+- some *cache*
+- regular testing  against the website (straightforward  and to couple
+  with the CI),
+- sharing this program: a *standalone executable* ? using Roswell ?,
+- a *command line tool*
+- …
+
+We'll carry on by writing  tests, running them automatically thanks to
+a  Continuous Integration  system, then  we'll build  a self-contained
+executable, using the advantages of  a couple Lisp implementations and
+parsing command line arguments.
+
+
+* Tests and CI
 
 We wouldn't be called a developper if we didn't write any test.
 
@@ -778,7 +803,7 @@ write unit  tests now, and  also hide the  large output of  the search
 results.
 
 
-*** Unit tests
+** Unit tests
 
 Since we do webscraping, the result  from the network calls are likely
 to  be  different  each  time.    That's  good  for  "integration"  or
@@ -865,7 +890,7 @@ Now we mock it. Extending the test above:
 Our tests  still write a  lot of stuff  on standard output,  let's fix
 that.
 
-*** Capturing output
+** Capturing output
 
 We knew giving an optional stream parameter to our =torrents= function
 would be useful sometime:
@@ -886,7 +911,7 @@ and that's it, our tests are silent now.
 
 We can write more of them.
 
-*** Isolating tests (with a macro)
+** Isolating tests (with a macro)
 
 I'm not bothered (yet?)  by the way we wrote tests  above, all of them
 inside  a =with-dynamic-stubs=  macro.  It's just  that  they are  not
@@ -950,7 +975,7 @@ we can see how it gets expanded like this:
 
 Easy :)
 
-*** make test
+** make test
 
     We must be  able to run tests  from the terminal for  at least two
     reasons:
@@ -1013,7 +1038,7 @@ silent output, and interactive reports.
 
 On a positive note, kuddos to Mockingbird it was very helpful.
 
-*** Continuous Integration
+** Continuous Integration
 
     Now that we have tests running  on the terminal, we'll want to run
     them automatically. We  probably want to run them  on every commit
@@ -1059,7 +1084,7 @@ test:
   But while we're  at it, let's see a couple  more Docker commands and
   a way to test our CI commands locally.
 
-*** A couple Docker commands
+** A couple Docker commands
 
     We have a  Docker image ready to  use, so let's see how  to use it
     ourselves. Run:
@@ -1084,29 +1109,6 @@ test:
    Also see  the Lisp image's README,  they have more stuff  on how to
    develop from our Emacs on the Lisp environment inside the image.
 
-** Conclusion
-
-This leads us to the end of part one.
-
-We now want or need more:
-
-- getting more content (seeders, leechers) (done in the app)
-- downloading the torrent file ?
-- *error handling* (network errors or timeout, unexpected errors)
-- scraping other sites, *asynchronously*  (the asynchronous part will be
-  straightforward, there's  a library for  that and it's  one function
-  change.  See the [[https://lispcookbook.github.io/cl-cookbook/web-scraping.html#async-requests][Cookbook tutorial]].)
-- searching into a local Pirate Bay dump,
-- some *cache*
-- regular testing  against the website (straightforward  and to couple
-  with the CI),
-- sharing this program: a *standalone executable* ? using Roswell ?,
-- a *command line tool*
-- …
-
-We'll  carry on  by building  a self-contained  executable, using  the
-advantages of a  couple Lisp implementations and  parsing command line
-arguments.
 
 
 * Building self-contained executables
