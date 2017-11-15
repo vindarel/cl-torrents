@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2017-11-16 jeu. 00:17 -->
+<!-- 2017-11-16 jeu. 00:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title></title>
@@ -241,70 +241,70 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2e3728c">1. Make it work</a>
+<li><a href="#org920b0af">1. Make it work</a>
 <ul>
-<li><a href="#org9342e68">1.1. Trying out at the REPL</a></li>
-<li><a href="#org2c0217d">1.2. Putting it together in a function</a></li>
-<li><a href="#orgef8fd4d">1.3. Creating a new project</a></li>
-<li><a href="#org5ddcf69">1.4. Adding our dependencies</a></li>
-<li><a href="#org3dfd285">1.5. Loading the project</a></li>
-<li><a href="#org4571f35">1.6. Searching with our keywords</a></li>
-<li><a href="#orga4f8059">1.7. Formatting output</a></li>
-<li><a href="#org5552f66">1.8. Getting more torrent information</a>
+<li><a href="#org0abe946">1.1. Trying out at the REPL</a></li>
+<li><a href="#org596f680">1.2. Putting it together in a function</a></li>
+<li><a href="#org602cf6a">1.3. Creating a new project</a></li>
+<li><a href="#org35ca6e4">1.4. Adding our dependencies</a></li>
+<li><a href="#orga097393">1.5. Loading the project</a></li>
+<li><a href="#orgaf6e155">1.6. Searching with our keywords</a></li>
+<li><a href="#orgf19f0e7">1.7. Formatting output</a></li>
+<li><a href="#org9fa8fa3">1.8. Getting more torrent information</a>
 <ul>
-<li><a href="#orgd5fab8e">1.8.1. To the magnet link</a></li>
+<li><a href="#orgf8d2642">1.8.1. To the magnet link</a></li>
 </ul>
 </li>
-<li><a href="#org20ac536">1.9. Exporting functions</a></li>
-<li><a href="#orgfbf0b24">1.10. Conclusion</a></li>
+<li><a href="#org41a981e">1.9. Exporting functions</a></li>
+<li><a href="#org791b142">1.10. Conclusion</a></li>
 </ul>
 </li>
-<li><a href="#orgeb47fa4">2. Tests and CI</a>
+<li><a href="#org1dd65c0">2. Tests and CI</a>
 <ul>
-<li><a href="#org0454f09">2.1. Unit tests</a></li>
-<li><a href="#orgb8dba65">2.2. Capturing output</a></li>
-<li><a href="#org43d0118">2.3. Isolating tests (with a macro)</a></li>
-<li><a href="#org6213867">2.4. make test</a></li>
-<li><a href="#orge84c931">2.5. Continuous Integration</a></li>
-<li><a href="#org9bc8868">2.6. A couple Docker commands</a></li>
+<li><a href="#orgd61344f">2.1. Unit tests</a></li>
+<li><a href="#org30badc4">2.2. Capturing output</a></li>
+<li><a href="#org34e5272">2.3. Isolating tests (with a macro)</a></li>
+<li><a href="#orge05228b">2.4. make test</a></li>
+<li><a href="#org07a9956">2.5. Continuous Integration</a></li>
+<li><a href="#org1369b64">2.6. A couple Docker commands</a></li>
 </ul>
 </li>
-<li><a href="#org23a05a9">3. Building and delivering self-contained executables</a>
+<li><a href="#org90c3174">3. Building and delivering self-contained executables</a>
 <ul>
-<li><a href="#org117b290">3.1. SBCL.</a></li>
-<li><a href="#orgf95ecb1">3.2. make build</a></li>
-<li><a href="#org1214c52">3.3. Size and startup times of executables per implementation</a></li>
-<li><a href="#org4147fc3">3.4. Parsing command line arguments</a></li>
-<li><a href="#orgfbe8494">3.5. Automatically building and delivering the executable</a></li>
-<li><a href="#orgd41977d">3.6. Final words</a></li>
+<li><a href="#org0cdfd9d">3.1. SBCL.</a></li>
+<li><a href="#org53e69b6">3.2. make build</a></li>
+<li><a href="#orgcaf2a60">3.3. Size and startup times of executables per implementation</a></li>
+<li><a href="#org033ef8c">3.4. Parsing command line arguments</a></li>
+<li><a href="#org64c2f4e">3.5. Automatically building and delivering the executable</a></li>
+<li><a href="#org2a879c4">3.6. Final words</a></li>
 </ul>
 </li>
-<li><a href="#org0863664">4. Moving functions into their own package</a>
+<li><a href="#orga11a7ce">4. Moving functions into their own package</a>
 <ul>
-<li><a href="#orgae6ef26">4.1. Dealing with symbol conflicts. shadowing-import, uninterning.</a></li>
-<li><a href="#org76b1eef">4.2. The helper functions. Ansi colors. Closures. Looping over a plist.</a></li>
-<li><a href="#orgdd35441">4.3. Formatting a format string</a></li>
+<li><a href="#org89e9595">4.1. Dealing with symbol conflicts. shadowing-import, uninterning.</a></li>
+<li><a href="#org8ddb9b0">4.2. The helper functions. Ansi colors. Closures. Looping over a plist.</a></li>
+<li><a href="#org4b3dfa9">4.3. Formatting a format string</a></li>
 </ul>
 </li>
-<li><a href="#orgd086af7">5. Error handling</a>
+<li><a href="#org98c5156">5. Error handling</a>
 <ul>
-<li><a href="#org5e0982e">5.1. Dealing with malformed command line arguments</a></li>
-<li><a href="#orgb11480a">5.2. Catching a user's C-c termination signal</a></li>
+<li><a href="#org9e88fb6">5.1. Dealing with malformed command line arguments</a></li>
+<li><a href="#orge7f6194">5.2. Catching a user's C-c termination signal</a></li>
 </ul>
 </li>
-<li><a href="#orga3472b4">6. More features</a>
+<li><a href="#orgf7571e8">6. More features</a>
 <ul>
-<li><a href="#org413110d">6.1. Cache</a></li>
+<li><a href="#orga363d7e">6.1. Cache</a></li>
 </ul>
 </li>
-<li><a href="#orgba43dd1">7. Conclusion</a></li>
+<li><a href="#orgd092458">7. Conclusion</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org2e3728c" class="outline-2">
-<h2 id="org2e3728c"><span class="section-number-2">1</span> Make it work</h2>
+<div id="outline-container-org920b0af" class="outline-2">
+<h2 id="org920b0af"><span class="section-number-2">1</span> Make it work</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Scraping   The   Pirate   Bay   is    easy,   they   don't   rely   on
@@ -394,8 +394,8 @@ helper:
 </p>
 </div>
 
-<div id="outline-container-org9342e68" class="outline-3">
-<h3 id="org9342e68"><span class="section-number-3">1.1</span> Trying out at the REPL</h3>
+<div id="outline-container-org0abe946" class="outline-3">
+<h3 id="org0abe946"><span class="section-number-3">1.1</span> Trying out at the REPL</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Let's try in the REPL:
@@ -538,8 +538,8 @@ inspector.
 </div>
 </div>
 
-<div id="outline-container-org2c0217d" class="outline-3">
-<h3 id="org2c0217d"><span class="section-number-3">1.2</span> Putting it together in a function</h3>
+<div id="outline-container-org596f680" class="outline-3">
+<h3 id="org596f680"><span class="section-number-3">1.2</span> Putting it together in a function</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 We came up with this function:
@@ -580,8 +580,8 @@ placeholder. <code>-&lt;&gt;&gt;</code> has a little name, "Diamond Spear".
 </div>
 </div>
 
-<div id="outline-container-orgef8fd4d" class="outline-3">
-<h3 id="orgef8fd4d"><span class="section-number-3">1.3</span> Creating a new project</h3>
+<div id="outline-container-org602cf6a" class="outline-3">
+<h3 id="org602cf6a"><span class="section-number-3">1.3</span> Creating a new project</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Before we write more functions we  should create a new project. For
@@ -609,8 +609,8 @@ so, you will be able to <code>ql:quickload</code> your project right away.
 </div>
 </div>
 
-<div id="outline-container-org5ddcf69" class="outline-3">
-<h3 id="org5ddcf69"><span class="section-number-3">1.4</span> Adding our dependencies</h3>
+<div id="outline-container-org35ca6e4" class="outline-3">
+<h3 id="org35ca6e4"><span class="section-number-3">1.4</span> Adding our dependencies</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 Our new <code>cl-torrents.asd</code> looks like this:
@@ -663,8 +663,8 @@ and <code>cl-arrows</code> if you wish.
 </div>
 </div>
 
-<div id="outline-container-org3dfd285" class="outline-3">
-<h3 id="org3dfd285"><span class="section-number-3">1.5</span> Loading the project</h3>
+<div id="outline-container-orga097393" class="outline-3">
+<h3 id="orga097393"><span class="section-number-3">1.5</span> Loading the project</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 Open the  <code>.asdf</code> file and  compile and load  it. In Slime,  it's with
@@ -724,8 +724,8 @@ underscore <code>_</code> in Python).
 </div>
 </div>
 
-<div id="outline-container-org4571f35" class="outline-3">
-<h3 id="org4571f35"><span class="section-number-3">1.6</span> Searching with our keywords</h3>
+<div id="outline-container-orgaf6e155" class="outline-3">
+<h3 id="orgaf6e155"><span class="section-number-3">1.6</span> Searching with our keywords</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 Until now  we only tried  things out with a  given search url,  set in
@@ -829,8 +829,8 @@ magnet link.
 </div>
 </div>
 
-<div id="outline-container-orga4f8059" class="outline-3">
-<h3 id="orga4f8059"><span class="section-number-3">1.7</span> Formatting output</h3>
+<div id="outline-container-orgf19f0e7" class="outline-3">
+<h3 id="orgf19f0e7"><span class="section-number-3">1.7</span> Formatting output</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
 Our  <code>torrents</code> function  prints  out intelligable  output, but  we
@@ -967,8 +967,8 @@ add more information on the right side (seeders, leechers).
 </div>
 
 
-<div id="outline-container-org5552f66" class="outline-3">
-<h3 id="org5552f66"><span class="section-number-3">1.8</span> Getting more torrent information</h3>
+<div id="outline-container-org9fa8fa3" class="outline-3">
+<h3 id="org9fa8fa3"><span class="section-number-3">1.8</span> Getting more torrent information</h3>
 <div class="outline-text-3" id="text-1-8">
 <p>
 With <code>plump:serialize</code>  we could check  what html is inside  our plump
@@ -1055,8 +1055,8 @@ project and compile, <code>C-c C-c</code> in Slime):
 </div>
 </div>
 
-<div id="outline-container-orgd5fab8e" class="outline-4">
-<h4 id="orgd5fab8e"><span class="section-number-4">1.8.1</span> To the magnet link</h4>
+<div id="outline-container-orgf8d2642" class="outline-4">
+<h4 id="orgf8d2642"><span class="section-number-4">1.8.1</span> To the magnet link</h4>
 <div class="outline-text-4" id="text-1-8-1">
 <p>
 We have the torrent's details page, we  know how to request it, now we
@@ -1247,8 +1247,8 @@ We request the magnet link with:
 </div>
 
 
-<div id="outline-container-org20ac536" class="outline-3">
-<h3 id="org20ac536"><span class="section-number-3">1.9</span> Exporting functions</h3>
+<div id="outline-container-org41a981e" class="outline-3">
+<h3 id="org41a981e"><span class="section-number-3">1.9</span> Exporting functions</h3>
 <div class="outline-text-3" id="text-1-9">
 <p>
 We need  to export symbols  in order to use  them from the  outside of
@@ -1298,8 +1298,8 @@ which  is quite  elegant and  can be  handy. This  is doable  with the
 </div>
 </div>
 
-<div id="outline-container-orgfbf0b24" class="outline-3">
-<h3 id="orgfbf0b24"><span class="section-number-3">1.10</span> Conclusion</h3>
+<div id="outline-container-org791b142" class="outline-3">
+<h3 id="org791b142"><span class="section-number-3">1.10</span> Conclusion</h3>
 <div class="outline-text-3" id="text-1-10">
 <p>
 This leads us to the end of part one.
@@ -1378,8 +1378,8 @@ executable.
 </div>
 
 
-<div id="outline-container-orgeb47fa4" class="outline-2">
-<h2 id="orgeb47fa4"><span class="section-number-2">2</span> Tests and CI</h2>
+<div id="outline-container-org1dd65c0" class="outline-2">
+<h2 id="org1dd65c0"><span class="section-number-2">2</span> Tests and CI</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 We wouldn't be called a developper if we didn't write any test.
@@ -1435,8 +1435,8 @@ results.
 </div>
 
 
-<div id="outline-container-org0454f09" class="outline-3">
-<h3 id="org0454f09"><span class="section-number-3">2.1</span> Unit tests</h3>
+<div id="outline-container-orgd61344f" class="outline-3">
+<h3 id="orgd61344f"><span class="section-number-3">2.1</span> Unit tests</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Since we do webscraping, the result  from the network calls are likely
@@ -1556,8 +1556,8 @@ that.
 </div>
 </div>
 
-<div id="outline-container-orgb8dba65" class="outline-3">
-<h3 id="orgb8dba65"><span class="section-number-3">2.2</span> Capturing output</h3>
+<div id="outline-container-org30badc4" class="outline-3">
+<h3 id="org30badc4"><span class="section-number-3">2.2</span> Capturing output</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 We knew giving an optional stream parameter to our <code>torrents</code> function
@@ -1590,8 +1590,8 @@ We can write more of them.
 </div>
 </div>
 
-<div id="outline-container-org43d0118" class="outline-3">
-<h3 id="org43d0118"><span class="section-number-3">2.3</span> Isolating tests (with a macro)</h3>
+<div id="outline-container-org34e5272" class="outline-3">
+<h3 id="org34e5272"><span class="section-number-3">2.3</span> Isolating tests (with a macro)</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 I'm not bothered (yet?)  by the way we wrote tests  above, all of them
@@ -1680,8 +1680,8 @@ Easy :)
 </div>
 </div>
 
-<div id="outline-container-org6213867" class="outline-3">
-<h3 id="org6213867"><span class="section-number-3">2.4</span> make test</h3>
+<div id="outline-container-orge05228b" class="outline-3">
+<h3 id="orge05228b"><span class="section-number-3">2.4</span> make test</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 We must be  able to run tests  from the terminal for  at least two
@@ -1783,8 +1783,8 @@ On a positive note, kuddos to Mockingbird it was very helpful.
 </div>
 </div>
 
-<div id="outline-container-orge84c931" class="outline-3">
-<h3 id="orge84c931"><span class="section-number-3">2.5</span> Continuous Integration</h3>
+<div id="outline-container-org07a9956" class="outline-3">
+<h3 id="org07a9956"><span class="section-number-3">2.5</span> Continuous Integration</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Now that we have tests running  on the terminal, we'll want to run
@@ -1849,8 +1849,8 @@ a way to test our CI commands locally.
 </div>
 </div>
 
-<div id="outline-container-org9bc8868" class="outline-3">
-<h3 id="org9bc8868"><span class="section-number-3">2.6</span> A couple Docker commands</h3>
+<div id="outline-container-org1369b64" class="outline-3">
+<h3 id="org1369b64"><span class="section-number-3">2.6</span> A couple Docker commands</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 We have a  Docker image ready to  use, so let's see how  to use it
@@ -1893,11 +1893,11 @@ develop from our Emacs on the Lisp environment inside the image.
 </div>
 
 
-<div id="outline-container-org23a05a9" class="outline-2">
-<h2 id="org23a05a9"><span class="section-number-2">3</span> Building and delivering self-contained executables</h2>
+<div id="outline-container-org90c3174" class="outline-2">
+<h2 id="org90c3174"><span class="section-number-2">3</span> Building and delivering self-contained executables</h2>
 <div class="outline-text-2" id="text-3">
-</div><div id="outline-container-org117b290" class="outline-3">
-<h3 id="org117b290"><span class="section-number-3">3.1</span> SBCL.</h3>
+</div><div id="outline-container-org0cdfd9d" class="outline-3">
+<h3 id="org0cdfd9d"><span class="section-number-3">3.1</span> SBCL.</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 So far  we used the  <code>torrents</code> command  in our Slime  REPL. That's
@@ -2019,8 +2019,8 @@ Obviously we want this in a Makefile.
 </div>
 </div>
 
-<div id="outline-container-orgf95ecb1" class="outline-3">
-<h3 id="orgf95ecb1"><span class="section-number-3">3.2</span> make build</h3>
+<div id="outline-container-org53e69b6" class="outline-3">
+<h3 id="org53e69b6"><span class="section-number-3">3.2</span> make build</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 sbcl has the <code>--eval</code> and <code>--load</code> options.
@@ -2071,8 +2071,8 @@ Are there downsides ?
 </div>
 </div>
 
-<div id="outline-container-org1214c52" class="outline-3">
-<h3 id="org1214c52"><span class="section-number-3">3.3</span> Size and startup times of executables per implementation</h3>
+<div id="outline-container-orgcaf2a60" class="outline-3">
+<h3 id="orgcaf2a60"><span class="section-number-3">3.3</span> Size and startup times of executables per implementation</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 <pre class="src src-text">$ ls -lh torrents
@@ -2218,8 +2218,8 @@ So we have room for improvement.
 </div>
 </div>
 
-<div id="outline-container-org4147fc3" class="outline-3">
-<h3 id="org4147fc3"><span class="section-number-3">3.4</span> Parsing command line arguments</h3>
+<div id="outline-container-org033ef8c" class="outline-3">
+<h3 id="org033ef8c"><span class="section-number-3">3.4</span> Parsing command line arguments</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 We   saw   earlier   that    SBCL   stores   the   arguments   into
@@ -2379,8 +2379,8 @@ input modes, history, basic expansion,…).</li>
 </div>
 </div>
 
-<div id="outline-container-orgfbe8494" class="outline-3">
-<h3 id="orgfbe8494"><span class="section-number-3">3.5</span> Automatically building and delivering the executable</h3>
+<div id="outline-container-org64c2f4e" class="outline-3">
+<h3 id="org64c2f4e"><span class="section-number-3">3.5</span> Automatically building and delivering the executable</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 We already have a continuous integration system with Gitlab CI (see
@@ -2510,8 +2510,8 @@ the executable's name.
 </div>
 
 
-<div id="outline-container-orgd41977d" class="outline-3">
-<h3 id="orgd41977d"><span class="section-number-3">3.6</span> Final words</h3>
+<div id="outline-container-org2a879c4" class="outline-3">
+<h3 id="org2a879c4"><span class="section-number-3">3.6</span> Final words</h3>
 <div class="outline-text-3" id="text-3-6">
 <p>
 As said  before, we didn't do  error handling yet, and  this can be
@@ -2523,8 +2523,8 @@ fix this below.
 </div>
 </div>
 
-<div id="outline-container-org0863664" class="outline-2">
-<h2 id="org0863664"><span class="section-number-2">4</span> Moving functions into their own package</h2>
+<div id="outline-container-orga11a7ce" class="outline-2">
+<h2 id="orga11a7ce"><span class="section-number-2">4</span> Moving functions into their own package</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 We have  written a  few helpers  functions to  treat with  colors of
@@ -2538,8 +2538,8 @@ package.
 </p>
 </div>
 
-<div id="outline-container-orgae6ef26" class="outline-3">
-<h3 id="orgae6ef26"><span class="section-number-3">4.1</span> Dealing with symbol conflicts. shadowing-import, uninterning.</h3>
+<div id="outline-container-org89e9595" class="outline-3">
+<h3 id="org89e9595"><span class="section-number-3">4.1</span> Dealing with symbol conflicts. shadowing-import, uninterning.</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 We move them in a new <code>src/utils.lisp</code> file.
@@ -2668,8 +2668,8 @@ accept everything in a row.
 </div>
 </div>
 
-<div id="outline-container-org76b1eef" class="outline-3">
-<h3 id="org76b1eef"><span class="section-number-3">4.2</span> The helper functions. Ansi colors. Closures. Looping over a plist.</h3>
+<div id="outline-container-org8ddb9b0" class="outline-3">
+<h3 id="org8ddb9b0"><span class="section-number-3">4.2</span> The helper functions. Ansi colors. Closures. Looping over a plist.</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 This was fun  to do. Our goal  was to colorize each  keyword with a
@@ -2868,8 +2868,8 @@ to the ansi prefixes and suffixes :(
 </div>
 </div>
 
-<div id="outline-container-orgdd35441" class="outline-3">
-<h3 id="orgdd35441"><span class="section-number-3">4.3</span> Formatting a format string</h3>
+<div id="outline-container-org4b3dfa9" class="outline-3">
+<h3 id="org4b3dfa9"><span class="section-number-3">4.3</span> Formatting a format string</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 No big deal ! We have to  adapt this "65", by adding the difference
@@ -2926,11 +2926,11 @@ To see the larger picture, see <a href="https://github.com/vindarel/cl-torrents/
 </div>
 </div>
 </div>
-<div id="outline-container-orgd086af7" class="outline-2">
-<h2 id="orgd086af7"><span class="section-number-2">5</span> Error handling</h2>
+<div id="outline-container-org98c5156" class="outline-2">
+<h2 id="org98c5156"><span class="section-number-2">5</span> Error handling</h2>
 <div class="outline-text-2" id="text-5">
-</div><div id="outline-container-org5e0982e" class="outline-3">
-<h3 id="org5e0982e"><span class="section-number-3">5.1</span> Dealing with malformed command line arguments</h3>
+</div><div id="outline-container-org9e88fb6" class="outline-3">
+<h3 id="org9e88fb6"><span class="section-number-3">5.1</span> Dealing with malformed command line arguments</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 If you try to give a bad  argument on the command, you'll enter the
@@ -2978,28 +2978,71 @@ object.
 <p>
 Yes, conditions are CLOS classes. When we create our owns,
 we   can   define   different   slots,   etc.   The   article   on
-<a href="https://z0ltan.wordpress.com/2016/08/06/conditions-and-restarts-in-common-lisp/">z0ltan.wordpress.com</a> will tell you more.
+<a href="https://z0ltan.wordpress.com/2016/08/06/conditions-and-restarts-in-common-lisp/">z0ltan.wordpress.com</a>   will  tell   you  more,   and  looking   at
+<code>unix-opts</code> code may help (just keep if it's too much for now).
+</p>
+
+<p>
+This is  how it defines  a condition:  it first defines  a generic
+<code>troublesome-option</code> class, that  inherits from <code>simple-error</code> and
+has three slots, amongst which an <code>option</code> that will store the bad
+one.  Then  it  defines   <code>unknown-option</code>,  which  inherits  from
+<code>troublesome-option</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #a020f0;">define-condition</span> <span style="color: #0000ff;">troublesome-option</span> (simple-error)
+  ((option
+    <span style="color: #483d8b;">:initarg</span> <span style="color: #483d8b;">:option</span>
+    <span style="color: #483d8b;">:reader</span> option))
+  (<span style="color: #483d8b;">:report</span> (<span style="color: #a020f0;">lambda</span> (c s) (format s <span style="color: #8b2252;">"troublesome option: ~s"</span> (option c))))
+  (<span style="color: #483d8b;">:documentation</span> <span style="color: #8b2252;">"Generalization over conditions that have to do with some</span>
+<span style="color: #8b2252;">particular option."</span>))
+
+(<span style="color: #a020f0;">define-condition</span> <span style="color: #0000ff;">unknown-option</span> (troublesome-option)
+  ()
+  (<span style="color: #483d8b;">:report</span> (<span style="color: #a020f0;">lambda</span> (c s) (format s <span style="color: #8b2252;">"unknown option: ~s"</span> (option c))))
+  (<span style="color: #483d8b;">:documentation</span> <span style="color: #8b2252;">"This condition is thrown when parser encounters</span>
+<span style="color: #8b2252;">unknown (not previously defined with `</span><span style="color: #008b8b;">define-opts</span><span style="color: #8b2252;">') option."</span>))
+</pre>
+</div>
+
+<p>
+Then, when it encounters an error,  it signals a condition and sets
+its <code>option</code> slot like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ff0000; font-weight: bold;">error</span> 'unknown-option
+   <span style="color: #483d8b;">:option</span> opt)
+</pre>
+</div>
+
+<p>
+See <a href="https://github.com/mrkkrp/unix-opts/blob/master/unix-opts.lisp#L83">the source</a>.
+</p>
+
+<p>
+Anyway, these are our little  functions to display an helpful error
+message and exit:
 </p>
 
 <div class="org-src-container">
 <pre class="src src-lisp">(<span style="color: #a020f0;">defun</span> <span style="color: #0000ff;">unknown-option</span> (condition)
   (format t <span style="color: #8b2252;">"~s option is unknown.~%"</span> (opts:option condition))
-  (opts:describe
-   <span style="color: #483d8b;">:args</span> <span style="color: #8b2252;">"[keywords]"</span>)
+  (opts:describe)
   (exit))
 
 (<span style="color: #a020f0;">defun</span> <span style="color: #0000ff;">missing-arg</span> (condition)
   (format t <span style="color: #8b2252;">"Bad options: ~a needs an argument.~&amp;"</span> (opts:option condition))
-  (opts:describe
-   <span style="color: #483d8b;">:args</span> <span style="color: #8b2252;">"[keywords]"</span>)
+  (opts:describe)
   (exit))
 
 (<span style="color: #a020f0;">defun</span> <span style="color: #0000ff;">arg-parser-failed</span> (condition)
   (format t <span style="color: #8b2252;">"Error: could not parse ~a as argument of ~a~&amp;."</span>
           (opts:raw-arg condition)
           (opts:option condition))
-  (opts:describe
-   <span style="color: #483d8b;">:args</span> <span style="color: #8b2252;">"[keywords]"</span>)
+  (opts:describe)
   (exit))
 </pre>
 </div>
@@ -3033,13 +3076,13 @@ Available options:
 </div>
 
 <p>
-And all is well. We didn't catch everything though…
+And all is well. We didn't catch everything though
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgb11480a" class="outline-3">
-<h3 id="orgb11480a"><span class="section-number-3">5.2</span> Catching a user's C-c termination signal</h3>
+<div id="outline-container-orge7f6194" class="outline-3">
+<h3 id="orge7f6194"><span class="section-number-3">5.2</span> Catching a user's C-c termination signal</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 Let's try a <code>C-c</code> and read the stacktrace:
@@ -3109,11 +3152,11 @@ symbols in the <code>*features*</code> list.  We can also combine symbols with
 </div>
 </div>
 
-<div id="outline-container-orga3472b4" class="outline-2">
-<h2 id="orga3472b4"><span class="section-number-2">6</span> More features</h2>
+<div id="outline-container-orgf7571e8" class="outline-2">
+<h2 id="orgf7571e8"><span class="section-number-2">6</span> More features</h2>
 <div class="outline-text-2" id="text-6">
-</div><div id="outline-container-org413110d" class="outline-3">
-<h3 id="org413110d"><span class="section-number-3">6.1</span> Cache</h3>
+</div><div id="outline-container-orga363d7e" class="outline-3">
+<h3 id="orga363d7e"><span class="section-number-3">6.1</span> Cache</h3>
 <div class="outline-text-3" id="text-6-1">
 <p>
 We'd like  a cache system.  This was quick  and easy with the
@@ -3183,8 +3226,8 @@ Quick and easy, tell me if I was <i>too</i> quick !
 </div>
 </div>
 
-<div id="outline-container-orgba43dd1" class="outline-2">
-<h2 id="orgba43dd1"><span class="section-number-2">7</span> Conclusion</h2>
+<div id="outline-container-orgd092458" class="outline-2">
+<h2 id="orgd092458"><span class="section-number-2">7</span> Conclusion</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 That the end of our tutorial (for now ?).
@@ -3198,7 +3241,7 @@ You can see the full sources and comment on the repository: <a href="https://git
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: vindarel</p>
-<p class="date">Created: 2017-11-16 jeu. 00:17</p>
+<p class="date">Created: 2017-11-16 jeu. 00:53</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
