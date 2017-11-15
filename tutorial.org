@@ -1463,6 +1463,44 @@ build:
 (see
 [[https://docs.gitlab.com/ce/ci/yaml/README.html#only-and-except-simplified][the doc]]).
 
+We'll add the rule to run tests first and to not build the software if
+they  fail (we  use [[https://docs.gitlab.com/ce/ci/environments.html][environments]]). We declare  two names  of "stages"
+(test and build) that respect the  given order, and add a "stage: xxx"
+in each job. Our final =.gitlab-ci.yml= is this:
+
+#+BEGIN_SRC text
+image: daewok/lisp-devel
+
+stages:          # <= new
+  - test
+  - build
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y git-core
+  - git clone https://github.com/Chream/mockingbird ~/quicklisp/local-projects/
+
+test:
+  stage: test     # <= new
+  only:
+
+  - tags
+  script:
+    - make test
+
+build:
+  stage: build    # <= new
+  only:
+    # Only when a new tag is pushed.
+    - tags
+  script:
+    - make build
+  artifacts:
+    paths:
+      # xxx include the version number
+      - torrents
+#+END_SRC
+
    And  voilà, that's  it.
 
    We  have an  url  to  download the  latest
