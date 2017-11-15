@@ -1110,8 +1110,7 @@ test:
    develop from our Emacs on the Lisp environment inside the image.
 
 
-
-* Building self-contained executables
+* Building and delivering self-contained executables
 
 ** SBCL.
 
@@ -1413,6 +1412,69 @@ FOO     "foo"   BAR     "bar"
 - [[https://github.com/mrkkrp/cl-readline][cl-readine]] -  bindings to  the GNU Readline  library (Emacs  and Vim
   input modes, history, basic expansion,…).
 - the Awesome-cl/scripting link above.
+
+** Automatically building and delivering the executable
+
+   We already have a continuous integration system with Gitlab CI (see
+   above, Tests and  CI). We're then very close in  having a system to
+   automatically build and deliver  our executable. Moreover, we'll do
+   that only when we push a new tag.
+
+   For this, we'll declare a [[https://docs.gitlab.com/ce/user/project/pipelines/job_artifacts.html][job artifact]].
+
+   First, we create a new job to run our command that builds the executable:
+
+#+BEGIN_SRC text
+build:
+  script:
+    - make build
+#+END_SRC
+
+   We'll see:
+
+#+html: <p align='center'><img src='img-ci-build.png' /></p>
+
+   To be able to browse the artifacts,  and get an url to download the
+   last one, we add:
+
+#+BEGIN_SRC text
+build:
+  script:
+    - make build
+  artifacts:
+    paths:
+      - torrents
+#+END_SRC
+
+   And now, to only to this on a new tag:
+
+#+BEGIN_SRC text
+build:
+  only:
+    # Only when a new tag is pushed.
+    - tags
+  script:
+    - make build
+  artifacts:
+    paths:
+      - torrents
+#+END_SRC
+
+(see
+[[https://docs.gitlab.com/ce/ci/yaml/README.html#only-and-except-simplified][the doc]]).
+
+   And  voilà, that's  it.
+
+   We  have an  url  to  download the  latest
+   artifact:
+
+#+BEGIN_SRC text
+https://gitlab.com/vindarel/cl-torrents/-/jobs/artifacts/master/raw/torrents?job=build
+#+END_SRC
+
+   Let's just put  the link on an  icon and add the  version number on
+   the executable's name.
+
 
 ** Final words
 
@@ -1824,8 +1886,7 @@ restarts (invokable by number or by possibly-abbreviated name):
     We re-build the project (=make build=), search for matrix once (we
     wait a bit) and a second time: we hit the cache.
 
-    Quick and easy, tell me if I missed something !
-
+    Quick and easy, tell me if I was /too/ quick !
 
 * Conclusion
 
