@@ -2,6 +2,8 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 
 [[https://gitlab.com/vindarel/cl-torrents][file:https://gitlab.com/vindarel/cl-torrents/badges/master/pipeline.svg]]
 
+Download: [[https://gitlab.com/vindarel/cl-torrents/-/jobs/artifacts/master/raw/torrents?job=build][GNU/Linux 64-bit]] (/78Mo, self-contained executable/).
+
 * cl-torrents
 
   This is a  little tool for the  lisp REPL or the  terminal to search
@@ -16,14 +18,16 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 
 ** Installation
 
-   We may (and should) provide an executable.
+   See the download link above.  It is a self-contained executable for
+   GNU/Linux  64-bits.    You  do  /not/   need  to  install   a  Lisp
+   implementation. It's a 78Mo binary (will get a bit lighter).
 
-   This  is not  distributed with  Quicklisp (or Roswell) (yet?).  Clone this  repo
+   The Lisp lib  is not  distributed with  Quicklisp (or Roswell) (yet?).  Clone this  repo
    where Quicklisp can find it:
 
 : git clone git@github.com:vindarel/cl-torrents.git ~/quicklisp/local-projects/
 
-and load it:
+and install it:
 
 : (ql:quickload "cl-torrents")
 
