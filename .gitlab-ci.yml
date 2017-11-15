@@ -6,6 +6,8 @@ before_script:
   - git clone https://github.com/Chream/mockingbird ~/quicklisp/local-projects/
 
 test:
+  only:
+    - tags
   script:
     - make test
 
