@@ -20,7 +20,7 @@
 #+SETUPFILE: theme-readtheorg.setup
 
 
-* Part 1
+* Make it work
 
 Scraping   The   Pirate   Bay   is    easy,   they   don't   rely   on
 javascript-generated pages. We just have to:
@@ -29,6 +29,10 @@ javascript-generated pages. We just have to:
 - parse the html into a data structure ([[https://shinmera.github.io/plump/][plump]]: =(plump:parse <html>)=)
 - search   with  CSS   selectors  ([[https://shinmera.github.io/lquery][lquery]]:   =(lquery:"  <parsed-html>
   <selectors>)=)
+
+We suppose  you have a  ready Common Lisp development  environment. If
+not, see the [[https://lispcookbook.github.io/cl-cookbook/getting-started.html][Cookbook/getting-started]] (and  if that's not enough, fill
+an issue !).
 
 Let's go.
 
@@ -75,7 +79,8 @@ the CSS class =Title=, which gives:
 (defparameter *selectors* ".Title")
 #+END_SRC
 
-If  you are  not accostumed  to CSS  selectors, I  like this  webpage:
+If  you are  not accostumed  to  CSS selectors,  this post  is a  nice
+helper:
 https://codingsec.net/2016/12/select-specific-text-css-using-selectors/.
 
 ** Trying out at the REPL
@@ -129,10 +134,11 @@ it, or that  we can use cl21  alongside CL in only in  some places but
 not in all our project (like in only one file, one "package").
 
 It is written  by a super productive and innovative  CL hacker and has
-600+ stars  on github.  Nevertheless, it wasn't  touched in  two years
+600+ stars  on github.  Nevertheless,  it wasn't touched in  two years
 and, as it lacks docstrings and  direction, we can be surprised by the
-new implementation of some functions. No  need to say the community is
-divided on this subject.
+new implementation  of some  functions (see  its issues).  Some people
+discourage the use of it.  I, at least, am a happy user for the moment
+:)
 
 Allright so, back to printing the html content of our first result:
 
@@ -171,15 +177,9 @@ So I can scrape again my search results with the new selector:
 this should print interesting stuff, like our torrents titles and even
 strings like =S: 16L: 1= which are indeed our seeders and leechers.
 
-I check the html content:
-
-#+BEGIN_SRC lisp
-  CL-TORRENTS> (plump:serialize (aref res 0))
-  ;todo: insert here html content with seeders too.
-#+END_SRC
-
-allright, good. It has the link  to the torrent's page inside the href
-of the "a" element, as well as the seeders count.
+I check the html content and it seems allright. It has the link to the
+torrent's page  inside the  href of  the "a" element,  as well  as the
+seeders count.
 
 Note that we  can also inspect the results with  the mouse: left/right
 clicks  on the  elements printed  in the  REPL get  us into  the Slime
@@ -290,7 +290,7 @@ Open the  =.asdf= file and  compile and load  it. In Slime,  it's with
 Now we can load the project at the REPL and install its dependencies:
 
 #+BEGIN_SRC lisp
-(asdf:make "cl-torrents" ;; or ql:quickload
+(ql:quickload "cl-torrents" ;; or asdf:make
 ; compiling file "/home/vince/projets/cl-torrents/src/cl-torrents.lisp" (written 28 AUG 2017 10:21:07 PM):
 ; compiling (IN-PACKAGE :CL-USER)
 ; compiling (DEFPACKAGE CL-TORRENTS ...)
@@ -529,7 +529,7 @@ node:
 #+END_SRC
 
 We want to get  the torrent's page, the url in  the firts =href=. From
-this page we'll be able to access to the magnet link.
+this page we'll be able to access the magnet link.
 
 We know how to access the =a=:
 
@@ -541,8 +541,7 @@ We know how to access the =a=:
 
 it returns a plump node.
 
-With  the REPL  autocompletion and  then a  check at  the doc  we find
-=lquery-funcs:attr= to extract attributes:
+We use =(lquery:$ ... (attr :href))= as seen above to extract attributes:
 
 #+BEGIN_SRC lisp
 (lquery:$ *elt* "a" (attr :href))
@@ -578,7 +577,9 @@ project and compile, =C-c C-c= in Slime):
 We have the torrent's details page, we  know how to request it, now we
 want to get the magnet link.
 
-We experiment, and get a /list/ of the links inside this page:
+We experiment, and get a /list/ of the links inside this page.
+
+This is what we first came up with: (can be simpler)
 
 #+BEGIN_SRC lisp
 (mapcar (lambda (it)
@@ -597,14 +598,25 @@ We experiment, and get a /list/ of the links inside this page:
 
 in the result, there's our magnet link.
 
-We  saw what  I consider  CL  oddities and  quirks here,  than can  be
-frustrating for the (impatient) beginner.  =mapcar= expects a list and
-lquery  returns a  vector. So either we  transform  the result to a list  with
-=coerce=, either we use =(map 'list  ...)=.  Also the name =mapcar= is
-unusual.
+At first I was frustrated to have to =coerce= something to a list but
+it is not mandatory.
 
-We  could use  [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=,  which works  on vectors  too so  no more
-questions, it will work.
+Because =mapcar= expects a list and
+lquery  returns a  vector, we had to  transform  lquery's result to a list  with
+=coerce=. But we  can  simply  use =map=,  that  works  on lists  and
+vectors, and ask it to return a list:
+
+#+BEGIN_SRC lisp
+(map 'list (lambda (it)
+             (lquery:$ it (attr  :href)))
+           (lquery:$ * "a"))
+#+END_SRC
+
+I  find the  name  =mapcar= unusual  too, it  was  frustrating at  the
+beginning but it's a just a name after all.
+
+We could also use [[https://lispcookbook.github.io/cl-cookbook/cl21.html][cl21]]'s =map=, which works on lists and vectors so no
+more questions, it will work.
 
 Still with cl21, we can write shorter lambdas, with the shorthand =lm=
 or with the =^= reader  macro and accessing arguments with =%1=... =%n=
@@ -645,8 +657,8 @@ We end up with  the following functions:
 #+END_SRC
 
 
-- extract the magnet link from an  html (the page of a torrent's page)
-  parsed with plump.
+- we extract the magnet link from an  html (the page of a torrent's page)
+  parsed with plump like this:
 
 #+BEGIN_SRC lisp
 (defun find-magnet-link (parsed)
@@ -740,26 +752,63 @@ which  is quite  elegant and  can be  handy. This  is doable  with the
 
 This leads us to the end of part one.
 
+We wrote a  function that makes a  query on TPB and returns  a list of
+Plump objects. Then  the function that prints the  results calls other
+ones that extract  the title, the seeders and leechers  from the Plump
+objects:  there is  some  coupling  and that  should  be avoided.   In
+reality, we quickly changed the =torrents= function so that it returns
+a list of alists with the required information extracted:
+
+#+BEGIN_SRC lisp
+(defun torrents (words &key (stream t))
+  "Search torrents."
+  (format stream "searching on the Pirate Bay…")
+  (let* ((query (str:join "+" words))
+         (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
+         (req (request *search-url*))
+         (html (plump:parse req))
+         (res (lquery:$ html *selectors*))
+         (toret (map 'list (lambda (node)
+                             `((:title . ,(result-title node))
+                               (:href . ,(result-href node))
+                               (:leechers . ,(result-leechers node))
+                               (:seeders . ,(result-peers node))
+                               (:source . :tpb)))
+                     res)))
+    (format stream " found ~a results.~&" (length res))
+    toret))
+
+(defun result-title (node)
+  "Return the title of a search result."
+  (aref
+   (lquery:$ node ".Title a" (text))
+   0))
+
+(defun result-href (node)
+  (let* ((href-vector (lquery:$ node "a" (attr :href))))
+    (aref href-vector 0)))
+#+END_SRC
+
+That way, the  print function does not rely on  TPB-specific code and
+we can give it other alists to print, from other torrent sites.
+
 We now want or need more:
 
-- getting more content (seeders, leechers) (done in the app)
+- getting more content (seeders, leechers):  done in the app.
 - downloading the torrent file ?
-- *error handling* (network errors or timeout, unexpected errors)
+- *error handling* (network errors or timeout, unexpected errors, user
+  interrupts)
 - scraping other sites, *asynchronously*  (the asynchronous part will be
   straightforward, there's  a library for  that and it's  one function
   change.  See the [[https://lispcookbook.github.io/cl-cookbook/web-scraping.html#async-requests][Cookbook tutorial]].)
-- searching into a local Pirate Bay dump,
-- some *cache*
-- regular testing  against the website (straightforward  and to couple
-  with the CI),
-- sharing this program: a *standalone executable* ? using Roswell ?,
-- a *command line tool*
+- some *cache* (part 6)
+- unit tests,  "live" tests and  continuous integration: see  the next
+  section.
+- building a *standalone executable*, parsing *command line arguments*: see part 3.
 - …
 
-We'll carry on by writing  tests, running them automatically thanks to
-a  Continuous Integration  system, then  we'll build  a self-contained
-executable, using the advantages of  a couple Lisp implementations and
-parsing command line arguments.
+We'll carry  on by  writing tests, then  we'll build  a self-contained
+executable.
 
 
 * Tests and CI
@@ -1284,11 +1333,13 @@ makes  them  relatively  small.  Memory footprint  will  be  the  same
 though.
 #+END_QUOTE
 
-** With ECL
+   So we have room for improvement.
+
+# ** With ECL
 
 # TODO !
 
-https://common-lisp.net/project/ecl/static/ecldoc/Extensions.html#Executable
+# https://common-lisp.net/project/ecl/static/ecldoc/Extensions.html#Executable
 
 # https://stackoverflow.com/questions/46520876/building-an-executable-with-ecl-missing-dependency-or-can-not-find-make-build-i
 
@@ -1930,4 +1981,4 @@ restarts (invokable by number or by possibly-abbreviated name):
 
   That the end of our tutorial (for now ?).
 
-  You can comment on the repository: https://github.com/vindarel/cl-torrents
+  You can see the full sources and comment on the repository: https://github.com/vindarel/cl-torrents
