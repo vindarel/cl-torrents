@@ -10,8 +10,12 @@ test:
     - make test
 
 build:
+  only:
+    # Only when a new tag is pushed.
+    - tags
   script:
     - make build
   artifacts:
     paths:
+      # xxx include the version number
       - torrents
