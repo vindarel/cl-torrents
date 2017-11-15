@@ -109,22 +109,19 @@ Keep the letters' possible mixed up or down case.
 ;; Describe handlers for bad command line arguments.
 (defun unknown-option (condition)
   (format t "~s option is unknown.~%" (opts:option condition))
-  (opts:describe
-   :args "[keywords]")
+  (opts:describe)
   (exit))
 
 (defun missing-arg (condition)
   (format t "Bad options: ~a needs an argument.~&" (opts:option condition))
-  (opts:describe
-   :args "[keywords]")
+  (opts:describe)
   (exit))
 
 (defun arg-parser-failed (condition)
   (format t "Error: could not parse ~a as argument of ~a~&."
           (opts:raw-arg condition)
           (opts:option condition))
-  (opts:describe
-   :args "[keywords]")
+  (opts:describe)
   (exit))
 
 (defmacro when-option ((options opt) &body body)
