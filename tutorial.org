@@ -313,6 +313,16 @@ names. We have to register here =dexador= and the others:
 
 and =cl-arrows= if you wish.
 
+If you /need/ to set package versions, use something like:
+
+#+BEGIN_SRC lisp
+  :depends-on ((:version "cl-ppcre" "2.0.11"))
+#+END_SRC
+
+but  there is  usually  no  need.  To  learn  more about  dependencies
+management  in Common  Lisp, what  to do  when you  need project-local
+dependencies (like a virtual env), see the [[https://lispcookbook.github.io/cl-cookbook/getting-started.html#advanced-dependencies-management][Cookbook]].
+
 ** Loading the project
 
 Open the  =.asdf= file and  compile and load  it. In Slime,  it's with
