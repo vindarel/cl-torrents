@@ -2,7 +2,8 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 
 [[https://gitlab.com/vindarel/cl-torrents][file:https://gitlab.com/vindarel/cl-torrents/badges/master/pipeline.svg]]
 
-Download: [[https://gitlab.com/vindarel/cl-torrents/-/jobs/artifacts/master/raw/torrents?job=build][GNU/Linux 64-bit]] (/78Mo, self-contained executable/).
+Download for:      [[https://gitlab.com/vindarel/cl-torrents/-/jobs/artifacts/master/raw/torrents?job=build][GNU/Linux       64-bit]]      (/78Mo,      self-contained
+executable/). [[https://gitlab.com/vindarel/cl-torrents/tags][Previous versions]].
 
 * cl-torrents
 
