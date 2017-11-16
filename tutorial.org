@@ -749,10 +749,22 @@ T
     We request the magnet link with:
 
 #+BEGIN_SRC lisp
-CL-TORRENTS> (magnet 0)
+(magnet 0)
 "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
 #+END_SRC
 
+   That  works, but  beware  if we  ask  for an  index  that does  not
+   exist. Let's take precautions:
+
+#+BEGIN_SRC lisp
+(defun magnet (index)
+  "Search the magnet from last search's `index''s result."
+  (if *last-search*
+      (if (< index (length *last-search*))
+          (magnet-link-from (elt *last-search* index))
+          (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
+      (format t "The search returned no results, we can not return this magnet link.~&")))
+#+END_SRC
 
 ** Exporting functions
 
@@ -2079,6 +2091,41 @@ restarts (invokable by number or by possibly-abbreviated name):
    the  implementation.  There's  also =#-=.   Actually =#+=  looks at
    symbols in the =*features*= list.  We can also combine symbols with
    =and=, =or= and =not=.
+
+** Scrapers errors
+
+   Web scraping  is by definition  unstable, we should be  prepared to
+   all sort of errors.
+
+   For  every function  that  parses  result, we  surround  it with  a
+   handler-case:
+
+#+BEGIN_SRC lisp
+(defun result-leechers (node)
+  (handler-case
+      (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2))
+    (error ()
+      "NA")))
+#+END_SRC
+
+   We do that generally for all =torrents= functions:
+
+#+BEGIN_SRC lisp
+(defun torrents (words &key (stream t))
+  "Return a list of..."
+  (format stream "searching on Kat...")
+  (handler-case
+      (let* ((query (str:join "+" words))
+         ...
+    (error ()
+      (format stream " no results.~&"))))))
+#+END_SRC
+
+    We chose to  just print "no results" and return  =nil= (the return
+    value of =format=).  We could also print the error  message of the
+    condition  (optional  argument  of  "error":  =(error  (condition)
+    ...)=). We  might want to  not catch errors  when we are  in Slime
+    too. Is that possible ?
 
 * More features
 ** Cache
