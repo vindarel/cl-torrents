@@ -23,7 +23,7 @@
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
-(defparameter *version* "0.5")
+(defparameter *version* "0.5.1")
 
 (defparameter *last-search* nil "Remembering the last search (should be an hash-map).")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
@@ -88,6 +88,7 @@
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
+    (save-results joined-terms res *store*)
     sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*))
