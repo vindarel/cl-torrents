@@ -27,25 +27,28 @@
 (defun torrents (words &key (stream t))
   "Search torrents."
   (format stream "searching on the Pirate Bay…")
-  (let* ((terms (if (listp words)
-                    words
-                    ;; The main gives words as a list,
-                    ;; the user at the Slime REPL one string.
-                    (str:words words)))
-         (query (str:join "+" terms))
-         (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
-         (req (request *search-url*))
-         (html (plump:parse req))
-         (res (lquery:$ html *selectors*))
-         (toret (map 'list (lambda (node)
-                             `((:title . ,(result-title node))
-                               (:href . ,(result-href node))
-                               (:leechers . ,(result-leechers node))
-                               (:seeders . ,(result-peers node))
-                               (:source . :tpb)))
-                     res)))
-    (format stream " found ~a results.~&" (length res))
-    toret))
+  (handler-case
+      (let* ((terms (if (listp words)
+                        words
+                        ;; The main gives words as a list,
+                        ;; the user at the Slime REPL one string.
+                        (str:words words)))
+             (query (str:join "+" terms))
+             (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
+             (req (request *search-url*))
+             (html (plump:parse req))
+             (res (lquery:$ html *selectors*))
+             (toret (map 'list (lambda (node)
+                                 `((:title . ,(result-title node))
+                                   (:href . ,(result-href node))
+                                   (:leechers . ,(result-leechers node))
+                                   (:seeders . ,(result-peers node))
+                                   (:source . :tpb)))
+                         res)))
+        (format stream " found ~a results.~&" (length res))
+        toret)
+    (error ()
+      (format stream " no results.~&"))))
 
 (defun result-title (node)
   "Return the title of a search result."

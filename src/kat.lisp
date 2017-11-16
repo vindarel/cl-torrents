@@ -46,15 +46,22 @@
 
 (defun result-seeders (node)
   ;; could be a better selector.
-  (parse-integer (elt (lquery:$ node ".ttable_col2" (text)) 1)))
+  (handler-case
+      (parse-integer (elt (lquery:$ node ".ttable_col2" (text)) 1))
+    (error ()
+      "NA")))
 
 (defun result-leechers (node)
   ;; could be a better selector.
-  (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2)))
+  (handler-case
+      (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2))
+    (error ()
+      "NA")))
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
   (format stream "searching on Kat...")
+  (handler-case
   (let* ((query (str:join "+" words))
          (url (str:replace-all "{}" query *search-url*))
          (req (request url))
@@ -78,4 +85,6 @@
                              )
                      results)))
     (format stream " found ~a results.~&" (length toret))
-    toret))
+    toret)
+    (error ()
+      (format stream " no results.~&"))))

@@ -23,7 +23,7 @@
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
-(defparameter *version* "0.5.1")
+(defparameter *version* "0.5.2")
 
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
@@ -38,8 +38,8 @@
 
 (defun save-results (terms val store)
   "Save results in cache."
-  (format t "Saving results for ~a.~&" terms)
-  (setcache terms val store))
+  (when val
+    (setcache terms val store)))
 
 (defun get-cached-results (terms store)
   (when (getcache terms store)
@@ -131,8 +131,11 @@
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
-  ;; yeah, we could give more than one index at once.
-  (magnet-link-from (elt *last-search* index)))
+  (if *last-search*
+      (if (< index (length *last-search*))
+          (magnet-link-from (elt *last-search* index))
+          (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
+      (format t "The search returned no results, we can not return this magnet link.~&")))
 
 (defun main ()
   "Parse command line arguments (portable way) and call the program."
