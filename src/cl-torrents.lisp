@@ -23,6 +23,8 @@
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
+(defparameter *version* "0.5")
+
 (defparameter *last-search* nil "Remembering the last search (should be an hash-map).")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
 (defparameter *keywords* '() "List of keywords given as input by the user.")
@@ -144,6 +146,10 @@
            :description "print this help text"
            :short #\h
            :long "help")
+    (:name :version
+           :description "print the version"
+           :short #\v
+           :long "version")
     (:name :nb-results
            :description "maximum number of results to print."
            :short #\n
@@ -170,6 +176,10 @@
           (opts:describe
            :prefix "CL-torrents. Usage:"
            :args "[keywords]")
+          (exit)))
+    (if (getf options :version)
+        (progn
+          (format t "cl-torrents version ~a~&" *version*)
           (exit)))
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))

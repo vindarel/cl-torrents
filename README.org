@@ -86,7 +86,7 @@ CL-torrents. Usage:
 
 Available options:
   -h, --help               print this help text
-  -v, --verbose            verbose output
+  -v, --version            print the version
   -n, --nb ARG             set the maximum number of results to print.
   -m, --magnet ARG         get the magnet link of the given search result.
 #+END_SRC
@@ -100,7 +100,7 @@ Results are cached.
 ** Settings
 
 Maximum number  of results  to print (50  by default  for convenience,
-when there can be more than a hundred results).
+when there can be hundreds).
 
 : (setf *nb-results* 50)
 
