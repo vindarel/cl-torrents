@@ -2105,7 +2105,7 @@ restarts (invokable by number or by possibly-abbreviated name):
   (handler-case
       (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2))
     (error ()
-      "NA")))
+      -1)))
 #+END_SRC
 
    We do that generally for all =torrents= functions:

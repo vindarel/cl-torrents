@@ -89,6 +89,7 @@ Available options:
   -h, --help               print this help text
   -v, --version            print the version
   -n, --nb ARG             set the maximum number of results to print.
+  -i, --info               print more information (like the torrent's url)
   -m, --magnet ARG         get the magnet link of the given search result.
 #+END_SRC
 
@@ -98,12 +99,14 @@ Available options:
 
 Results are cached.
 
-** Settings
+** Options
 
-Maximum number  of results  to print (50  by default  for convenience,
+=-n <i>=: maximum number  of results  to print (50  by default  for convenience,
 when there can be hundreds).
 
 : (setf *nb-results* 50)
+
+=-i= (=--info==) to print more information, like the url.
 
 ** Tutorial
 
@@ -120,8 +123,9 @@ when there can be hundreds).
 - creating and loading a project,
 - basic data structures and gotchas,
 - some useful libraries,
-- unit tests, with mocks, running tests from the shell,
-- creating executables, command line arguments,
+- unit tests, with mocks, running tests from the shell, continuous integration,
+- parsing command line arguments, creating executables, continuous delivery,
+- basics of error handling,
 - ...
 
   It will eventually  tackle more topics and  features (more settings,
@@ -135,6 +139,7 @@ when there can be hundreds).
 - [X] CI
 - local copy of TPB
 - more command line options (specially verbosity)
+  - [X] =-i= print url
 - open an url
 - download the torrent file
 - generate a json
@@ -154,6 +159,7 @@ when there can be hundreds).
 - [[Https://github.com/CodyReichert/awesome-cl][Awesome-cl]]
 - [[https://lispcookbook.github.io/cl-cookbook/][the Common Lisp Cookbook]]
 - http://quickdocs.org/
+- (my) [[https://lisp-journey.gitlab.io/][lisp-journey]]: introductory posts, lists of resources, screencasts.
 
 
 * Setting up a Common Lisp environment
