@@ -27,7 +27,7 @@ javascript-generated pages. We just have to:
 
 - get the html page ([[http://quickdocs.org/dexador/][dexador]]: =(dex:get <url>)=)
 - parse the html into a data structure ([[https://shinmera.github.io/plump/][plump]]: =(plump:parse <html>)=)
-- search   with  CSS   selectors  ([[https://shinmera.github.io/lquery][lquery]]:   =(lquery:"  <parsed-html>
+- search   with  CSS   selectors  ([[https://shinmera.github.io/lquery][lquery]]:   =(lquery:$  <parsed-html>
   <selectors>)=)
 
 We suppose  you have a  ready Common Lisp development  environment. If

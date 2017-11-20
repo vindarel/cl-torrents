@@ -47,14 +47,14 @@
       (parse-integer (elt (lquery:$ node "td" (text))
                           4))
     (error ()
-      "NAN")))
+      -1)))
 
 (defun result-leechers (node)
   (handler-case
       (parse-integer (elt (lquery:$ node "td" (text))
                           5))
     (error ()
-      "NAN")))
+      -1)))
 
 (defun result-title (node)
   (elt (lquery:$ node ".desc a" (text))
@@ -62,7 +62,7 @@
 
 (defun torrents (words &key (stream t))
   "Return a list of alists with title, href, and seeders."
-  (format stream "searching torrent.cd…")
+  (format stream "searching torrent.cd...")
   (handler-case
       ;; instead of this error handling, unprecise, we would benefit
       ;; from a threading macro that stops when someone is nil (see
