@@ -49,14 +49,14 @@
   (handler-case
       (parse-integer (elt (lquery:$ node ".ttable_col2" (text)) 1))
     (error ()
-      "NA")))
+      -1)))
 
 (defun result-leechers (node)
   ;; could be a better selector.
   (handler-case
       (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2))
     (error ()
-      "NA")))
+      -1)))
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
