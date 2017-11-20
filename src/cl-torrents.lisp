@@ -23,7 +23,7 @@
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
-(defparameter *version* "0.5.2")
+(defparameter *version* "0.6")
 
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
@@ -91,7 +91,7 @@
     (save-results joined-terms res *store*)
     sorted))
 
-(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*))
+(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; xxx: do not rely on *last-search*.
@@ -114,7 +114,9 @@
                     (assoc-value it :seeders)
                     (assoc-value it :leechers)
                     (assoc-value it :source)
-                    )))
+                    )
+              (if infos
+                  (format stream "~a~&" (assoc-value it :href)))))
           (reverse (sublist results 0 nb-results)))
   t)
 
@@ -159,6 +161,10 @@
            :short #\n
            :long "nb"
            :arg-parser #'parse-integer)
+    (:name :infos
+           :description "print more information (like the torrent's url)"
+           :short #\i
+           :long "info")
     (:name :magnet
            :description "get the magnet link of the given search result."
            :short #\m
@@ -178,7 +184,7 @@
     (if (getf options :help)
         (progn
           (opts:describe
-           :prefix "CL-torrents. Usage:"
+           :prefix (format nil "CL-torrents version ~a. Usage:" *version*)
            :args "[keywords]")
           (exit)))
     (if (getf options :version)
@@ -193,7 +199,9 @@
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
     ;; trivial-signal didn't work (see issue #3)
     (handler-case
-        (display-results :results (async-torrents free-args) :nb-results *nb-results*)
+        (display-results :results (async-torrents free-args)
+                         :nb-results *nb-results*
+                         :infos (getf options :infos))
       (sb-sys:interactive-interrupt () (progn
                                          (format *error-output* "Aborting.~&")
                                          (exit))))
