@@ -27,7 +27,7 @@ javascript-generated pages. We just have to:
 
 - get the html page ([[http://quickdocs.org/dexador/][dexador]]: =(dex:get <url>)=)
 - parse the html into a data structure ([[https://shinmera.github.io/plump/][plump]]: =(plump:parse <html>)=)
-- search   with  CSS   selectors  ([[https://shinmera.github.io/lquery][lquery]]:   =(lquery:"  <parsed-html>
+- search   with  CSS   selectors  ([[https://shinmera.github.io/lquery][lquery]]:   =(lquery:$  <parsed-html>
   <selectors>)=)
 
 We suppose  you have a  ready Common Lisp development  environment. If
@@ -39,7 +39,7 @@ Let's go.
 Install our dependencies right away:
 
 #+BEGIN_SRC lisp
-(ql:quickload '("dexador" "plump" "lquery"))
+(ql:quickload '("dexador" "plump" "lquery" "str"))
 #+END_SRC
 
 To begin  with, we do  a search on the  website and we  copy-paste the
@@ -91,10 +91,40 @@ Let's try in the REPL:
 (defparameter html (dex:get *search-url*)) ;; returns the html
 (defparameter parsed (plump:parse html))   ;; returns a list of plump elements
 (defparameter results (lquery:$ parsed *selectors*)) ;; returns a list of stuff
-(setf results (lquery:$ parsed *selectors* (text)))  ;; returns text, i.e. the titles
+(setf results (lquery:$ parsed *selectors*))
 #+END_SRC
 
-A little explanation for the =lquery=  line: the last =(text)= part is
+it returns:
+
+#+BEGIN_SRC text
+#(#<PLUMP-DOM:ELEMENT th {100369D943}> #<PLUMP-DOM:ELEMENT td {10036A7CE3}>
+  #<PLUMP-DOM:ELEMENT td {10036B6163}> #<PLUMP-DOM:ELEMENT td {10036FC903}>
+  ...
+  #<PLUMP-DOM:ELEMENT td {10047C0BC3}> #<PLUMP-DOM:ELEMENT th {10047D44E3}>
+  #<PLUMP-DOM:ELEMENT td {10047DE853}> #<PLUMP-DOM:ELEMENT th {10047F2333}>
+  #<PLUMP-DOM:ELEMENT td {10047FC673}> #<PLUMP-DOM:ELEMENT td {100480ACF3}>
+  #<PLUMP-DOM:ELEMENT td {10048195D3}> #<PLUMP-DOM:ELEMENT td {1004827D73}>)
+#+END_SRC
+
+We can check its inner text representation:
+
+#+BEGIN_SRC lisp
+(lquery:$ parsed *selectors* (text))
+;; =>
+#("
+Title
+"
+  "Matrix FRENCH DVDRIP 1999 COOLUpload Date: 05.06.15 Size: 700,30 MB"
+  "The Matrix Reloaded (2003) FullHD, Dual Audio: English + SpaUpload Date: 12.04.15 Size: 8,51 GB"
+[...]
+"
+  "Arturia - Matrix 12-V v1.0.1.9 OS X [HEXWARS][dada]Upload Date: 28.12.14 Size: 100,86 MB"
+  "Native Instruments - Maschine Expansion Golden Kingdom HYBRIUpload Date: 03.06.15 Size: 267,84 MB"
+  "Arturia - Matrix-12 V v1 1 0 522 R2 AU AAX VST VST3 ST OS X Upload Date: 02.04.15 Size: 100,49 MB"
+  "Arturia - Matrix-12 V v1.1.0.522 OS X [PitcHsHiFTeR][dada]Upload Date: 28.03.15 Size: 130,44 MB")
+#+END_SRC
+
+A little explanation for =lquery=: the last =(text)= part is
 an lquery thing to get the text representation of the node, instead of
 a  lquery internal  object.  Likewise  we'll be  able  to call  =(attr
 :href)=  or  =(html)=, which  are  self-explanatory.  If you  want  CL
@@ -104,7 +134,7 @@ I  like to  check the  html content  of the  plump nodes.  We use  the
 =serialize= plump function (the second function from the doc ;) ):
 
 #+BEGIN_SRC lisp
-CL-TORRENTS> (plump:serialize (first results))
+(plump:serialize (first results))
 #+END_SRC
 
 but we get an error:
@@ -114,6 +144,7 @@ The value #(
 ... all the content of results here ...
 )
 is not of type LIST
+when binding LIST
 …
 #+END_QUOTE
 
@@ -143,7 +174,7 @@ discourage the use of it.  I, at least, am a happy user for the moment
 Allright so, back to printing the html content of our first result:
 
 #+BEGIN_SRC text
-CL-TORRENTS> (plump:serialize (aref results 0))
+(plump:serialize (aref results 0))
 <th class="Title header ">
 <a href="https://piratebay.to/search/0/800/0/matrix/0/ATitle/1/">Title</a>
 </th>
@@ -194,7 +225,7 @@ We came up with this function:
   ""
   (let* ((html (dex:get *search-url*))
          (parsed (plump:parse html))
-         (res (lquery:$ parsed *selectors* (text))))
+         (res (lquery:$ parsed *selectors*)))
     res))
 #+END_SRC
 
@@ -211,7 +242,7 @@ load another external library:
 (-<>> *search-url*
   (dex:get)
   (plump:parse)
-  (lquery:$ <> *selectors* (text)))
+  (lquery:$ <> *selectors*))
 #+END_SRC
 
 [[https://github.com/nightfly19/cl-arrows][cl-arrows]] defines  a few  threading macros. The  classic one  would be
@@ -281,6 +312,16 @@ names. We have to register here =dexador= and the others:
 #+END_SRC
 
 and =cl-arrows= if you wish.
+
+If you /need/ to set package versions, use something like:
+
+#+BEGIN_SRC lisp
+  :depends-on ((:version "cl-ppcre" "2.0.11"))
+#+END_SRC
+
+but  there is  usually  no  need.  To  learn  more about  dependencies
+management  in Common  Lisp, what  to do  when you  need project-local
+dependencies (like a virtual env), see the [[https://lispcookbook.github.io/cl-cookbook/getting-started.html#advanced-dependencies-management][Cookbook]].
 
 ** Loading the project
 
@@ -369,7 +410,7 @@ and voilà. We put this at the beginning of our search function and we get:
          (*search-url* (str:replace-all "{KEYWORDS}" query *search-url*))
          (req (dex:get *search-url*))
          (html (plump:parse req))
-         (res (lquery:$ html *selectors* (text)))
+         (res (lquery:$ html *selectors*))
          (res-list (coerce res 'list))))
 
     res-list))
@@ -381,7 +422,7 @@ Let's try:
 
 #+BEGIN_SRC lisp
 (torrents "matrix trilogy")
-#("Matrix FRENCH DVDRIP 1999 COOLUpload Date: 05.06.15 Size: 700,30 MB"
+("Matrix FRENCH DVDRIP 1999 COOLUpload Date: 05.06.15 Size: 700,30 MB"
   "The Matrix Reloaded (2003) FullHD, Dual Audio: English + SpaUpload Date: 12.04.15 Size: 8,51 GB"
   "The Matrix Trilogy (1999-2003) + Extras 1080p BluRay x264 DuUpload Date: 12.02.15 Size: 12,86 GB"
   "The Matrix Trilogy (1999-2003) BluRay BDRip 1080p AC3Upload Date: 15.09.15 Size: 23,29 GB"
@@ -708,10 +749,22 @@ T
     We request the magnet link with:
 
 #+BEGIN_SRC lisp
-CL-TORRENTS> (magnet 0)
+(magnet 0)
 "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
 #+END_SRC
 
+   That  works, but  beware  if we  ask  for an  index  that does  not
+   exist. Let's take precautions:
+
+#+BEGIN_SRC lisp
+(defun magnet (index)
+  "Search the magnet from last search's `index''s result."
+  (if *last-search*
+      (if (< index (length *last-search*))
+          (magnet-link-from (elt *last-search* index))
+          (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
+      (format t "The search returned no results, we can not return this magnet link.~&")))
+#+END_SRC
 
 ** Exporting functions
 
@@ -2039,6 +2092,41 @@ restarts (invokable by number or by possibly-abbreviated name):
    symbols in the =*features*= list.  We can also combine symbols with
    =and=, =or= and =not=.
 
+** Scrapers errors
+
+   Web scraping  is by definition  unstable, we should be  prepared to
+   all sort of errors.
+
+   For  every function  that  parses  result, we  surround  it with  a
+   handler-case:
+
+#+BEGIN_SRC lisp
+(defun result-leechers (node)
+  (handler-case
+      (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2))
+    (error ()
+      "NA")))
+#+END_SRC
+
+   We do that generally for all =torrents= functions:
+
+#+BEGIN_SRC lisp
+(defun torrents (words &key (stream t))
+  "Return a list of..."
+  (format stream "searching on Kat...")
+  (handler-case
+      (let* ((query (str:join "+" words))
+         ...
+    (error ()
+      (format stream " no results.~&"))))))
+#+END_SRC
+
+    We chose to  just print "no results" and return  =nil= (the return
+    value of =format=).  We could also print the error  message of the
+    condition  (optional  argument  of  "error":  =(error  (condition)
+    ...)=). We  might want to  not catch errors  when we are  in Slime
+    too. Is that possible ?
+
 * More features
 ** Cache
 
@@ -2084,6 +2172,8 @@ restarts (invokable by number or by possibly-abbreviated name):
                  (getcache joined *store*)
                  (tpb::torrents words :stream log-stream))
 #+END_SRC
+
+    =setcache= takes an optional expiry time, in seconds.
 
     We re-build the project (=make build=), search for matrix once (we
     wait a bit) and a second time: we hit the cache.

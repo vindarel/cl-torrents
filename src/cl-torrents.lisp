@@ -23,7 +23,9 @@
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
-(defparameter *last-search* nil "Remembering the last search (should be an hash-map).")
+(defparameter *version* "0.6")
+
+(defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
 (defparameter *keywords* '() "List of keywords given as input by the user.")
 (defvar *keywords-colors* nil
@@ -36,8 +38,8 @@
 
 (defun save-results (terms val store)
   "Save results in cache."
-  (format t "Saving results for ~a.~&" terms)
-  (setcache terms val store))
+  (when val
+    (setcache terms val store)))
 
 (defun get-cached-results (terms store)
   (when (getcache terms store)
@@ -86,9 +88,10 @@
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
+    (save-results joined-terms res *store*)
     sorted))
 
-(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*))
+(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; xxx: do not rely on *last-search*.
@@ -111,7 +114,9 @@
                     (assoc-value it :seeders)
                     (assoc-value it :leechers)
                     (assoc-value it :source)
-                    )))
+                    )
+              (if infos
+                  (format stream "~a~&" (assoc-value it :href)))))
           (reverse (sublist results 0 nb-results)))
   t)
 
@@ -128,8 +133,11 @@
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
-  ;; yeah, we could give more than one index at once.
-  (magnet-link-from (elt *last-search* index)))
+  (if *last-search*
+      (if (< index (length *last-search*))
+          (magnet-link-from (elt *last-search* index))
+          (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
+      (format t "The search returned no results, we can not return this magnet link.~&")))
 
 (defun main ()
   "Parse command line arguments (portable way) and call the program."
@@ -144,11 +152,19 @@
            :description "print this help text"
            :short #\h
            :long "help")
+    (:name :version
+           :description "print the version"
+           :short #\v
+           :long "version")
     (:name :nb-results
            :description "maximum number of results to print."
            :short #\n
            :long "nb"
            :arg-parser #'parse-integer)
+    (:name :infos
+           :description "print more information (like the torrent's url)"
+           :short #\i
+           :long "info")
     (:name :magnet
            :description "get the magnet link of the given search result."
            :short #\m
@@ -168,8 +184,12 @@
     (if (getf options :help)
         (progn
           (opts:describe
-           :prefix "CL-torrents. Usage:"
+           :prefix (format nil "CL-torrents version ~a. Usage:" *version*)
            :args "[keywords]")
+          (exit)))
+    (if (getf options :version)
+        (progn
+          (format t "cl-torrents version ~a~&" *version*)
           (exit)))
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))
@@ -179,7 +199,9 @@
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
     ;; trivial-signal didn't work (see issue #3)
     (handler-case
-        (display-results :results (async-torrents free-args) :nb-results *nb-results*)
+        (display-results :results (async-torrents free-args)
+                         :nb-results *nb-results*
+                         :infos (getf options :infos))
       (sb-sys:interactive-interrupt () (progn
                                          (format *error-output* "Aborting.~&")
                                          (exit))))
