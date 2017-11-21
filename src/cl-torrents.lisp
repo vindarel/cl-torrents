@@ -20,10 +20,9 @@
   (:export :torrents
            :magnet
            :main))
-;; to do: shadow-import to use search as a funnction name.
 (in-package :cl-torrents)
 
-(defparameter *version* "0.6")
+(defparameter *version* "0.6.1")
 
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
@@ -73,9 +72,10 @@
                     words
                     (str:words words)))
          (joined-terms (str:join "+" terms))
-         (res (if (get-cached-results joined-terms *store*)
+         (cached-res (get-cached-results joined-terms *store*))
+         (res (if cached-res
                   ;; the cache is mixed with "torrents" and "async-torrents": ok.
-                  (getcache joined-terms *store*)
+                  cached-res
                   (mapcan (lambda (fun)
                             (lparallel:pfuncall fun terms))
                           '(tpb:torrents
@@ -88,13 +88,13 @@
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
-    (save-results joined-terms res *store*)
+    (unless cached-res
+      (save-results joined-terms sorted *store*))
     sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
-            ;; xxx: do not rely on *last-search*.
             ;; I want to color the output.
             ;; Adding color characters for the terminal augments the string length.
             ;; We want a string padding for the title of 65 chars.
