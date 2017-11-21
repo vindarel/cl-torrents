@@ -1342,7 +1342,7 @@ $ ls -lh torrents
 -rwxr-xr-x 1 vince vince 69M sept. 30 22:58 torrents
 #+END_SRC
 
-   Our  executables  weighs  69Mo.  Quite big  for  this  little  cli
+   Our  executables  weighs  78Mo.  Quite big  for  this  little  cli
    app. But it will be totally ok for a business application.
 
    To ease the distribution of apps to people who already have a Lisp,
@@ -1388,13 +1388,29 @@ though.
 
    So we have room for improvement.
 
-# ** With ECL
+   Finally,  we  tried  the  latest  ECL  version  (16.1.3)  with  the
+   [[https://hub.docker.com/r/daewok/lisp-devel/][lisp-devel  Docker image]]  (Debian's 13.x  is too  old, it  has ASDF
+   compatibility  problems,   that  should   be  resolved   with  ASDF
+   3.3.2). We had a simple makefile target:
 
-# TODO !
+#+BEGIN_SRC text
+# Makefile
+	ecl \
+		-eval '(ql:quickload :closer-mop)' \  # seems needed O_o
+		-eval '(load "cl-torrents.asd")' \
+		-eval '(ql:quickload :cl-torrents)' \ # building everything...
+		-eval '(asdf:make-build :cl-torrents :type :program :move-here #P"./")'
+#+END_SRC
 
-# https://common-lisp.net/project/ecl/static/ecldoc/Extensions.html#Executable
+    which we can  call manually after loading the  image (or integrate
+    into Gitlab CI):
 
-# https://stackoverflow.com/questions/46520876/building-an-executable-with-ecl-missing-dependency-or-can-not-find-make-build-i
+: service docker start
+: docker run --rm -it -v /home/vince/projets/cl-torrents:/usr/local/share/common-lisp/source  daewok/lisp-devel:latest bash
+
+    In the end,  we got a 52Mo executable, and  unfortunately it got a
+    runtime error, so we won't ship it, and we won't investigate this.
+
 
 ** Parsing command line arguments
 
