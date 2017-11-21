@@ -6,8 +6,7 @@
                 :keyword-color-pairs
                 :exit
                 :sublist)
-  (:export :torrents
-           :magnet))
+  (:export :torrents))
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :tpb)
 

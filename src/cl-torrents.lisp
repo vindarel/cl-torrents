@@ -202,9 +202,14 @@
         (display-results :results (async-torrents free-args)
                          :nb-results *nb-results*
                          :infos (getf options :infos))
-      (sb-sys:interactive-interrupt () (progn
-                                         (format *error-output* "Aborting.~&")
-                                         (exit))))
+      (#+sbcl sb-sys:interactive-interrupt
+        #+ccl  ccl:interrupt-signal-condition
+        #+clisp system::simple-interrupt-condition
+        #+ecl ext:interactive-interrupt
+        #+allegro excl:interrupt-signal
+        () (progn
+             (format *error-output* "Aborting.~&")
+             (exit))))
 
     (if (getf options :magnet)
         (progn
