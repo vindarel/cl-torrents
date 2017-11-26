@@ -7,7 +7,7 @@
   (:use :cl :asdf))
 (in-package :cl-torrents-asd)
 
-(defsystem cl-torrents
+(defsystem torrents
   :version "0.1"
   :author ""
   :license ""

@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage cl-torrents.utils
+(defpackage torrents.utils
   (:use :cl)
   (:export :sublist
            :find-magnet-link
@@ -8,7 +8,7 @@
            :missing-arg
            :when-option))
 
-(in-package :cl-torrents.utils)
+(in-package :torrents.utils)
 
 (defparameter *colors* '(
                          cl-ansi-text:blue

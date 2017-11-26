@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage cl-torrents
+(defpackage torrents
   (:use :cl
         :clache)
   ;; see also Quickutil to import only the utility we need.
@@ -7,7 +7,7 @@
   (:import-from :alexandria
                 :assoc-value ;; get the val of an alist alone, not the (key val) couple.
                 :flatten)
-  (:import-from :cl-torrents.utils
+  (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
                 :exit
@@ -20,7 +20,7 @@
   (:export :torrents
            :magnet
            :main))
-(in-package :cl-torrents)
+(in-package :torrents)
 
 (defparameter *version* "0.6.1")
 

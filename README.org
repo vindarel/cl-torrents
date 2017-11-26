@@ -30,7 +30,7 @@ executable/). [[https://gitlab.com/vindarel/cl-torrents/tags][Previous versions]
 
 and install it:
 
-: (ql:quickload "cl-torrents")
+: (ql:quickload "torrents")
 
 
 ** Usage
@@ -146,6 +146,8 @@ when there can be hundreds).
 - download the torrent file
 - generate a json
 - ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
+- add torrent to a local torrent client
+- add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app,...
 
 ** Theme
