@@ -18,6 +18,7 @@
                 :find-magnet-link
                 :sublist)
   (:export :torrents
+           :async-torrents
            :magnet
            :main))
 (in-package :torrents)
@@ -43,32 +44,23 @@
 (defun get-cached-results (terms store)
   (when (getcache terms store)
     (progn
-      (format t "Got cached results for ~a.~&" terms)
+      ;; (format t "Got cached results for ~a.~&" terms)
       (getcache terms store))))
 
-
 (defun torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
-  "Search on the different websites.
-- `log-stream': a stream for logging messages. Used to discard them in tests, where we only want to get the result of `display-results'."
-  (let* ((terms (if (listp words)
-                   words
-                   ;; The main function gives words as a list,
-                   ;; the user at the REPL a string.
-                   (str:words words)))
-        (joined (str:join "+" terms))
-        (res (if (get-cached-results joined *store*)
-                 (getcache joined *store*)
-                 (tpb::torrents words :stream log-stream))))
-    (setf *keywords* terms)
-    (setf *keywords-colors* (keyword-color-pairs terms))
-    (setf *last-search* res)
-    (save-results terms res *store*)
+  "Search for torrents on the different sources and print the results, sorted by number of seeders.
+`words': a string (space-separated keywords) or a list of strings.
+`nb-results': max number of results to print.
+`log-stream': used in tests to capture (and ignore) some output."
+  (let ((res (async-torrents words :log-stream log-stream)))
     (display-results :results res :stream stream :nb-results nb-results)))
 
-(defun async-torrents (words)
+(defun async-torrents (words &key (log-stream t))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (let* ((terms (if (listp words)
+                    ;; The main function gives words as a list,
+                    ;; the user at the REPL a string.
                     words
                     (str:words words)))
          (joined-terms (str:join "+" terms))
