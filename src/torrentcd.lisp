@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage torrentcd
   (:use :cl)
-  (:import-from :cl-torrents.utils
+  (:import-from :torrents.utils
                 :join-for-query)
   (:import-from :alexandria
                 :flatten)

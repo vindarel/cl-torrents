@@ -2,19 +2,19 @@
 build:
 	#TODO:
 	sbcl --load cl-torrents.asd \
-	     --eval '(ql:quickload :cl-torrents)' \
-	     --eval '(use-package :cl-torrents)' \
+	     --eval '(ql:quickload :torrents)' \
+	     --eval '(use-package :torrents)' \
              --eval "(sb-ext:save-lisp-and-die #p\"torrents\" :toplevel #'main :executable t)"
 
 test:
 	sbcl --load cl-torrents.asd \
-	     --eval '(ql:quickload :cl-torrents)' \
+	     --eval '(ql:quickload :torrents)' \
 	     --eval '(prove:run #P"tests/cl-torrents.lisp")' \
 	     --eval '(quit)'
 
 test-end2end:
 	sbcl --load cl-torrents.asd \
-	     --eval '(ql:quickload :cl-torrents)' \
+	     --eval '(ql:quickload :torrents)' \
 	     --eval '(prove:run #P"tests/end2end.lisp")' \
 	     --eval '(quit)'
 
@@ -34,5 +34,5 @@ ecl-docker:
 		-eval '(format t "--- ASDF version: ~a~&" (asdf:asdf-version))' \
 		-eval '(ql:quickload :closer-mop)' \
 		-eval '(load "cl-torrents.asd")' \
-		-eval '(ql:quickload :cl-torrents)' \
-		-eval '(asdf:make-build :cl-torrents :type :program :move-here #P"./")'
+		-eval '(ql:quickload :torrents)' \
+		-eval '(asdf:make-build :torrents :type :program :move-here #P"./")'

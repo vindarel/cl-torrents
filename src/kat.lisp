@@ -3,7 +3,7 @@
   (:use :cl)
   (:import-from :alexandria
                 :flatten)
-  (:import-from :cl-torrents.utils
+  (:import-from :torrents.utils
                 :join-for-query
                 :sublist)
   (:export :torrents)

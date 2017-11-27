@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage tpb
   (:use :cl)
-  (:import-from :cl-torrents.utils
+  (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
                 :exit

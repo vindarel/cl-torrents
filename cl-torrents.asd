@@ -3,9 +3,9 @@
 |#
 
 (in-package :cl-user)
-(defpackage cl-torrents-asd
+(defpackage torrents-asd
   (:use :cl :asdf))
-(in-package :cl-torrents-asd)
+(in-package :torrents-asd)
 
 (defsystem torrents
   :version "0.1"

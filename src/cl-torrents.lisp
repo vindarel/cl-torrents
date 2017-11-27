@@ -17,7 +17,7 @@
                 :when-option
                 :find-magnet-link
                 :sublist)
-  (:export :torrents
+  (:export :torrentsearch
            :async-torrents
            :magnet
            :main))
@@ -47,15 +47,15 @@
       ;; (format t "Got cached results for ~a.~&" terms)
       (getcache terms store))))
 
-(defun torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
+(defun torrentsearch (words &key (stream t) (nb-results *nb-results*) (log-stream t))
   "Search for torrents on the different sources and print the results, sorted by number of seeders.
 `words': a string (space-separated keywords) or a list of strings.
 `nb-results': max number of results to print.
 `log-stream': used in tests to capture (and ignore) some output."
-  (let ((res (async-torrents words :log-stream log-stream)))
+  (let ((res (async-torrents words :stream stream :log-stream log-stream)))
     (display-results :results res :stream stream :nb-results nb-results)))
 
-(defun async-torrents (words &key (log-stream t))
+(defun async-torrents (words &key (stream t) (log-stream t))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (let* ((terms (if (listp words)
@@ -69,7 +69,7 @@
                   ;; the cache is mixed with "torrents" and "async-torrents": ok.
                   cached-res
                   (mapcan (lambda (fun)
-                            (lparallel:pfuncall fun terms :stream log-stream))
+                            (lparallel:pfuncall fun terms :stream stream :log-stream log-stream))
                           '(tpb:torrents
                             kat:torrents
                             torrentcd:torrents))))

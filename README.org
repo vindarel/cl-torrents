@@ -43,7 +43,8 @@ and install it:
    Search for torrents:
 
 #+BEGIN_SRC text
-(torrents "matrix")
+(use-package :torrents)
+(torrentsearch "matrix")
   [...]
   6: The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]
   5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
