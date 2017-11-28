@@ -1,9 +1,9 @@
 (in-package :cl-user)
-(defpackage cl-torrents-test.end2end
+(defpackage torrents-test.end2end
   (:use :cl
         :cl-torrents
         :prove))
-(in-package :cl-torrents-test.end2end)
+(in-package :torrents-test.end2end)
 
 ;;
 ;; These tests do network access: end-to-end tests.

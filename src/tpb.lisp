@@ -1,13 +1,12 @@
 (in-package :cl-user)
 (defpackage tpb
   (:use :cl)
-  (:import-from :cl-torrents.utils
+  (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
                 :exit
                 :sublist)
-  (:export :torrents
-           :magnet))
+  (:export :torrents))
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :tpb)
 

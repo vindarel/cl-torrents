@@ -1,13 +1,13 @@
 (in-package :cl-user)
-(defpackage cl-torrents
+(defpackage torrents
   (:use :cl
         :clache)
   ;; see also Quickutil to import only the utility we need.
   ;; http://quickutil.org/lists/
   (:import-from :alexandria
                 :assoc-value ;; get the val of an alist alone, not the (key val) couple.
-                :flatten)
-  (:import-from :cl-torrents.utils
+                )
+  (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
                 :exit
@@ -17,13 +17,13 @@
                 :when-option
                 :find-magnet-link
                 :sublist)
-  (:export :torrents
+  (:export :torrentsearch
+           :async-torrents
            :magnet
            :main))
-;; to do: shadow-import to use search as a funnction name.
-(in-package :cl-torrents)
+(in-package :torrents)
 
-(defparameter *version* "0.6")
+(defparameter *version* "0.6.1")
 
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
@@ -44,40 +44,32 @@
 (defun get-cached-results (terms store)
   (when (getcache terms store)
     (progn
-      (format t "Got cached results for ~a.~&" terms)
+      ;; (format t "Got cached results for ~a.~&" terms)
       (getcache terms store))))
 
-
-(defun torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
-  "Search on the different websites.
-- `log-stream': a stream for logging messages. Used to discard them in tests, where we only want to get the result of `display-results'."
-  (let* ((terms (if (listp words)
-                   words
-                   ;; The main function gives words as a list,
-                   ;; the user at the REPL a string.
-                   (str:words words)))
-        (joined (str:join "+" terms))
-        (res (if (get-cached-results joined *store*)
-                 (getcache joined *store*)
-                 (tpb::torrents words :stream log-stream))))
-    (setf *keywords* terms)
-    (setf *keywords-colors* (keyword-color-pairs terms))
-    (setf *last-search* res)
-    (save-results terms res *store*)
+(defun torrentsearch (words &key (stream t) (nb-results *nb-results*) (log-stream t))
+  "Search for torrents on the different sources and print the results, sorted by number of seeders.
+`words': a string (space-separated keywords) or a list of strings.
+`nb-results': max number of results to print.
+`log-stream': used in tests to capture (and ignore) some output."
+  (let ((res (async-torrents words :stream stream :log-stream log-stream)))
     (display-results :results res :stream stream :nb-results nb-results)))
 
-(defun async-torrents (words)
+(defun async-torrents (words &key (stream t) (log-stream t))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (let* ((terms (if (listp words)
+                    ;; The main function gives words as a list,
+                    ;; the user at the REPL a string.
                     words
                     (str:words words)))
          (joined-terms (str:join "+" terms))
-         (res (if (get-cached-results joined-terms *store*)
+         (cached-res (get-cached-results joined-terms *store*))
+         (res (if cached-res
                   ;; the cache is mixed with "torrents" and "async-torrents": ok.
-                  (getcache joined-terms *store*)
+                  cached-res
                   (mapcan (lambda (fun)
-                            (lparallel:pfuncall fun terms))
+                            (lparallel:pfuncall fun terms :stream stream :log-stream log-stream))
                           '(tpb:torrents
                             kat:torrents
                             torrentcd:torrents))))
@@ -88,13 +80,13 @@
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
-    (save-results joined-terms res *store*)
+    (unless cached-res
+      (save-results joined-terms sorted *store*))
     sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
-            ;; xxx: do not rely on *last-search*.
             ;; I want to color the output.
             ;; Adding color characters for the terminal augments the string length.
             ;; We want a string padding for the title of 65 chars.
@@ -202,12 +194,16 @@
         (display-results :results (async-torrents free-args)
                          :nb-results *nb-results*
                          :infos (getf options :infos))
-      (sb-sys:interactive-interrupt () (progn
-                                         (format *error-output* "Aborting.~&")
-                                         (exit))))
+      (#+sbcl sb-sys:interactive-interrupt
+        #+ccl  ccl:interrupt-signal-condition
+        #+clisp system::simple-interrupt-condition
+        #+ecl ext:interactive-interrupt
+        #+allegro excl:interrupt-signal
+        () (progn
+             (format *error-output* "Aborting.~&")
+             (exit))))
 
     (if (getf options :magnet)
-        ;; if we had caching we wouldn't have to search for torrents first.
         (progn
           (format t "~a~&" (magnet (getf options :magnet)))
           (exit)))))

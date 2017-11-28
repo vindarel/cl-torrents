@@ -3,11 +3,11 @@
 |#
 
 (in-package :cl-user)
-(defpackage cl-torrents-asd
+(defpackage torrents-asd
   (:use :cl :asdf))
-(in-package :cl-torrents-asd)
+(in-package :torrents-asd)
 
-(defsystem cl-torrents
+(defsystem torrents
   :version "0.1"
   :author ""
   :license ""

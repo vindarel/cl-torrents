@@ -21,7 +21,7 @@ executable/). [[https://gitlab.com/vindarel/cl-torrents/tags][Previous versions]
 
    See the download link above.  It is a self-contained executable for
    GNU/Linux  64-bits.    You  do  /not/   need  to  install   a  Lisp
-   implementation. It's a 78Mo binary (will get a bit lighter).
+   implementation. It's a 78Mo binary.
 
    The Lisp lib  is not  distributed with  Quicklisp (or Roswell) (yet?).  Clone this  repo
    where Quicklisp can find it:
@@ -30,7 +30,7 @@ executable/). [[https://gitlab.com/vindarel/cl-torrents/tags][Previous versions]
 
 and install it:
 
-: (ql:quickload "cl-torrents")
+: (ql:quickload "torrents")
 
 
 ** Usage
@@ -43,7 +43,8 @@ and install it:
    Search for torrents:
 
 #+BEGIN_SRC text
-(torrents "matrix")
+(use-package :torrents)
+(torrentsearch "matrix")
   [...]
   6: The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]
   5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
@@ -140,10 +141,14 @@ when there can be hundreds).
 - local copy of TPB
 - more command line options (specially verbosity)
   - [X] =-i= print url
+- [X] build  with  ECL. Used  [[https://hub.docker.com/r/daewok/lisp-devel/][the  lisp-devel]]  docker
+  image. Result: a 52Mo  executable with a runtime error.
 - open an url
 - download the torrent file
 - generate a json
 - ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
+- add torrent to a local torrent client
+- add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app,...
 
 ** Theme

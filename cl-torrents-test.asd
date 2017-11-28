@@ -3,14 +3,14 @@
 |#
 
 (in-package :cl-user)
-(defpackage cl-torrents-test-asd
+(defpackage torrents-test-asd
   (:use :cl :asdf))
-(in-package :cl-torrents-test-asd)
+(in-package :torrents-test-asd)
 
-(defsystem cl-torrents-test
+(defsystem torrents-test
   :author ""
   :license ""
-  :depends-on (:cl-torrents
+  :depends-on (:torrents
                :prove)
   :components ((:module "t"
                 :components
