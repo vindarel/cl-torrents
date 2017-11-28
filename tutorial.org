@@ -2201,3 +2201,173 @@ restarts (invokable by number or by possibly-abbreviated name):
   That the end of our tutorial (for now ?).
 
   You can see the full sources and comment on the repository: https://github.com/vindarel/cl-torrents
+* Appendice A: the same, with CL21
+
+  We like CL21. It cleans  many CL inconsistencies and brings "modern"
+  features.
+
+  Yet it is only a CL extension,  that we can use isolated in just one
+  package of our code base if don't  want to use it everywhere, and we
+  can still use regular CL symbols prefixed by =cl:=.
+
+- http://cl21.org/
+- https://lispcookbook.github.io/cl-cookbook/cl21.html
+- https://github.com/cl21/cl21/wiki
+
+  Let's see how much it costs to  put it in our existing code base and
+  most of all, if it would have eased our first contact with Lisp, our
+  development, and the tutorial.
+
+** Installation
+
+  First, we need to install it from its own Quicklisp dist (repository).
+
+#+BEGIN_SRC lisp
+(ql-dist:install-dist "http://dists.cl21.org/cl21.txt")
+(ql:quickload :cl21)
+#+END_SRC
+
+  To try things out at the REPL:
+
+#+BEGIN_SRC lisp
+(in-package :cl21)
+#+END_SRC
+
+** Replacing CL by CL21
+
+   We have to  use =cl21= instead of =cl=, and  =cl21-user= instead of
+   =cl-user=.
+
+   Our package definition:
+
+#+BEGIN_SRC lisp
+(in-package :cl-user)
+(defpackage torrents
+  (:use :cl
+        :clache)
+  ...
+#+END_SRC
+
+   becomes:
+
+#+BEGIN_SRC lisp
+(in-package :cl21-user)
+(defpackage torrents
+  (:use :cl21
+        :clache)
+  ...
+#+END_SRC
+
+   Our  =.asd= gained  a =cl21=  dependency.   This is  not enough  to
+   automatically install CL21 from its own dist though.
+
+   When we compiled our sources,  the debugger complained about symbol
+   conflicts  and  asked  to  choose  between  the  old  and  the  new
+   one. Indeed, CL21 either redefines or re-exports all CL symbols, so
+   that's a  lot of conflicts in  the running image. We  restarted our
+   Lisp.
+
+#+BEGIN_SRC lisp
+    (ql:quickload "cl21")
+    ;; To load "cl21":
+    ;; Load 1 ASDF system:
+    ;;     cl21
+    ;; ;
+    ;; Loading "cl21"
+    ;; .
+    ;; .......
+    ;; (
+     ;; "cl21")
+
+    ;; Compiled cl-torrents.asd
+    (ql:quickload "cl-torrents")
+  ;; To load "torrents":
+  ;;   Load 1 ASDF system:
+  ;;     torrents
+  ;; ; Load ing "torrents"
+  ;; ..................................................
+  ;; [package torrents.utils]..........................
+  ;; [package tpb].....................................
+  ;; [package torrentcd]...............................
+  ;; [package kat].....................................
+  ;; [package torrents]................................
+  ;; [package torrents]................................
+  ;; [package torrents]..
+  ;; ("torrents")
+
+  (in-package :torrents)
+  ;; ...
+#+END_SRC
+
+   here we compiled the =cl-torrents.lisp= sources (=C-c C-k)= and had
+   an  error  on  the   debugger,  complaining  that  =mapcar=  didn't
+   exist. Indeed, CL21 uses the classical =map= name instead. It still
+   has  =mapcan=.  BTW,  "filter"  is  provided  by  =keep[-if][-not]=
+   (instead of =remove[-if][not]=).
+
+- https://lispcookbook.github.io/cl-cookbook/cl21.html#mapping
+
+  And, that's it, we didn't have  other conflicts and other test suite
+  executed rightly.
+
+** Benefits ?
+
+   I know  I have been frustrated  by =first= not being  generic, thus
+   not working on arrays.  I wanted  to use it when trying things with
+   =plump= and  =lquery=, but plump  returns an  array. And it  is the
+   same with other functions and  other data structures. And there are
+   inconsistencies,  sometimes  the  firts   parameter  is  the  list,
+   sometimes not.
+
+   It just feels  wrong to me, specially today, and  specially when CL
+   has this generic mecanism.
+
+   So CL functions become generic:
+
+- getf (also for hash-maps,...)
+- equalp
+- emptyp
+- coerce
+
+  and CL21 also defines new functions:
+
+- =append=
+- =flatten=
+- =elt=
+- =emptyp=
+- =equalp=
+- =split=, =split-if=
+- =drop=, =drop-while=
+- =take=, =take-while=
+- =join=
+- =length=
+- =keep=, =keep-if=, =nkeep=, =nkeep-if=
+- =partition=, =partition-if=
+
+- https://lispcookbook.github.io/cl-cookbook/cl21.html#generic-functions
+
+  Same story  with =map= and =mapcar=.  You want to use  what is named
+  =map= in  all other languages, but  you get error messages,  have to
+  google  and learn  about =mapcar=  and =map  'list= with  a freaking
+  first argument.
+
+  In the end, we  nearly didn't have to edit our code  base to make it
+  work with CL21, but we didn't have much room for improvement either.
+  We made  the code compact  and clean already  (well, we hope  !  PRs
+  welcome). So CL21's benefit would have been noticeable (and huge for
+  us) during development.
+
+  Allright, I'm  sold on CL21,  if it was  only for that,  but there's
+  more. More functional verbs (very welcome),  shorter lambdas, sane hash-tables, and
+  less important and optional stuff (built-in regexps,…).
+
+** Downsides ?
+
+  Is using  CL21 worth  the risk  ? It doesn't  show much  activity on
+  Github, although from  time to time an issue shows  activity, and it
+  has open issues.  I'll let you judge,  this was only an example in a
+  little project.
+
+  There's  a real  consequence to  the  long dependency  list of  CL21
+  though: the executable size. We had  one of *78Mo*, and the CL21 one
+  is *93Mo*.
