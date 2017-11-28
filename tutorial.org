@@ -2207,7 +2207,7 @@ restarts (invokable by number or by possibly-abbreviated name):
   features.
 
   Yet it is only a CL extension,  that we can use isolated in just one
-  package of our code base if don't  want to use it everywhere, and we
+  package of our code base if we don't  want to use it everywhere, and we
   can still use regular CL symbols prefixed by =cl:=.
 
 - http://cl21.org/
@@ -2307,7 +2307,7 @@ restarts (invokable by number or by possibly-abbreviated name):
 
 - https://lispcookbook.github.io/cl-cookbook/cl21.html#mapping
 
-  And, that's it, we didn't have  other conflicts and other test suite
+  And, that's it, we didn't have  other conflicts and our test suite
   executed rightly.
 
 ** Benefits ?
@@ -2316,13 +2316,13 @@ restarts (invokable by number or by possibly-abbreviated name):
    not working on arrays.  I wanted  to use it when trying things with
    =plump= and  =lquery=, but plump  returns an  array. And it  is the
    same with other functions and  other data structures. And there are
-   inconsistencies,  sometimes  the  firts   parameter  is  the  list,
+   inconsistencies,  sometimes  the  first   parameter  is  the  list,
    sometimes not.
 
-   It just feels  wrong to me, specially today, and  specially when CL
-   has this generic mecanism.
+   It just feels  wrong to me, specially today, and  specially since CL
+   has this genericity mecanism.
 
-   So CL functions become generic:
+   So some CL functions become generic (and extensible):
 
 - getf (also for hash-maps,...)
 - equalp
@@ -2352,14 +2352,12 @@ restarts (invokable by number or by possibly-abbreviated name):
   first argument.
 
   In the end, we  nearly didn't have to edit our code  base to make it
-  work with CL21, but we didn't have much room for improvement either.
-  We made  the code compact  and clean already  (well, we hope  !  PRs
-  welcome). So CL21's benefit would have been noticeable (and huge for
-  us) during development.
+  work  with CL21.   We don't  have  real benefits  to do  this to  an
+  existing code base either, they would have been noticeable (and huge
+  for us) during development, and should be for future developments.
 
   Allright, I'm  sold on CL21,  if it was  only for that,  but there's
-  more. More functional verbs (very welcome),  shorter lambdas, sane hash-tables, and
-  less important and optional stuff (built-in regexps,…).
+  more, check it out !
 
 ** Downsides ?
 
