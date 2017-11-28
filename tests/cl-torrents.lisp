@@ -40,12 +40,13 @@
         ;TODO: fix test
         (torrents:async-torrents "matrix" :stream out :log-stream nil)) "torrent search ok")
 
-  (is 6 ;; 5 + 1 newline
+  (is 5
       (length
        (str:lines
         (let ((torrents::*nb-results* 5))
           (with-output-to-string (out)
-            (torrents::display-results :results (torrents:async-torrents "matrix" :stream nil) :stream out)))))
+            (torrents::display-results :results (torrents:async-torrents "matrix" :stream nil) :stream out)))
+        :omit-nulls t))
       "set the max nb of displayed results.")
 
   (is (assoc-value (elt torrents::*last-search* 0) :href)
