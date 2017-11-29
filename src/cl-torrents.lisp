@@ -69,7 +69,7 @@
                   ;; the cache is mixed with "torrents" and "async-torrents": ok.
                   cached-res
                   (mapcan (lambda (fun)
-                            (lparallel:pfuncall fun terms :stream stream :log-stream log-stream))
+                            (lparallel:pfuncall fun terms :stream log-stream))
                           '(tpb:torrents
                             kat:torrents
                             torrentcd:torrents))))
