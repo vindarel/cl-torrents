@@ -1335,6 +1335,32 @@ build:
 
    Are there downsides ?
 
+** with Buildapp and Roswell
+
+   We might  like a more  shell-friendly way to build  our executable,
+   and while  we're at it  a portable one, so  we would have  the same
+   command to work with various implementations.
+
+   [[http://www.xach.com/lisp/buildapp/][Buildapp]]  is a  battle-tested  "application for  SBCL  or CCL  that
+   configures and saves an executable Common Lisp image".
+
+   Example usage:
+
+#+BEGIN_SRC text
+buildapp --output myapp \
+         --asdf-path . \
+         --asdf-tree ~/quicklisp/dists \
+         --load-system my-app \
+         --entry my-app:main
+#+END_SRC
+
+   Many applications use  it (for example, [[https://github.com/dimitri/pgloader][pgloader]]).  It is available
+   on Debian: =apt install buildapp=.
+
+   [[https://roswell.github.io][Roswell]], that  does a lot, also  has the =ros build=  command, that
+   should  work  for  more   implementations.  It  is  not  documented
+   ([[https://github.com/roswell/roswell/issues/253][issue]]).
+
 ** Size and startup times of executables per implementation
 
 #+BEGIN_SRC text
