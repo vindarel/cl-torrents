@@ -21,6 +21,7 @@
                :unix-opts ;; with alias opts
                :alexandria
                :clache
+               :mockingbird
                :lquery)
   :components ((:module "src"
                 :components
