@@ -19,7 +19,6 @@
                :mockingbird
                :cl-ansi-text
                :unix-opts ;; with alias opts
-               :alexandria
                :clache
                :mockingbird
                :lquery)

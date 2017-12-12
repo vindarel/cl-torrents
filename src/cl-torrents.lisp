@@ -2,11 +2,6 @@
 (defpackage torrents
   (:use :cl
         :clache)
-  ;; see also Quickutil to import only the utility we need.
-  ;; http://quickutil.org/lists/
-  (:import-from :alexandria
-                :assoc-value ;; get the val of an alist alone, not the (key val) couple.
-                )
   (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
@@ -35,6 +30,12 @@
                         (ensure-directories-exist #p"cache/")
                         (make-instance 'file-store :directory #p"cache/"))
   "Cache for results. The directory must exist.")
+
+(defun assoc-value (alist key &key (test #'equalp))
+  ;; Don't import Alexandria just for that.
+  ;; See also Quickutil to import only the utility we need.
+  ;; http://quickutil.org/lists/
+  (cdr (assoc key alist :test test)))
 
 (defun save-results (terms val store)
   "Save results in cache."

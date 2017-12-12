@@ -3,13 +3,13 @@
   (:use :cl
         :torrents
         :mockingbird
-        :prove)
-  (:import-from :alexandria
-                :assoc-value ;; get the val of an alist alone, not the (key val) couple.
-                ))
+        :prove))
 (in-package :cl-torrents-test)
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :cl-torrents)' in your Lisp.
+
+(defun assoc-value (alist key &key (test #'equalp))
+  (cdr (assoc key alist :test test)))
 
 (defun file-to-string (path)
   "Return the given file as a string."
