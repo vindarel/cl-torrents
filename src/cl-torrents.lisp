@@ -26,10 +26,18 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
+(defvar *cache-directory*
+  (merge-pathnames #p".cl-torrents/cache/" (user-homedir-pathname))
+  "The directory where cl-torrents stores its cache.")
+
+(defun ensure-cache ()
+  (ensure-directories-exist
+   (merge-pathnames *cache-directory*)))
+
 (defparameter *store* (progn
-                        (ensure-directories-exist #p"cache/")
-                        (make-instance 'file-store :directory #p"cache/"))
-  "Cache for results. The directory must exist.")
+                        (ensure-cache)
+                        (make-instance 'file-store :directory *cache-directory*))
+  "Cache. The directory must exist.")
 
 (defun assoc-value (alist key &key (test #'equalp))
   ;; Don't import Alexandria just for that.
@@ -37,12 +45,12 @@
   ;; http://quickutil.org/lists/
   (cdr (assoc key alist :test test)))
 
-(defun save-results (terms val store)
+(defun save-results (terms val &key (store *store*))
   "Save results in cache."
   (when val
     (setcache terms val store)))
 
-(defun get-cached-results (terms store)
+(defun get-cached-results (terms &key (store *store*))
   (when (getcache terms store)
     (progn
       ;; (format t "Got cached results for ~a.~&" terms)
@@ -65,7 +73,7 @@
                     words
                     (str:words words)))
          (joined-terms (str:join "+" terms))
-         (cached-res (get-cached-results joined-terms *store*))
+         (cached-res (get-cached-results joined-terms))
          (res (if cached-res
                   ;; the cache is mixed with "torrents" and "async-torrents": ok.
                   cached-res
@@ -82,7 +90,7 @@
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
     (unless cached-res
-      (save-results joined-terms sorted *store*))
+      (save-results joined-terms sorted))
     sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
@@ -138,6 +146,8 @@
   ;; if not inside a function, can not build an executable (can not
   ;; save core with multiple threads running).
   (setf lparallel:*kernel* (lparallel:make-kernel 2))
+
+  (ensure-cache)
 
   ;; Define the cli args.
   (opts:define-opts

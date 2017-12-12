@@ -37,7 +37,6 @@
                      (torrents::request-details resultpage))
 
   (ok (with-output-to-string (out)
-        ;TODO: fix test
         (torrents:async-torrents "matrix" :stream out :log-stream nil)) "torrent search ok")
 
   (is 5
@@ -79,7 +78,6 @@
 ;; Now we can run tests one by one.
 (with-mocked-search-results
     (ok (with-output-to-string (out)
-          ;TODO: fix test
           (torrents:async-torrents "foo" :stream out :log-stream nil))
         "search ok"))
 

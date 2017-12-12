@@ -13,9 +13,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scraping katcr.co.
-;; Ok but I don't find the results very complete, still.
-
-;; ;TODO: include and print with the other results from TPB.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defparameter *base-url* "http://katcr.co")

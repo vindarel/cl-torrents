@@ -2179,14 +2179,27 @@ restarts (invokable by number or by possibly-abbreviated name):
    not on a DB):
 
 #+BEGIN_SRC lisp
+(defvar *cache-directory*
+  (merge-pathnames #p".cl-torrents/cache/" (user-homedir-pathname))
+  "The directory where cl-torrents stores its cache.")
+
+(defun ensure-cache ()
+  (ensure-directories-exist
+   (merge-pathnames *cache-directory*)))
+
 (defparameter *store* (progn
-                        (ensure-directories-exist #p"cache/")
-                        (make-instance 'file-store :directory #p"cache/"))
-  "Cache for results. The directory must exist.")
+                        (ensure-cache)
+                        (make-instance 'file-store :directory *cache-directory*))
+  "Cache. The directory must exist.")
 #+END_SRC
 
-   this FS  storage is provided by  [[https://github.com/skypher/cl-store][cl-store]]. We could also  create an
+   the FS  storage is provided by  [[https://github.com/skypher/cl-store][cl-store]]. We could also  create an
    in-memory cache, suitable for memoization.
+
+   The function =ensure-directories-exist=  creates a nested directory
+   structure for us if needed. We  wrap its call in the =ensure-cache=
+   function  in order  to  call  it at  the  beginning  of the  =main=
+   function, when cl-torrents is called from the command line.
 
    Saving  something in  the  cache  and retrieving  it  is made  with
    =(setcache key val store)= and =getcache key store=. We just create
@@ -2215,12 +2228,20 @@ restarts (invokable by number or by possibly-abbreviated name):
                  (tpb::torrents words :stream log-stream))
 #+END_SRC
 
+   Better yet, with an optional  =store= argument that defaults to the
+   =*store*= parameter:
+
+#+BEGIN_SRC lisp
+(defun save-results (terms val &key (store *store*))
+   ...
+#+END_SRC
+
     =setcache= takes an optional expiry time, in seconds.
 
     We re-build the project (=make build=), search for matrix once (we
     wait a bit) and a second time: we hit the cache.
 
-    Quick and easy, tell me if I was /too/ quick !
+    Quick and easy ! (and too quick, we don't use the expiry time yet)
 
 * Conclusion
 

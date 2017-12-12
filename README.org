@@ -134,6 +134,8 @@ when there can be hundreds).
 
   the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
 
+  It was built with https://github.com/fniessen/org-html-themes.
+
 ** Ideas, todos
 
 - [X] cache (on files) v0.3
@@ -151,10 +153,12 @@ when there can be hundreds).
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app,...
 
-** Theme
+** Release notes
 
-  The tutorial was built with https://github.com/fniessen/org-html-themes.
+*** v0.6.3
 
+- fix cache not created
+- create cache in =~/.cl-torrents/cache/=
 
 * Resources
 
