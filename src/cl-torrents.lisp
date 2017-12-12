@@ -26,13 +26,15 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
-(defvar *cache-directory*
-  (merge-pathnames #p".cl-torrents/cache/" (user-homedir-pathname))
+(defparameter *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname))
+        "The directory to put configuration files.")
+
+(defparameter *cache-directory*
+  (merge-pathnames #p"cache/" *config-directory*)
   "The directory where cl-torrents stores its cache.")
 
 (defun ensure-cache ()
-  (ensure-directories-exist
-   (merge-pathnames *cache-directory*)))
+  (ensure-directories-exist *cache-directory*))
 
 (defparameter *store* (progn
                         (ensure-cache)
