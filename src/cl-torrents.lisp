@@ -214,7 +214,8 @@
         #+allegro excl:interrupt-signal
         () (progn
              (format *error-output* "Aborting.~&")
-             (exit))))
+             (exit)))
+      (error (c) (format t "Woops, an unknown error occured:~&~a~&" c)))
 
     (if (getf options :magnet)
         (progn
