@@ -11,6 +11,7 @@
   :author ""
   :license ""
   :depends-on (:torrents
+               :mockingbird
                :prove)
   :components ((:module "t"
                 :components

@@ -16,7 +16,6 @@
                :plump
                :str
                :lparallel
-               :mockingbird
                :cl-ansi-text
                :unix-opts ;; with alias opts
                :clache
