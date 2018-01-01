@@ -25,7 +25,7 @@
 
 (defun torrents (words &key (stream t))
   "Search torrents."
-  (format stream "searching on the Pirate Bay…")
+  (format stream "searching '~a' on the Pirate Bay…" words)
   (handler-case
       (let* ((terms (if (listp words)
                         words

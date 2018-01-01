@@ -513,7 +513,7 @@ so that our search results are saved in this variable which we define:
 
 #+BEGIN_SRC
 (defvar *last-search* nil
-    "Remembering the last search (should be an hash-map).")
+    "Remembering the last search.")
 #+END_SRC
 
 and we can easily access this result list elsewhere.

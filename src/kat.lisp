@@ -57,7 +57,7 @@
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
-  (format stream "searching on Kat...")
+  (format stream "searching '~a' on Kat..." words)
   (handler-case
       (let* ((query (str:join "+" words))
              (url (str:replace-all "{}" query *search-url*))
