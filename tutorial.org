@@ -1335,30 +1335,38 @@ build:
 
    Are there downsides ?
 
-** with Buildapp and Roswell
+** with ASDF or Roswell
 
-   We might  like a more  shell-friendly way to build  our executable,
-   and while  we're at it  a portable one, so  we would have  the same
+   We might  enjoy a more  shell-friendly way to build  our executable,
+   and most of all  a portable one, so  we would have  the same
    command to work with various implementations.
 
-   [[http://www.xach.com/lisp/buildapp/][Buildapp]]  is a  battle-tested  "application for  SBCL  or CCL  that
-   configures and saves an executable Common Lisp image".
+   Since  version 3.1,  ASDF, the  de-facto build  system, shipped
+   with every  implementation, allows that  with the [[https://common-lisp.net/project/asdf/asdf.html#Convenience-Functions][make]]  command. It
+   needs parameters in our .asd declaration:
 
-   Example usage:
-
-#+BEGIN_SRC text
-buildapp --output myapp \
-         --asdf-path . \
-         --asdf-tree ~/quicklisp/dists \
-         --load-system my-app \
-         --entry my-app:main
+#+BEGIN_SRC lisp
+:build-operation "program-op" ;; leave as is
+:build-pathname "<binary-name>"
+:entry-point "<my-package:main-function>"
 #+END_SRC
 
-   Many applications use  it (for example, [[https://github.com/dimitri/pgloader][pgloader]]).  It is available
-   on Debian: =apt install buildapp=.
+   and then a call to =asdf:make :my-package=.
 
-   [[https://roswell.github.io][Roswell]], that  does a lot, also  has the =ros build=  command, that
-   should  work  for  more   implementations.  It  is  not  documented
+So, in a Makefile:
+
+#+BEGIN_SRC text
+LISP ?= sbcl
+
+build:
+    $(LISP) --load cl-torrents.asd \
+    	    --eval '(ql:quickload :cl-torrents)' \
+	    --eval '(asdf:make :cl-torrents)' \
+	    --eval '(quit)'
+#+END_SRC
+
+   Finally [[https://roswell.github.io][Roswell]], that  does a lot, also  has the =ros build=  command, that
+   should  work  for  more   implementations.  It  is  a bit under-documented
    ([[https://github.com/roswell/roswell/issues/253][issue]]).
 
 ** Size and startup times of executables per implementation
