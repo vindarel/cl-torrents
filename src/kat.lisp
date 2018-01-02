@@ -1,8 +1,6 @@
 (in-package :cl-user)
 (defpackage kat
   (:use :cl)
-  (:import-from :alexandria
-                :flatten)
   (:import-from :torrents.utils
                 :join-for-query
                 :sublist)
@@ -66,7 +64,11 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 ;; With hash-table: ok but lacks pretty printing. Again a detail.
+                                 ;; With hash-table: ok but lacks pretty printing.
+                                 ;; Again an unusual detail.
+                                 ;; => not relevant since we can inspect it interactively ?
+                                 ;; => fixed with cl21
+                                 ;; => just use structs, or CLOS ?
                                  ;; (let (atorrent)
                                  ;;   (setf atorrent (make-hash-table :test #'equalp))
                                  ;;   (setf (gethash :title atorrent)

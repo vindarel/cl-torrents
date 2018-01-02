@@ -27,7 +27,12 @@
                  (:file "tpb")
                  (:file "torrentcd")
                  (:file "kat")
-                 (:file "cl-torrents"))))
+                 (:file "torrents"))))
+  ;; build executable with asdf:make :torrents.
+  :build-operation "program-op"
+  :build-pathname "asdftorrents"
+  :entry-point "torrents:main"
+
   :description ""
   :long-description
   #.(with-open-file (stream (merge-pathnames

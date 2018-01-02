@@ -1,12 +1,12 @@
 (in-package :cl-user)
-(defpackage cl-torrents-test
+(defpackage torrents-test
   (:use :cl
         :torrents
         :mockingbird
         :prove))
-(in-package :cl-torrents-test)
+(in-package :torrents-test)
 
-;; NOTE: To run this test file, execute `(asdf:test-system :cl-torrents)' in your Lisp.
+;; NOTE: To run this test file, execute `(asdf:test-system :torrents)' in your Lisp.
 
 (defun assoc-value (alist key &key (test #'equalp))
   (cdr (assoc key alist :test test)))
