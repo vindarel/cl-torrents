@@ -4,11 +4,6 @@ stages:
   - test
   - build
 
-before_script:
-  - apt-get update -qy
-  - apt-get install -y git-core
-  - git clone https://github.com/Chream/mockingbird ~/quicklisp/local-projects/
-
 test:
   stage: test
   only:

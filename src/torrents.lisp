@@ -2,11 +2,6 @@
 (defpackage torrents
   (:use :cl
         :clache)
-  ;; see also Quickutil to import only the utility we need.
-  ;; http://quickutil.org/lists/
-  (:import-from :alexandria
-                :assoc-value ;; get the val of an alist alone, not the (key val) couple.
-                )
   (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
@@ -23,7 +18,7 @@
            :main))
 (in-package :torrents)
 
-(defparameter *version* "0.6.1")
+(defparameter *version* "0.7.1")
 
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
@@ -31,17 +26,33 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
-(defparameter *store* (progn
-                        (ensure-directories-exist #p"cache/")
-                        (make-instance 'file-store :directory #p"cache/"))
-  "Cache for results. The directory must exist.")
+(defparameter *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname))
+        "The directory to put configuration files.")
 
-(defun save-results (terms val store)
+(defparameter *cache-directory*
+  (merge-pathnames #p"cache/" *config-directory*)
+  "The directory where cl-torrents stores its cache.")
+
+(defun ensure-cache ()
+  (ensure-directories-exist *cache-directory*))
+
+(defparameter *store* (progn
+                        (ensure-cache)
+                        (make-instance 'file-store :directory *cache-directory*))
+  "Cache. The directory must exist.")
+
+(defun assoc-value (alist key &key (test #'equalp))
+  ;; Don't import Alexandria just for that.
+  ;; See also Quickutil to import only the utility we need.
+  ;; http://quickutil.org/lists/
+  (cdr (assoc key alist :test test)))
+
+(defun save-results (terms val &key (store *store*))
   "Save results in cache."
   (when val
     (setcache terms val store)))
 
-(defun get-cached-results (terms store)
+(defun get-cached-results (terms &key (store *store*))
   (when (getcache terms store)
     (progn
       ;; (format t "Got cached results for ~a.~&" terms)
@@ -64,7 +75,7 @@
                     words
                     (str:words words)))
          (joined-terms (str:join "+" terms))
-         (cached-res (get-cached-results joined-terms *store*))
+         (cached-res (get-cached-results joined-terms))
          (res (if cached-res
                   ;; the cache is mixed with "torrents" and "async-torrents": ok.
                   cached-res
@@ -81,7 +92,7 @@
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
     (unless cached-res
-      (save-results joined-terms sorted *store*))
+      (save-results joined-terms sorted))
     sorted))
 
 (defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
@@ -137,6 +148,8 @@
   ;; if not inside a function, can not build an executable (can not
   ;; save core with multiple threads running).
   (setf lparallel:*kernel* (lparallel:make-kernel 2))
+
+  (ensure-cache)
 
   ;; Define the cli args.
   (opts:define-opts
@@ -201,7 +214,8 @@
         #+allegro excl:interrupt-signal
         () (progn
              (format *error-output* "Aborting.~&")
-             (exit))))
+             (exit)))
+      (error (c) (format t "Woops, an unknown error occured:~&~a~&" c)))
 
     (if (getf options :magnet)
         (progn

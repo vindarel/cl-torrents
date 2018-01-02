@@ -1,15 +1,15 @@
 (in-package :cl-user)
-(defpackage cl-torrents-test
+(defpackage torrents-test
   (:use :cl
         :torrents
         :mockingbird
-        :prove)
-  (:import-from :alexandria
-                :assoc-value ;; get the val of an alist alone, not the (key val) couple.
-                ))
-(in-package :cl-torrents-test)
+        :prove))
+(in-package :torrents-test)
 
-;; NOTE: To run this test file, execute `(asdf:test-system :cl-torrents)' in your Lisp.
+;; NOTE: To run this test file, execute `(asdf:test-system :torrents)' in your Lisp.
+
+(defun assoc-value (alist key &key (test #'equalp))
+  (cdr (assoc key alist :test test)))
 
 (defun file-to-string (path)
   "Return the given file as a string."
@@ -37,7 +37,6 @@
                      (torrents::request-details resultpage))
 
   (ok (with-output-to-string (out)
-        ;TODO: fix test
         (torrents:async-torrents "matrix" :stream out :log-stream nil)) "torrent search ok")
 
   (is 5
@@ -79,7 +78,6 @@
 ;; Now we can run tests one by one.
 (with-mocked-search-results
     (ok (with-output-to-string (out)
-          ;TODO: fix test
           (torrents:async-torrents "foo" :stream out :log-stream nil))
         "search ok"))
 

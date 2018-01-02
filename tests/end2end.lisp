@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage torrents-test.end2end
   (:use :cl
-        :cl-torrents
+        :torrents
         :prove))
 (in-package :torrents-test.end2end)
 

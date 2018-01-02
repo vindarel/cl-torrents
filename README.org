@@ -2,8 +2,7 @@ TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]]
 
 [[https://gitlab.com/vindarel/cl-torrents][file:https://gitlab.com/vindarel/cl-torrents/badges/master/pipeline.svg]]
 
-Download for:      [[https://gitlab.com/vindarel/cl-torrents/-/jobs/41320078/artifacts/file/torrents][GNU/Linux       64-bit]]      (/78Mo,      self-contained
-executable/). [[https://gitlab.com/vindarel/cl-torrents/tags][Previous versions]].
+Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/78Mo, self-contained executable/).
 
 * cl-torrents
 
@@ -134,6 +133,8 @@ when there can be hundreds).
 
   the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
 
+  It was built with https://github.com/fniessen/org-html-themes.
+
 ** Ideas, todos
 
 - [X] cache (on files) v0.3
@@ -151,9 +152,14 @@ when there can be hundreds).
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app,...
 
-** Theme
+** Release notes
 
-  The tutorial was built with https://github.com/fniessen/org-html-themes.
+[[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
+
+*** v0.7
+
+- fix cache not created
+- create cache in =~/.cl-torrents/cache/=
 
 
 * Resources

@@ -16,11 +16,10 @@
                :plump
                :str
                :lparallel
-               :mockingbird
                :cl-ansi-text
                :unix-opts ;; with alias opts
-               :alexandria
                :clache
+               :mockingbird
                :lquery)
   :components ((:module "src"
                 :components
@@ -28,7 +27,12 @@
                  (:file "tpb")
                  (:file "torrentcd")
                  (:file "kat")
-                 (:file "cl-torrents"))))
+                 (:file "torrents"))))
+  ;; build executable with asdf:make :torrents.
+  :build-operation "program-op"
+  :build-pathname "asdftorrents"
+  :entry-point "torrents:main"
+
   :description ""
   :long-description
   #.(with-open-file (stream (merge-pathnames

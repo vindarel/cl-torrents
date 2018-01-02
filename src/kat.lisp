@@ -1,8 +1,6 @@
 (in-package :cl-user)
 (defpackage kat
   (:use :cl)
-  (:import-from :alexandria
-                :flatten)
   (:import-from :torrents.utils
                 :join-for-query
                 :sublist)
@@ -13,9 +11,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scraping katcr.co.
-;; Ok but I don't find the results very complete, still.
-
-;; ;TODO: include and print with the other results from TPB.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defparameter *base-url* "http://katcr.co")
@@ -60,7 +55,7 @@
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
-  (format stream "searching on Kat...")
+  (format stream "searching '~a' on Kat..." words)
   (handler-case
       (let* ((query (str:join "+" words))
              (url (str:replace-all "{}" query *search-url*))
@@ -69,7 +64,11 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 ;; With hash-table: ok but lacks pretty printing. Again a detail.
+                                 ;; With hash-table: ok but lacks pretty printing.
+                                 ;; Again an unusual detail.
+                                 ;; => not relevant since we can inspect it interactively ?
+                                 ;; => fixed with cl21
+                                 ;; => just use structs, or CLOS ?
                                  ;; (let (atorrent)
                                  ;;   (setf atorrent (make-hash-table :test #'equalp))
                                  ;;   (setf (gethash :title atorrent)

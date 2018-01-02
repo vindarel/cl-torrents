@@ -513,7 +513,7 @@ so that our search results are saved in this variable which we define:
 
 #+BEGIN_SRC
 (defvar *last-search* nil
-    "Remembering the last search (should be an hash-map).")
+    "Remembering the last search.")
 #+END_SRC
 
 and we can easily access this result list elsewhere.
@@ -1335,30 +1335,38 @@ build:
 
    Are there downsides ?
 
-** with Buildapp and Roswell
+** with ASDF or Roswell
 
-   We might  like a more  shell-friendly way to build  our executable,
-   and while  we're at it  a portable one, so  we would have  the same
+   We might  enjoy a more  shell-friendly way to build  our executable,
+   and most of all  a portable one, so  we would have  the same
    command to work with various implementations.
 
-   [[http://www.xach.com/lisp/buildapp/][Buildapp]]  is a  battle-tested  "application for  SBCL  or CCL  that
-   configures and saves an executable Common Lisp image".
+   Since  version 3.1,  ASDF, the  de-facto build  system, shipped
+   with every  implementation, allows that  with the [[https://common-lisp.net/project/asdf/asdf.html#Convenience-Functions][make]]  command. It
+   needs parameters in our .asd declaration:
 
-   Example usage:
-
-#+BEGIN_SRC text
-buildapp --output myapp \
-         --asdf-path . \
-         --asdf-tree ~/quicklisp/dists \
-         --load-system my-app \
-         --entry my-app:main
+#+BEGIN_SRC lisp
+:build-operation "program-op" ;; leave as is
+:build-pathname "<binary-name>"
+:entry-point "<my-package:main-function>"
 #+END_SRC
 
-   Many applications use  it (for example, [[https://github.com/dimitri/pgloader][pgloader]]).  It is available
-   on Debian: =apt install buildapp=.
+   and then a call to =asdf:make :my-package=.
 
-   [[https://roswell.github.io][Roswell]], that  does a lot, also  has the =ros build=  command, that
-   should  work  for  more   implementations.  It  is  not  documented
+So, in a Makefile:
+
+#+BEGIN_SRC text
+LISP ?= sbcl
+
+build:
+    $(LISP) --load cl-torrents.asd \
+    	    --eval '(ql:quickload :cl-torrents)' \
+	    --eval '(asdf:make :cl-torrents)' \
+	    --eval '(quit)'
+#+END_SRC
+
+   Finally [[https://roswell.github.io][Roswell]], that  does a lot, also  has the =ros build=  command, that
+   should  work  for  more   implementations.  It  is  a bit under-documented
    ([[https://github.com/roswell/roswell/issues/253][issue]]).
 
 ** Size and startup times of executables per implementation
@@ -2179,14 +2187,27 @@ restarts (invokable by number or by possibly-abbreviated name):
    not on a DB):
 
 #+BEGIN_SRC lisp
+(defvar *cache-directory*
+  (merge-pathnames #p".cl-torrents/cache/" (user-homedir-pathname))
+  "The directory where cl-torrents stores its cache.")
+
+(defun ensure-cache ()
+  (ensure-directories-exist
+   (merge-pathnames *cache-directory*)))
+
 (defparameter *store* (progn
-                        (ensure-directories-exist #p"cache/")
-                        (make-instance 'file-store :directory #p"cache/"))
-  "Cache for results. The directory must exist.")
+                        (ensure-cache)
+                        (make-instance 'file-store :directory *cache-directory*))
+  "Cache. The directory must exist.")
 #+END_SRC
 
-   this FS  storage is provided by  [[https://github.com/skypher/cl-store][cl-store]]. We could also  create an
+   the FS  storage is provided by  [[https://github.com/skypher/cl-store][cl-store]]. We could also  create an
    in-memory cache, suitable for memoization.
+
+   The function =ensure-directories-exist=  creates a nested directory
+   structure for us if needed. We  wrap its call in the =ensure-cache=
+   function  in order  to  call  it at  the  beginning  of the  =main=
+   function, when cl-torrents is called from the command line.
 
    Saving  something in  the  cache  and retrieving  it  is made  with
    =(setcache key val store)= and =getcache key store=. We just create
@@ -2215,12 +2236,20 @@ restarts (invokable by number or by possibly-abbreviated name):
                  (tpb::torrents words :stream log-stream))
 #+END_SRC
 
+   Better yet, with an optional  =store= argument that defaults to the
+   =*store*= parameter:
+
+#+BEGIN_SRC lisp
+(defun save-results (terms val &key (store *store*))
+   ...
+#+END_SRC
+
     =setcache= takes an optional expiry time, in seconds.
 
     We re-build the project (=make build=), search for matrix once (we
     wait a bit) and a second time: we hit the cache.
 
-    Quick and easy, tell me if I was /too/ quick !
+    Quick and easy ! (and too quick, we don't use the expiry time yet)
 
 * Conclusion
 

@@ -11,10 +11,11 @@
   :author ""
   :license ""
   :depends-on (:torrents
+               :mockingbird
                :prove)
-  :components ((:module "t"
+  :components ((:module "tests"
                 :components
-                ((:test-file "cl-torrents"))))
+                ((:test-file "torrents"))))
   :description "Test system for cl-torrents"
 
   :defsystem-depends-on (:prove-asdf)

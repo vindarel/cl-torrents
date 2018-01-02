@@ -62,7 +62,7 @@
 
 (defun torrents (words &key (stream t))
   "Return a list of alists with title, href, and seeders."
-  (format stream "searching torrent.cd...")
+  (format stream "searching '~a' on torrent.cd..." words)
   (handler-case
       ;; instead of this error handling, unprecise, we would benefit
       ;; from a threading macro that stops when someone is nil (see
