@@ -1561,10 +1561,13 @@ FOO     "foo"   BAR     "bar"
    If you like this and want more shiny stuff:
 
 - [[https://github.com/mrkkrp/cl-ansi-term][cl-ansi-term]]  - print  colorized  text,  horizontal lines,  progress
-  bars, list,  tables,… [[https://github.com/mrkkrp/shtookovina][shtookovina]] by  the same author is  an example
-  command-line app that makes good use of it.
-- [[https://github.com/mrkkrp/cl-readline][cl-readine]] -  bindings to  the GNU Readline  library (Emacs  and Vim
-  input modes, history, basic expansion,…).
+  bars, list,  tables,…
+- [[https://github.com/mrkkrp/cl-readline][cl-readline]] -  bindings to  the GNU Readline  library (Emacs  and Vim
+  input   modes,  history,   basic   expansion, custom completion,…).  Example   project:
+  [[https://github.com/koji-kojiro/cl-repl][cl-repl]]. Demo example: [[https://github.com/vindarel/cl-readline-example][cl-readine-example]].
+  [[https://github.com/mrkkrp/shtookovina][shtookovina]] by the  same author is an example  command-line app that
+  makes good use of both projects.
+
 - the Awesome-cl/scripting link above.
 
 ** Automatically building and delivering the executable

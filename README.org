@@ -97,7 +97,7 @@ Available options:
 
 #+html: <p align='center'><img src='img-cli.png' /></p>
 
-Results are cached.
+Results are cached in =~/.cl-torrents/cache/=.
 
 ** Options
 
@@ -150,7 +150,7 @@ when there can be hundreds).
 - ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
 - add torrent to a local torrent client
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
-- self-contained web app,...
+- self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
 
 ** Release notes
 
@@ -158,7 +158,7 @@ when there can be hundreds).
 
 *** v0.7
 
-- fix cache not created
+- fix cache not created by binary
 - create cache in =~/.cl-torrents/cache/=
 
 
@@ -170,7 +170,8 @@ when there can be hundreds).
 - [[Https://github.com/CodyReichert/awesome-cl][Awesome-cl]]
 - [[https://lispcookbook.github.io/cl-cookbook/][the Common Lisp Cookbook]]
 - http://quickdocs.org/
-- (my) [[https://lisp-journey.gitlab.io/][lisp-journey]]: introductory posts, lists of resources, screencasts.
+- (my) [[https://lisp-journey.gitlab.io/][lisp-journey]]: introductory posts, lists of resources, selection
+  of screencasts.
 
 
 * Setting up a Common Lisp environment
@@ -186,4 +187,5 @@ when there can be hundreds).
 
    and install Quicklisp (two commands) and Slime for Emacs (in MELPA,
    with   package.el)  or   try  Atom-slime   or  Vim   package.   See
+   [[https://lispcookbook.github.io/cl-cookbook/getting-started.html][https://lispcookbook.github.io/cl-cookbook/getting-started.html]] and
    [[http://lisp-lang.org/wiki/article/editors][http://lisp-lang.org/wiki/article/editors]].
