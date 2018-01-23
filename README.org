@@ -88,12 +88,14 @@ or  use =-i=  (=--interactive=) to  enter the  interactive prompt,  in
 which you  can use completion  for the commands (*upcoming  in version
 0.8*):
 
-
+- help
+- quit (or =C-c=)
 - search <keywords>
 - magnet <i>
 - version
 - details (toggle the display of details)
-- open <i>
+- open <i> open the torrent's page with a browser
+- firefox <i>
 
 #+BEGIN_SRC text
 $ torrents -h

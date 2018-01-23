@@ -142,18 +142,28 @@
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "The search returned no results, we can not return this magnet link.~&")))
 
+(defun url-from (index)
+  "Return the url from last search's `index''s result."
+  (if *last-search*
+      (if (< index (length *last-search*))
+          (assoc-value *last-search* :href)
+          (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
+      (format t "The last search didn't return results.~&")))
+
 (defparameter *commands* '(
-                        ("version" . "print cl-torrents version")
-                        ("details" . "toggle the display of details")
-                        ("search" . "<keywords> search torrents")
-                        ("magnet" . "<i> get magnet link from search result nb i")   ;; with arg
-                        ("nb-results" . "<n> set the number of results to print")
-                        ;; "nb"
-                        ("help" . "print this help")
-                        ;; ("info" . "print a recap")
-                        ("open" . "<i> open this torrent page with the default browser")
-                        ("firefox" . "<i> open this torrent page with firefox")
-                        )
+                           ("version" . "print cl-torrents version")
+                           ("details" . "toggle the display of details")
+                           ("search" . "<keywords> search torrents")
+                           ("magnet" . "<i> get magnet link from search result nb i") ;; with arg
+                           ("nb-results" . "<n> set the number of results to print")
+                           ;; "nb"
+                           ("help" . "print this help")
+                           ;; ("info" . "print a recap")
+                           ("url" . "<i> get the torrent's page url")
+                           ("open" . "<i> open this torrent page with the default browser")
+                           ("firefox" . "<i> open this torrent page with firefox")
+                           ("quit" . "quit")
+                           )
   "List of verbs, first keywords for completion on the REPL.")
 
 (defparameter *verbs* (mapcar #'car *commands*)
@@ -201,6 +211,25 @@
                     (format t "~10a:~t ~a~&" (car it) (cdr it)))
           *commands*))
 
+(defparameter *browser* "firefox"
+  "Default browser, in case $BROWSER is not set.")
+
+(defun browse (index)
+    "Open with the default browser (or firefox). Use from Slime."
+    (let ((url (url-from index))
+          (browser (or (uiop:getenv "BROWSER")
+                       *browser*)))
+      (declare (ignorable browser))
+      (if url
+          (uiop:launch-program (list browser
+                                     url))
+          (format t "couldn't find the url of ~a, got ~a~&" index url))))
+
+(defun open-with-browser (args)
+  "Open firefox to this search result's url. Use from the repl."
+  (let ((index (parse-integer (car args))))
+    (browse index)))
+
 (defun repl ()
   "Start a readline interactive prompt.
 
@@ -247,7 +276,14 @@
         (when (string= "magnet" verb)
           ;; get one magnet link, could get more.
                                         ;xxx: catch errors (network).
-          (format t "~a~&" (magnet (parse-integer (first args))))))
+          (format t "~a~&" (magnet (parse-integer (first args)))))
+        (when (string= "url" verb)
+          (format t "~a~&" (url-from (parse-integer (car args))))
+          (finish-output))
+        (when (or (string= "open" verb)
+                  (string= "firefox" verb))
+          (open-with-browser args)
+          (finish-output)))
 
     (#+sbcl sb-sys:interactive-interrupt
       () (progn
