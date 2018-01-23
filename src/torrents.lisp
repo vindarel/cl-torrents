@@ -142,6 +142,21 @@
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "The search returned no results, we can not return this magnet link.~&")))
 
+(defun repl ()
+  "Start a readline interactive prompt."
+  (handler-case
+      (do ((i 0 (1+ i))
+           (text ""))
+          ((string= "quit" (string-trim " " text)))
+        (setf text
+              (rl:readline :prompt (format nil "torrents > ")
+                           :add-history t)))
+    (#+sbcl sb-sys:interactive-interrupt
+      () (progn
+           (uiop:quit)))
+    (error (c)
+      (format t "Unknown error: ~&~a~&" c))))
+
 (defun main ()
   "Parse command line arguments (portable way) and call the program."
 
@@ -166,15 +181,19 @@
            :short #\n
            :long "nb"
            :arg-parser #'parse-integer)
-    (:name :infos
-           :description "print more information (like the torrent's url)"
-           :short #\i
-           :long "info")
+    (:name :details
+           :description "print more details (like the torrent's url)"
+           :short #\d
+           :long "details")
     (:name :magnet
            :description "get the magnet link of the given search result."
            :short #\m
            :long "magnet"
-           :arg-parser #'parse-integer))
+           :arg-parser #'parse-integer)
+    (:name :interactive
+           :description "enter an interactive repl"
+           :short #\i
+           :long "interactive"))
 
 
   (multiple-value-bind (options free-args)
@@ -199,6 +218,8 @@
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))
 
+    (if (getf options :interactive)
+        (repl))
 
     ;; This is the only way I found
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp

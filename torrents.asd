@@ -20,7 +20,8 @@
                :unix-opts ;; with alias opts
                :clache
                :mockingbird
-               :lquery)
+               :lquery
+               :cl-readline)
   :components ((:module "src"
                 :components
                 ((:file "utils")

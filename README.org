@@ -89,7 +89,7 @@ Available options:
   -h, --help               print this help text
   -v, --version            print the version
   -n, --nb ARG             set the maximum number of results to print.
-  -i, --info               print more information (like the torrent's url)
+  -d, --details            print more details (like the torrent's url)
   -m, --magnet ARG         get the magnet link of the given search result.
 #+END_SRC
 
@@ -106,7 +106,7 @@ when there can be hundreds).
 
 : (setf *nb-results* 50)
 
-=-i= (=--info==) to print more information, like the url.
+=-d= (=--details==) to print more details, like the url.
 
 ** Tutorial
 
