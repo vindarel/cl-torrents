@@ -1,12 +1,7 @@
+LISP?=sbcl
 
 build:
-	sbcl --load torrents.asd \
-	     --eval '(ql:quickload :torrents)' \
-	     --eval '(use-package :torrents)' \
-             --eval "(sb-ext:save-lisp-and-die #p\"torrents\" :toplevel #'main :executable t)"
-
-asdfbuild:
-	sbcl --load torrents.asd \
+	$(LISP) --load torrents.asd \
 		--eval '(ql:quickload :torrents)' \
 		--eval '(asdf:make :torrents)' \
 		--eval '(quit)'

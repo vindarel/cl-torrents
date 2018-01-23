@@ -32,7 +32,7 @@
                  (:file "torrents"))))
   ;; build executable with asdf:make :torrents.
   :build-operation "program-op"
-  :build-pathname "asdftorrents"
+  :build-pathname "torrents"
   :entry-point "torrents:main"
 
   :description ""
