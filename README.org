@@ -6,8 +6,9 @@ Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/ta
 
 * cl-torrents
 
-  This is a  little tool for the  lisp REPL or the  terminal to search
-  for torrents and get magnet links.
+  This is  a little  tool for  the *lisp REPL*  or the  *command line*
+  (also with  an *interactive  prompt*) to search  for torrents  and get
+  magnet links.
 
   We  currently scrape  the following  sites and  present the  results
   sorted by seeders:
@@ -35,7 +36,7 @@ and install it:
 ** Usage
 
    We can  use this little app  both in a  Lisp REPL (Slime) and  in a
-   terminal.
+   terminal, as a command line tool or from its embedded interactive prompt.
 
 *** Lisp REPL
 
@@ -79,7 +80,20 @@ and install it:
   tutorial to show you diverse Common Lisp topics.
 
 
-*** Command line
+*** Command line & interactive prompt
+
+Use the  options given below,
+
+or  use =-i=  (=--interactive=) to  enter the  interactive prompt,  in
+which you  can use completion  for the commands (*upcoming  in version
+0.8*):
+
+
+- search <keywords>
+- magnet <i>
+- version
+- details (toggle the display of details)
+- open <i>
 
 #+BEGIN_SRC text
 $ torrents -h
@@ -90,8 +104,12 @@ Available options:
   -v, --version            print the version
   -n, --nb ARG             set the maximum number of results to print.
   -d, --details            print more details (like the torrent's url)
+  -i, --interactive        enter an interactive repl
   -m, --magnet ARG         get the magnet link of the given search result.
 #+END_SRC
+
+Example: below we  search for "matrix…", we display only  1 result and
+we get the magnet link of the first result.
 
 : $ torrents -n 1 matrix french 1999 cool -m 0
 

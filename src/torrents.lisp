@@ -142,7 +142,14 @@
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "The search returned no results, we can not return this magnet link.~&")))
 
-(defparameter *verbs* '("open" "firefox" "magnet" "details")
+(defparameter *verbs* '(
+                        "version"
+                        "details" ;; toggle on/off display of details
+                        "search"  ;; with arg(s)
+                        "magnet"  ;; with arg
+                        "open" ;; with arg, open with default browser
+                        "firefox"       ;; with arg, open with firefox.
+                        )
   "List of verbs, first keywords for completion on the REPL.")
 
 (defun common-prefix (items)
@@ -169,31 +176,64 @@
                  (cdr items))))))
 
 (defun select-completions (text list)
-  (let ((els (remove-if-not (alexandria:curry #'alexandria:starts-with-subseq text)
+  "Select all verbs from `list' that start with `text'."
+  (let ((els (remove-if-not (alexandria:curry #'str:starts-with? text)
                             list)))
     (if (cdr els)
         (cons (common-prefix els) els)
         els)))
 
 (defun custom-complete (text start end)
+  "Complete a symbol when the cursor is at the beginning of the prompt."
   (declare (ignore end))
   (if (zerop start)
       (select-completions text *verbs*)))
 
-
-
 (defun repl ()
-  "Start a readline interactive prompt."
+  "Start a readline interactive prompt.
+
+  Auto completes some verbs (search, magnet, details,...).
+
+  "
 
   (rl:register-function :complete #'custom-complete)
 
   (handler-case
       (do ((i 0 (1+ i))
-           (text ""))
-          ((string= "quit" (string-trim " " text)))
+           (text "")
+           (verb "")
+           (args "")
+           (details nil))
+          ((string= "quit" (str:trim text)))
         (setf text
-              (rl:readline :prompt (format nil "cl-torrents [~a] > " i)
-                           :add-history t)))
+              (rl:readline :prompt (cl-ansi-text:green (format nil "cl-torrents [~a] > " i))
+                           :add-history t))
+        (setf verb (first (str:words text)))
+        (setf args (rest (str:words text)))
+
+        ;xxx: use cond
+        (when (string= "hello" verb)
+          (format t "hello torrents repl !!~&")
+          (finish-output))
+        (when (string= "version" verb)
+          (format t "~a~&" *version*)
+          (finish-output))
+        (when (string= "details" verb)
+          (setf details (not details))
+          (format t "details set to ~a~&" details)
+          (finish-output))
+        (when (string= "search" verb)
+          (format t "searching: ~a~&" args)
+                                        ;xxx: catch errors (network).
+          (display-results :results (async-torrents args)
+                           :nb-results *nb-results*
+                           :infos details)
+          (finish-output))
+        (when (string= "magnet" verb)
+          ;; get one magnet link, could get more.
+                                        ;xxx: catch errors (network).
+          (format t "~a~&" (magnet (parse-integer (first args))))))
+
     (#+sbcl sb-sys:interactive-interrupt
       () (progn
            (uiop:quit)))
