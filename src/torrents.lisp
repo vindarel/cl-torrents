@@ -142,14 +142,57 @@
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "The search returned no results, we can not return this magnet link.~&")))
 
+(defparameter *verbs* '("open" "firefox" "magnet" "details")
+  "List of verbs, first keywords for completion on the REPL.")
+
+(defun common-prefix (items)
+  ;; tmp waiting for cl-str 0.5 in Quicklisp february.
+  "Find the common prefix between strings.
+
+   Uses the built-in `mismatch', that returns the position at which
+   the strings fail to match.
+
+   Example: `(str:common-prefix '(\"foobar\" \"foozz\"))` => \"foo\"
+
+   - items: list of strings
+   - Return: a string.
+
+  "
+  ;; thanks koji-kojiro/cl-repl
+  (when items (subseq
+               (car items)
+               0
+               (apply
+                #'min
+                (mapcar
+                 #'(lambda (i) (or (mismatch (car items) i) (length i)))
+                 (cdr items))))))
+
+(defun select-completions (text list)
+  (let ((els (remove-if-not (alexandria:curry #'alexandria:starts-with-subseq text)
+                            list)))
+    (if (cdr els)
+        (cons (common-prefix els) els)
+        els)))
+
+(defun custom-complete (text start end)
+  (declare (ignore end))
+  (if (zerop start)
+      (select-completions text *verbs*)))
+
+
+
 (defun repl ()
   "Start a readline interactive prompt."
+
+  (rl:register-function :complete #'custom-complete)
+
   (handler-case
       (do ((i 0 (1+ i))
            (text ""))
           ((string= "quit" (string-trim " " text)))
         (setf text
-              (rl:readline :prompt (format nil "torrents > ")
+              (rl:readline :prompt (format nil "cl-torrents [~a] > " i)
                            :add-history t)))
     (#+sbcl sb-sys:interactive-interrupt
       () (progn
@@ -219,7 +262,9 @@
         (setf *nb-results* (getf options :nb-results)))
 
     (if (getf options :interactive)
-        (repl))
+        (progn
+          (repl)
+          (uiop:quit)))
 
     ;; This is the only way I found
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp

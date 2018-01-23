@@ -21,6 +21,7 @@
                :clache
                :mockingbird
                :lquery
+               :alexandria  ;; to remove tmp !
                :cl-readline)
   :components ((:module "src"
                 :components
