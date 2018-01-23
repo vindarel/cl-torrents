@@ -142,15 +142,22 @@
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "The search returned no results, we can not return this magnet link.~&")))
 
-(defparameter *verbs* '(
-                        "version"
-                        "details" ;; toggle on/off display of details
-                        "search"  ;; with arg(s)
-                        "magnet"  ;; with arg
-                        "open" ;; with arg, open with default browser
-                        "firefox"       ;; with arg, open with firefox.
+(defparameter *commands* '(
+                        ("version" . "print cl-torrents version")
+                        ("details" . "toggle the display of details")
+                        ("search" . "<keywords> search torrents")
+                        ("magnet" . "<i> get magnet link from search result nb i")   ;; with arg
+                        ("nb-results" . "<n> set the number of results to print")
+                        ;; "nb"
+                        ("help" . "print this help")
+                        ;; ("info" . "print a recap")
+                        ("open" . "<i> open this torrent page with the default browser")
+                        ("firefox" . "<i> open this torrent page with firefox")
                         )
   "List of verbs, first keywords for completion on the REPL.")
+
+(defparameter *verbs* (mapcar #'car *commands*)
+  "List of strings.")
 
 (defun common-prefix (items)
   ;; tmp waiting for cl-str 0.5 in Quicklisp february.
@@ -189,6 +196,11 @@
   (if (zerop start)
       (select-completions text *verbs*)))
 
+(defun repl-help ()
+  (mapcar (lambda (it)
+                    (format t "~10a:~t ~a~&" (car it) (cdr it)))
+          *commands*))
+
 (defun repl ()
   "Start a readline interactive prompt.
 
@@ -218,6 +230,9 @@
         (when (string= "version" verb)
           (format t "~a~&" *version*)
           (finish-output))
+        (when (or (string= "help" verb)
+                  (string= "?" verb))
+          (repl-help))
         (when (string= "details" verb)
           (setf details (not details))
           (format t "details set to ~a~&" details)
