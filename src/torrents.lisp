@@ -18,7 +18,7 @@
            :main))
 (in-package :torrents)
 
-(defparameter *version* "0.7.1")
+(defparameter *version* (uiop:read-file-form #p"version.lisp-expr"))
 
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")

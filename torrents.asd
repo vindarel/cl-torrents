@@ -8,7 +8,7 @@
 (in-package :torrents-asd)
 
 (defsystem torrents
-  :version "0.1"
+  :version (:read-file-form "version.lisp-expr")
   :author ""
   :license ""
   :depends-on (
