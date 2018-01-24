@@ -151,23 +151,23 @@
       (format t "The last search didn't return results.~&")))
 
 (defparameter *commands* '(
-                           ("version" . "print cl-torrents version")
-                           ("details" . "toggle the display of details")
                            ("search" . "<keywords> search torrents")
                            ("magnet" . "<i> get magnet link from search result nb i") ;; with arg
+                           ("details" . "toggle the display of details")
                            ("nb-results" . "<n> set the number of results to print")
                            ;; "nb"
-                           ("help" . "print this help")
                            ;; ("info" . "print a recap")
                            ("url" . "<i> get the torrent's page url")
                            ("open" . "<i> open this torrent page with the default browser")
                            ("firefox" . "<i> open this torrent page with firefox")
+                           ("version" . "print cl-torrents version")
+                           ("help" . "print this help")
                            ("quit" . "quit")
                            )
-  "List of verbs, first keywords for completion on the REPL.")
+  "List of alist tuples, a verb and its doc, for completion on the REPL.")
 
-(defparameter *verbs* (mapcar #'car *commands*)
-  "List of strings.")
+(defparameter *verbs* (mapcar #'first *commands*)
+  "List of verbs for completion. Strings.")
 
 (defun common-prefix (items)
   ;; tmp waiting for cl-str 0.5 in Quicklisp february.
@@ -266,6 +266,8 @@
           (setf details (not details))
           (format t "details set to ~a~&" details)
           (finish-output))
+        (when (string= "nb-results" verb)
+          (setf *nb-results* (parse-integer (first args))))
         (when (string= "search" verb)
           (format t "searching: ~a~&" args)
                                         ;xxx: catch errors (network).
