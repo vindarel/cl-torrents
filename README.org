@@ -80,22 +80,9 @@ and install it:
   tutorial to show you diverse Common Lisp topics.
 
 
-*** Command line & interactive prompt
+*** Command line
 
 Use the  options given below,
-
-or  use =-i=  (=--interactive=) to  enter the  interactive prompt,  in
-which you  can use completion  for the commands (*upcoming  in version
-0.8*):
-
-- help
-- quit (or =C-c=)
-- search <keywords>
-- magnet <i>
-- version
-- details (toggle the display of details)
-- open <i> open the torrent's page with a browser
-- firefox <i>
 
 #+BEGIN_SRC text
 $ torrents -h
@@ -127,6 +114,26 @@ when there can be hundreds).
 : (setf *nb-results* 50)
 
 =-d= (=--details==) to print more details, like the url.
+
+*** Interactive prompt (*new in version 0.8*)
+
+Use  the option  =-i=  (=--interactive=) to  enter the  readline-based
+interactive prompt, in which you  can use completion for the following
+commands:
+
+- =help=
+- =quit= (or =C-c=)
+- =search= <keywords>
+- =magnet<i>
+- =version=
+- =details= (toggle the display of details)
+- =open= <i> open the torrent's page with a browser
+- =firefox= <i>
+
+#+html: <p align='center'><img src='repl.png' /></p>
+
+See  more  possibly  useful   libraries  in  [[https://github.com/CodyReichert/awesome-cl#scripting][awesome-cl#scripting]]  and
+[[http://quickdocs.org/search?q=console][quickdocs/console]].
 
 ** Tutorial
 
@@ -171,10 +178,17 @@ when there can be hundreds).
 - add torrent to a local torrent client
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
+- [X] interactive prompt, with completion of commands.
+  - save  the   settings  (details,   nb-results),  possibly   with  a
+    persistent objects storage, will be straightforward.
 
 ** Release notes
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
+
+*** v0.8
+
+- added a readline-based repl with some commands: search, magnet,…
 
 *** v0.7
 
@@ -200,12 +214,15 @@ when there can be hundreds).
   multiplatform CL  environment shipping: Emacs25 and  Slime (slightly
   customized), SBCL, Quicklisp and Git.
 
-  Otherwise:
+  Emacs      isn't      the      only     editor      though,      see
+   [[https://lispcookbook.github.io/cl-cookbook/editor-support.html][https://lispcookbook.github.io/cl-cookbook/editor-support.html]]  for   Vim  plugins,   to
+  discover Lem (ncurses and Electron frontends), Atom-Slime, notebooks
+  and the ipython-like [[https://github.com/koji-kojiro/cl-repl][cl-repl]].
 
-: apt install sbcl rlwrap
-: rlwrap sbcl
+  Anyway:
+
+: apt install sbcl
 
    and install Quicklisp (two commands) and Slime for Emacs (in MELPA,
-   with   package.el)  or   try  Atom-slime   or  Vim   package.   See
-   [[https://lispcookbook.github.io/cl-cookbook/getting-started.html][https://lispcookbook.github.io/cl-cookbook/getting-started.html]] and
-   [[http://lisp-lang.org/wiki/article/editors][http://lisp-lang.org/wiki/article/editors]].
+   with   package.el).   See
+   [[https://lispcookbook.github.io/cl-cookbook/getting-started.html][https://lispcookbook.github.io/cl-cookbook/getting-started.html]].
