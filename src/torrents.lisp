@@ -140,7 +140,7 @@
       (if (< index (length *last-search*))
           (magnet-link-from (elt *last-search* index))
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
-      (format t "The search returned no results, we can not return this magnet link.~&")))
+      (format t "no search results to get the magnet link from.~&")))
 
 (defun url-from (index)
   "Return the url from last search's `index''s result."
@@ -148,7 +148,7 @@
       (if (< index (length *last-search*))
           (assoc-value *last-search* :href)
           (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
-      (format t "The last search didn't return results.~&")))
+      (format t "no search results to get the url from.~&")))
 
 (defparameter *commands* '(
                            ("search" . "<keywords> search torrents")
@@ -208,7 +208,7 @@
 
 (defun repl-help ()
   (mapcar (lambda (it)
-                    (format t "~10a:~t ~a~&" (car it) (cdr it)))
+                    (format t "~10a-~t ~a~&" (car it) (cdr it)))
           *commands*))
 
 (defparameter *browser* "firefox"
@@ -252,40 +252,45 @@
         (setf verb (first (str:words text)))
         (setf args (rest (str:words text)))
 
-        ;xxx: use cond
-        (when (string= "hello" verb)
-          (format t "hello torrents repl !!~&")
+        (cond
+          ((or (string= "fortune" verb)
+               (string= "yo" verb))
+           (if (probe-file "/usr/games/fortune")
+               (uiop:run-program "/usr/games/fortune" :output *standard-output*)
+               (format t "nothing in /usr/games/fortune, man.~&")))
+
+          ((string= "version" verb)
+           (format t "~a~&" *version*))
+
+          ((or (string= "help" verb)
+               (string= "?" verb))
+           (repl-help))
+
+          ((string= "details" verb)
+           (setf details (not details))
+           (format t "details set to ~a~&" details))
+
+          ((string= "nb-results" verb)
+           (setf *nb-results* (parse-integer (first args))))
+
+          ((string= "search" verb)
+           (format t "searching: ~a~&" args)
+           ;; catch errors (network)
+           (display-results :results (async-torrents args)
+                            :nb-results *nb-results*
+                            :infos details))
+
+          ((string= "magnet" verb)
+           (format t "~a~&" (magnet (parse-integer (first args)))))
+
+          ((string= "url" verb)
+           (format t "~a~&" (url-from (parse-integer (car args)))))
+
+          ((or (string= "open" verb)
+               (string= "firefox" verb))
+           (open-with-browser args)))
+
           (finish-output))
-        (when (string= "version" verb)
-          (format t "~a~&" *version*)
-          (finish-output))
-        (when (or (string= "help" verb)
-                  (string= "?" verb))
-          (repl-help))
-        (when (string= "details" verb)
-          (setf details (not details))
-          (format t "details set to ~a~&" details)
-          (finish-output))
-        (when (string= "nb-results" verb)
-          (setf *nb-results* (parse-integer (first args))))
-        (when (string= "search" verb)
-          (format t "searching: ~a~&" args)
-                                        ;xxx: catch errors (network).
-          (display-results :results (async-torrents args)
-                           :nb-results *nb-results*
-                           :infos details)
-          (finish-output))
-        (when (string= "magnet" verb)
-          ;; get one magnet link, could get more.
-                                        ;xxx: catch errors (network).
-          (format t "~a~&" (magnet (parse-integer (first args)))))
-        (when (string= "url" verb)
-          (format t "~a~&" (url-from (parse-integer (car args))))
-          (finish-output))
-        (when (or (string= "open" verb)
-                  (string= "firefox" verb))
-          (open-with-browser args)
-          (finish-output)))
 
     (#+sbcl sb-sys:interactive-interrupt
       () (progn
