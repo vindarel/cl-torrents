@@ -83,6 +83,7 @@
                             (lparallel:pfuncall fun terms :stream log-stream))
                           '(tpb:torrents
                             kat:torrents
+                            torrents.1337:torrents
                             torrentcd:torrents))))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
@@ -103,6 +104,8 @@
             ;; We want a string padding for the title of 65 chars.
             ;; We must add to the padding the length of the extra color markers,
             ;; thus we must compute it and format the format string before printing the title.
+            ;;
+            ;; xxx see also the v directive: https://stackoverflow.com/questions/48868555/in-common-lisp-format-how-does-recursive-formatting-work
             (let* ((title (assoc-value it :title))
                    (title-colored (colorize-all-keywords title *keywords-colors*))
                    (title-padding (+ 65
@@ -128,7 +131,9 @@
   (dex:get url))
 
 (defun magnet-link-from (alist)
-  "Extract the magnet link from a `torrent' result."
+  "Extract the magnet link from a `torrent' result.
+
+   Return the first href of the page that starts with 'magnet'."
   (let* ((url (assoc-value alist :href))
          (html (request-details url))
          (parsed (plump:parse html)))

@@ -3,7 +3,8 @@
   (:use :cl
         :torrents
         :mockingbird
-        :prove))
+        :prove)
+  (:export :file-to-string))
 (in-package :torrents-test)
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :torrents)' in your Lisp.
