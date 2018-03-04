@@ -153,7 +153,7 @@
   "Return the url from last search's `index''s result."
   (if *last-search*
       (if (< index (length *last-search*))
-          (assoc-value *last-search* :href)
+          (assoc-value (elt *last-search* index) :href)
           (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
       (format t "no search results to get the url from.~&")))
 
@@ -234,7 +234,7 @@
 
 (defun open-with-browser (args)
   "Open firefox to this search result's url. Use from the repl."
-  (let ((index (parse-integer (car args))))
+  (let* ((index (parse-integer (first args))))
     (browse index)))
 
 (defun repl ()
