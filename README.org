@@ -186,6 +186,11 @@ See  more  possibly  useful   libraries  in  [[https://github.com/CodyReichert/a
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
+*** v0.9
+
+- added results from [[http://1337x.to][1337x.to]]
+- removed the other scrapers :/
+
 *** v0.8
 
 - added a readline-based repl with some commands: search, magnet,…
@@ -195,6 +200,18 @@ See  more  possibly  useful   libraries  in  [[https://github.com/CodyReichert/a
 - fix cache not created by binary
 - create cache in =~/.cl-torrents/cache/=
 
+
+* Dev
+
+Clone in =~/quicklisp/local-projects= and =(ql:quickload :torrents)=.
+
+Unit tests:
+
+: make test
+
+End-to-end tests (checking that the websites respond and our scrapers still work):
+
+: make test-end2end
 
 * Resources
 

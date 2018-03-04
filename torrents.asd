@@ -9,8 +9,8 @@
 
 (defsystem torrents
   :version (:read-file-form "version.lisp-expr")
-  :author ""
-  :license ""
+  :author "vindarel"
+  :license "MIT"
   :depends-on (
                :dexador
                :plump
@@ -29,6 +29,7 @@
                  (:file "tpb")
                  (:file "torrentcd")
                  (:file "kat")
+                 (:file "1337")
                  (:file "torrents"))))
   ;; build executable with asdf:make :torrents.
   :build-operation "program-op"
@@ -49,4 +50,4 @@
                                :fill-pointer t)))
           (setf (fill-pointer seq) (read-sequence seq stream))
           seq)))
-  :in-order-to ((test-op (test-op cl-torrents-test))))
+  :in-order-to ((test-op (test-op torrents-test))))
