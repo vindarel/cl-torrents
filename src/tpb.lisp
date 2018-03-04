@@ -10,6 +10,12 @@
 ;; to do: shadow-import to use search as a funnction name.
 (in-package :tpb)
 
+
+;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+;; This piratebay clone is down.
+;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 (defparameter *search-url* "http://piratebay.to/search/?FilterStr={KEYWORDS}&ID=&Limit=800&Letter=&Sorting=DSeeder"
   "Base search url. KEYWORDS to be replaced by the search terms (a string with +-separated words).")
 

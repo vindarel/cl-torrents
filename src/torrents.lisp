@@ -81,10 +81,12 @@
                   cached-res
                   (mapcan (lambda (fun)
                             (lparallel:pfuncall fun terms :stream log-stream))
-                          '(tpb:torrents
-                            kat:torrents
+                          '(
+                            ;; tpb:torrents
+                            ;; kat:torrents
                             torrents.1337:torrents
-                            torrentcd:torrents))))
+                            ;; torrentcd:torrents
+                            ))))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
                              (> (assoc-value a :seeders)

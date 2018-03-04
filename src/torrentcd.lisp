@@ -9,6 +9,11 @@
   )
 (in-package :torrentcd)
 
+;; !!!!!!!!!!!!!!!!!!!!!
+;; torrent.cd is down :(
+;; !!!!!!!!!!!!!!!!!!!!!
+
+
 ;; This scraping is fragile... good live tests are mandatory.
 ;; and lacks error handling !
 
