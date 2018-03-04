@@ -7,15 +7,11 @@ Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/ta
 * cl-torrents
 
   This is  a little  tool for  the *lisp REPL*  or the  *command line*
-  (also with  an *interactive  prompt*) to search  for torrents  and get
+  (also with  a readline *interactive  prompt*) to search  for torrents  and get
   magnet links.
 
-  We  currently scrape  the following  sites and  present the  results
-  sorted by seeders:
-
-- the  Pirate Bay ([[https://piratebay.to/][piratebay.to]])
-- Kickass Torrents ([[https://katcr.co][katcr.co]])
-- Torrent.cd ([[https://torrent.cd/][torrent.cd]]).
+  We  currently scrape  [[http://1337x.to][1337x.to]] (since v0.9)  and present  the  results sorted  by
+  seeders.
 
 ** Installation
 
@@ -32,11 +28,17 @@ and install it:
 
 : (ql:quickload "torrents")
 
+To build the executable:
+
+: make build
+
 
 ** Usage
 
    We can  use this little app  both in a  Lisp REPL (Slime) and  in a
    terminal, as a command line tool or from its embedded interactive prompt.
+
+   Results are cached in =~/.cl-torrents/cache/=.
 
 *** Lisp REPL
 
@@ -104,36 +106,26 @@ we get the magnet link of the first result.
 
 #+html: <p align='center'><img src='img-cli.png' /></p>
 
-Results are cached in =~/.cl-torrents/cache/=.
+*** Readline interface
 
-** Options
+Start it with =torrents -i=.
 
-=-n <i>=: maximum number  of results  to print (50  by default  for convenience,
-when there can be hundreds).
+See the =help=.
 
-: (setf *nb-results* 50)
+Available commands are (use the auto-completion):
 
-=-d= (=--details==) to print more details, like the url.
-
-*** Interactive prompt (*new in version 0.8*)
-
-Use  the option  =-i=  (=--interactive=) to  enter the  readline-based
-interactive prompt, in which you  can use completion for the following
-commands:
-
-- =help=
+- =search=
+- =magnet <i>=, where /i/ is a result index,
+- =open= or =firefox <i>=: open the given torrent page in a web browser
+- =url <i>=
+- =nb-results= =n= to set the number of results to print to /n/
+- =details=: toggle the display of details
 - =quit= (or =C-c=)
-- =search= <keywords>
-- =magnet<i>
-- =version=
-- =details= (toggle the display of details)
-- =open= <i> open the torrent's page with a browser
-- =firefox= <i>
 
-#+html: <p align='center'><img src='repl.png' /></p>
+We are in  a regular [[https://tiswww.case.edu/php/chet/readline/readline.html#SEC9][readline]] interface, so the  usual keybindings and
+options are available.
 
-See  more  possibly  useful   libraries  in  [[https://github.com/CodyReichert/awesome-cl#scripting][awesome-cl#scripting]]  and
-[[http://quickdocs.org/search?q=console][quickdocs/console]].
+#+html: <p align='center'><img src='img-readline.png' /></p>
 
 ** Tutorial
 
@@ -171,7 +163,7 @@ See  more  possibly  useful   libraries  in  [[https://github.com/CodyReichert/a
   - [X] =-i= print url
 - [X] build  with  ECL. Used  [[https://hub.docker.com/r/daewok/lisp-devel/][the  lisp-devel]]  docker
   image. Result: a 52Mo  executable with a runtime error.
-- open an url
+- [X] open an url
 - download the torrent file
 - generate a json
 - ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
@@ -188,12 +180,14 @@ See  more  possibly  useful   libraries  in  [[https://github.com/CodyReichert/a
 
 *** v0.9
 
-- added results from [[http://1337x.to][1337x.to]]
-- removed the other scrapers :/
+- added [[http://1337x.to][1337x.to]] scraper.
+- removed piratebay.to, katcr.co, torrent.cd, they're down :/
 
 *** v0.8
 
-- added a readline-based repl with some commands: search, magnet,…
+- added a readline-based repl  with some commands: =search=, =magnet=,
+  =open=, with their completion.  See =help=.  Built with [[https://github.com/mrkkrp/cl-readline][cl-readline]],
+  but might use [[https://github.com/vindarel/replic][replic]] anytime soon.
 
 *** v0.7
 
