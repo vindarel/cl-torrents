@@ -237,6 +237,12 @@
   (let* ((index (parse-integer (first args))))
     (browse index)))
 
+(defun confirm ()
+  "Ask confirmation. Nothing means yes."
+  (member (rl:readline :prompt (format nil  "~%Do you want to quit ? [Y]/n : "))
+          '("y" "Y" "")
+          :test 'equal))
+
 (defun repl ()
   "Start a readline interactive prompt.
 
@@ -258,6 +264,11 @@
                            :add-history t))
         (setf verb (first (str:words text)))
         (setf args (rest (str:words text)))
+
+        (if (string= text "NIL")
+            ;; that's a C-d, a blank input is just "".
+            (when (confirm)
+              (uiop:quit)))
 
         (cond
           ((or (string= "fortune" verb)
@@ -297,7 +308,7 @@
                (string= "firefox" verb))
            (open-with-browser args)))
 
-          (finish-output))
+        (finish-output))
 
     (#+sbcl sb-sys:interactive-interrupt
       () (progn
