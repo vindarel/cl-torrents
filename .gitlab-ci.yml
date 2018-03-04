@@ -11,6 +11,14 @@ test:
   script:
     - make test
 
+# Run end-to-end tests regularly.
+e2e:
+  stage: test
+  only:
+    - triggers
+  script:
+    - make test-end2end
+
 build:
   stage: build
   only:
