@@ -26,20 +26,25 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
-(defparameter *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname))
-        "The directory to put configuration files.")
+;; Parameters below: create at startup, not at build time.
+(defparameter *config-directory* nil
+  "The directory to put configuration files.")
 
-(defparameter *cache-directory*
-  (merge-pathnames #p"cache/" *config-directory*)
+(defparameter *cache-directory* nil
   "The directory where cl-torrents stores its cache.")
 
+(defparameter *store* nil
+  "Cache. The directory must exist.")
+
 (defun ensure-cache ()
+  (setf *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname)))
+  (setf *cache-directory* (merge-pathnames #p"cache/" *config-directory*))
   (ensure-directories-exist *cache-directory*))
 
-(defparameter *store* (progn
-                        (ensure-cache)
-                        (make-instance 'file-store :directory *cache-directory*))
-  "Cache. The directory must exist.")
+(defun ensure-cache-and-store ()
+  (setf *store* (progn
+                  (ensure-cache)
+                  (make-instance 'file-store :directory *cache-directory*))))
 
 (defun assoc-value (alist key &key (test #'equalp))
   ;; Don't import Alexandria just for that.
@@ -63,6 +68,11 @@
 `words': a string (space-separated keywords) or a list of strings.
 `nb-results': max number of results to print.
 `log-stream': used in tests to capture (and ignore) some output."
+  ;; Better way to define those before but also for the executable ?
+  (unless *cache-directory*
+    (ensure-cache))
+  (unless *store*
+    (ensure-cache-and-store))
   (let ((res (async-torrents words :stream stream :log-stream log-stream)))
     (display-results :results res :stream stream :nb-results nb-results)))
 
@@ -323,7 +333,9 @@
   ;; save core with multiple threads running).
   (setf lparallel:*kernel* (lparallel:make-kernel 2))
 
-  (ensure-cache)
+  (handler-case
+      (ensure-cache-and-store)
+    (error (c) (format *error-output* "~&~a~&" c)))
 
   ;; Define the cli args.
   (opts:define-opts
