@@ -35,7 +35,8 @@
 
 ;; stubs: network calls return our known recorded html pages..
 (with-dynamic-stubs ((dex:get htmlpage)
-                     (torrents::request-details resultpage))
+                     (torrents::request-details resultpage)
+                     (torrents::get-cached-results nil))
 
   (ok (with-output-to-string (out)
         (torrents:async-torrents "matrix" :stream out :log-stream nil)) "torrent search ok")
@@ -56,9 +57,11 @@
 
 ;; We can do the same with a macro, in order to isolate tests and to
 ;; factorize with-dynamic-stubs.
+
 (defmacro with-mocked-search-results (body)
   `(with-dynamic-stubs ((dex:get htmlpage)
-                        (torrents::request-details resultpage))
+                        (torrents::request-details resultpage)
+                        (torrents::get-cached-results nil))
      ,body))
 
 ;; Now we can run tests one by one.
