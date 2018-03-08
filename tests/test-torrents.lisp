@@ -49,23 +49,8 @@
         :omit-nulls t))
       "set the max nb of displayed results.")
 
-  (is (assoc-value (elt torrents::*last-search* 0) :href)
-      "https://piratebay.to/torrent/2297350/Matrix FRENCH DVDRIP 1999 COOL/"
-      :test #'equalp
-      "we get the right href.")
-
   (ok (str:starts-with? "magnet" (magnet 0))
       "magnet <i> returns the the magnet link from search result.")
-
-  (is 205
-      (assoc-value (elt torrents::*last-search* 0) :seeders)
-      :test #'equalp
-      "nb of peers.")
-
-  (is 7
-      (assoc-value (elt torrents::*last-search* 0) :leechers)
-      :test #'equalp
-      "nb of leechers.")
 
   )
 
