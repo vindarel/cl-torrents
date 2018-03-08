@@ -3,8 +3,6 @@
   (:use :cl)
   (:import-from :torrents.utils
                 :join-for-query)
-  (:import-from :alexandria
-                :flatten)
   (:export :torrents)
   )
 (in-package :torrentcd)
