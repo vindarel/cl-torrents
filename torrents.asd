@@ -30,6 +30,7 @@
                  (:file "torrentcd")
                  (:file "kat")
                  (:file "1337")
+                 (:file "downloadsme")
                  (:file "torrents"))))
   ;; build executable with asdf:make :torrents.
   :build-operation "program-op"

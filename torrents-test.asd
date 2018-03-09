@@ -15,7 +15,8 @@
                :prove)
   :components ((:module "tests"
                 :components
-                ((:test-file "torrents")
+                ((:test-file "test-torrents")
+                 (:test-file "test-downloadsme")
                  (:test-file "test-1337"))))
   :description "Test system for cl-torrents."
 

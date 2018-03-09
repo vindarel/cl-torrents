@@ -25,4 +25,15 @@
                           (torrents::magnet-link-from (first torrents.1337::*search-results*)))
         "We get the magnet link of the first result.")))
 
+(subtest "Testing torrentdownloads.me"
+  (let ((res (torrents.downloadsme:torrents '("matrix"))))
+    (ok res
+        "The search is not null")
+
+    (ok (print (first res)))
+
+    (ok (str:starts-with? "magnet"
+                          (torrents::magnet-link-from (first torrents.downloadsme::*search-results*)))
+        "magnet link of the first result.")))
+
 (finalize)

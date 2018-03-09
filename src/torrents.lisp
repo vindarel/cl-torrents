@@ -95,6 +95,7 @@
                             ;; tpb:torrents
                             ;; kat:torrents
                             torrents.1337:torrents
+                            torrents.downloadsme:torrents
                             ;; torrentcd:torrents
                             ))))
          (sorted (sort res (lambda (a b)

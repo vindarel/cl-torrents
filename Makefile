@@ -12,6 +12,7 @@ test:
 	     --eval '(ql:quickload :torrents-test)' \
 	     --eval '(prove:run #P"tests/test-torrents.lisp")' \
 	     --eval '(prove:run #P"tests/test-1337.lisp")' \
+	     --eval '(prove:run #P"tests/test-downloadsme.lisp")' \
 	     --eval '(quit)'
 
 test-end2end:
