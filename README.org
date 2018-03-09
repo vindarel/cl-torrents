@@ -81,6 +81,9 @@ To build the executable:
   We may add more features, eventually.  Our goal is rather to write a
   tutorial to show you diverse Common Lisp topics.
 
+**** Parameters
+
+=*cache-p*=: if nil, don't use the cache system.
 
 *** Command line
 

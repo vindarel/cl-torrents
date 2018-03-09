@@ -30,6 +30,9 @@
 (defparameter *config-directory* nil
   "The directory to put configuration files.")
 
+(defparameter *cache-p* t
+  "If true, use the cache.")
+
 (defparameter *cache-directory* nil
   "The directory where cl-torrents stores its cache.")
 
@@ -54,14 +57,15 @@
 
 (defun save-results (terms val &key (store *store*))
   "Save results in cache."
-  (when val
+  (when (and *cache-p* val)
     (setcache terms val store)))
 
 (defun get-cached-results (terms &key (store *store*))
-  (when (getcache terms store)
-    (progn
-      ;; (format t "Got cached results for ~a.~&" terms)
-      (getcache terms store))))
+  (when *cache-p*
+    (when (getcache terms store)
+      (progn
+        ;; (format t "Got cached results for ~a.~&" terms)
+        (getcache terms store)))))
 
 (defun torrentsearch (words &key (stream t) (nb-results *nb-results*) (log-stream t))
   "Search for torrents on the different sources and print the results, sorted by number of seeders.
