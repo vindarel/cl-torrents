@@ -181,6 +181,11 @@ options are available.
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
+*** v0.10
+
+- added [[https://www.torrentdownloads.me][torrentdownloads.me]] scraper.
+- new parameter, =*cache-p*=: if nil, don't use the cache.
+
 *** v0.9
 
 - added [[http://1337x.to][1337x.to]] scraper.
