@@ -74,7 +74,11 @@ To build the executable:
 ;; "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
 #+END_SRC
 
-  or the option =-m <index>=.
+  We can open it with a torrent client (transmission-gtk by default):
+
+#+BEGIN_SRC lisp
+(download 0)
+#+END_SRC
 
   And voilà :)
 
@@ -120,6 +124,8 @@ Available commands are (use the auto-completion):
 - =search=
 - =magnet <i>=, where /i/ is a result index,
 - =open= or =firefox <i>=: open the given torrent page in a web browser
+- =download  <i>=:   open  a  magnet   link  with  a   torrent  client
+  (transmission-gtk by default)
 - =url <i>=
 - =nb-results= =n= to set the number of results to print to /n/
 - =details=: toggle the display of details
@@ -186,7 +192,7 @@ scrapers = 1337 DOWNLOADSME
 - [X] open an url
 - download the torrent file
 - [X] ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
-- add torrent to a local torrent client
+- [X] add torrent to a local torrent client
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
 - [X] interactive prompt, with completion of commands.

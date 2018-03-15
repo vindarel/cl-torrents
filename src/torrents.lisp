@@ -15,6 +15,8 @@
   (:export :torrentsearch
            :async-torrents
            :magnet
+           :browse
+           :download
            :main))
 (in-package :torrents)
 
@@ -180,6 +182,7 @@
                            ("search" . "<keywords> search torrents")
                            ("magnet" . "<i> get magnet link from search result nb i") ;; with arg
                            ("details" . "toggle the display of details")
+                           ("download" . "<i> download the given magnet link with a torrent client (transmission-gtk by default)")
                            ("nb-results" . "<n> set the number of results to print")
                            ;; "nb"
                            ;; ("info" . "print a recap")
@@ -256,6 +259,17 @@
   (let* ((index (parse-integer (first args))))
     (browse index)))
 
+(defparameter *torrent-client* "transmission-gtk"
+  "Default torrent client.")
+
+(defparameter *torrent-clients-list* '("transmission-gtk")
+  "List of available torrent clients, along with the optional command line options.")
+
+(defun download (soft index)
+  "Download with a torrent client."
+  (uiop:launch-program (list (find soft *torrent-clients-list* :test #'equal)
+                             (magnet-link-from (elt *last-search* index)))))
+
 (defun confirm ()
   "Ask confirmation. Nothing means yes."
   (member (rl:readline :prompt (format nil  "~%Do you want to quit ? [Y]/n : "))
@@ -323,9 +337,13 @@
           ((string= "url" verb)
            (format t "~a~&" (url-from (parse-integer (car args)))))
 
+          ((string= "download" verb)
+           (download *torrent-client* (parse-integer (first args))))
+
           ((or (string= "open" verb)
                (string= "firefox" verb))
            (open-with-browser args)))
+
 
         (finish-output))
 
