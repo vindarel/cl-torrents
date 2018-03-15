@@ -130,6 +130,23 @@ options are available.
 
 #+html: <p align='center'><img src='img-readline.png' /></p>
 
+*** Configuration file (new in v0.11)
+
+    cl-torrents will (try to)  read a =cl-torrents.conf= configuration
+    file  from   three  locations:  cl-torrents'   library  directory,
+    =~/.config/cl-torrents.conf= and  the current directory.  The last
+    one takes precedence.
+
+    Example content:
+
+#+BEGIN_SRC conf
+[default]
+
+scrapers = 1337 DOWNLOADSME
+#+END_SRC
+
+   On the Lisp side, this is easily provided by [[https://common-lisp.net/project/py-configparser/api-docs.shtml][py-configparser]].
+
 ** Tutorial
 
    Writing   a   little   web   scraper   like   this   one   is   not
@@ -168,8 +185,7 @@ options are available.
   image. Result: a 52Mo  executable with a runtime error.
 - [X] open an url
 - download the torrent file
-- generate a json
-- ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
+- [X] ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
 - add torrent to a local torrent client
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
@@ -181,6 +197,8 @@ options are available.
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
+*** v0.11 (dev)
+- =cl-torrents.conf= configuration file.
 *** v0.10
 
 - added [[https://www.torrentdownloads.me][torrentdownloads.me]] scraper.

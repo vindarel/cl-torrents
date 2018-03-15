@@ -39,6 +39,7 @@
 (defparameter *store* nil
   "Cache. The directory must exist.")
 
+
 (defun ensure-cache ()
   (setf *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname)))
   (setf *cache-directory* (merge-pathnames #p"cache/" *config-directory*))
@@ -80,6 +81,15 @@
   (let ((res (async-torrents words :stream stream :log-stream log-stream)))
     (display-results :results res :stream stream :nb-results nb-results)))
 
+(defvar *scrapers-alist* '(("1337" . torrents.1337:torrents)
+                           ("downloadsme" . torrents.downloadsme:torrents))
+  "Alist to associate a scraper name (str, for a user config) to its
+  symbol function to call.")
+
+(defvar *torrents-list* (mapcar #'cdr *scrapers-alist*)
+  "List of scraper functions to call. Modified after reading the
+  user's conf files.")
+
 (defun async-torrents (words &key (stream t) (log-stream t))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
@@ -95,13 +105,7 @@
                   cached-res
                   (mapcan (lambda (fun)
                             (lparallel:pfuncall fun terms :stream log-stream))
-                          '(
-                            ;; tpb:torrents
-                            ;; kat:torrents
-                            torrents.1337:torrents
-                            torrents.downloadsme:torrents
-                            ;; torrentcd:torrents
-                            ))))
+                          *torrents-list*)))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
                              (> (assoc-value a :seeders)
@@ -339,7 +343,11 @@
   (setf lparallel:*kernel* (lparallel:make-kernel 2))
 
   (handler-case
-      (ensure-cache-and-store)
+      (progn
+        (ensure-cache-and-store)
+        (setf *cfg* (read-config))
+        (when (config-has-scrapers-option-p *cfg*)
+          (setf *torrents-list* (config-torrents *cfg*))))
     (error (c) (format *error-output* "~&~a~&" c)))
 
   ;; Define the cli args.

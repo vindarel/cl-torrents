@@ -21,6 +21,7 @@
                :clache
                :mockingbird
                :lquery
+               :py-configparser
                :alexandria  ;; to remove tmp !
                :cl-readline)
   :components ((:module "src"
@@ -31,7 +32,8 @@
                  (:file "kat")
                  (:file "1337")
                  (:file "downloadsme")
-                 (:file "torrents"))))
+                 (:file "torrents")
+                 (:file "config"))))
   ;; build executable with asdf:make :torrents.
   :build-operation "program-op"
   :build-pathname "torrents"
