@@ -139,8 +139,8 @@ options are available.
 *** Configuration file (new in v0.11)
 
     cl-torrents will (try to)  read a =cl-torrents.conf= configuration
-    file  from   three  locations:  cl-torrents'   library  directory,
-    =~/.config/cl-torrents.conf= and  the current directory.  The last
+    file  from  three   locations:  cl-torrents  library's  directory,
+    =~/.config/cl-torrents.conf= and the  current directory.  The last
     one takes precedence.
 
     Example content:
@@ -149,6 +149,8 @@ options are available.
 [default]
 
 scrapers = 1337 DOWNLOADSME
+
+browser = firefox
 #+END_SRC
 
    On the Lisp side, this is easily provided by [[https://common-lisp.net/project/py-configparser/api-docs.shtml][py-configparser]].

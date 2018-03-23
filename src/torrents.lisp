@@ -28,6 +28,15 @@
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
+(defparameter *browser* "firefox"
+  "Default browser, in case $BROWSER is not set.")
+
+(defparameter *torrent-client* "transmission-gtk"
+  "Default torrent client.")
+
+(defparameter *torrent-clients-list* '("transmission-gtk")
+  "List of available torrent clients, along with the optional command line options.")
+
 ;; Parameters below: create at startup, not at build time.
 (defparameter *config-directory* nil
   "The directory to put configuration files.")
@@ -240,9 +249,6 @@
                     (format t "~10a-~t ~a~&" (car it) (cdr it)))
           *commands*))
 
-(defparameter *browser* "firefox"
-  "Default browser, in case $BROWSER is not set.")
-
 (defun browse (index)
     "Open with the default browser (or firefox). Use from Slime."
     (let ((url (url-from index))
@@ -258,12 +264,6 @@
   "Open firefox to this search result's url. Use from the repl."
   (let* ((index (parse-integer (first args))))
     (browse index)))
-
-(defparameter *torrent-client* "transmission-gtk"
-  "Default torrent client.")
-
-(defparameter *torrent-clients-list* '("transmission-gtk")
-  "List of available torrent clients, along with the optional command line options.")
 
 (defun download (soft index)
   "Download with a torrent client."
@@ -365,7 +365,9 @@
         (ensure-cache-and-store)
         (setf *cfg* (read-config))
         (when (config-has-scrapers-option-p *cfg*)
-          (setf *torrents-list* (config-torrents *cfg*))))
+          (setf *torrents-list* (config-torrents *cfg*)))
+        (when (config-has-option-p *cfg* "browser")
+          (setf *browser* (config-option *cfg* "browser"))))
     (error (c) (format *error-output* "~&~a~&" c)))
 
   ;; Define the cli args.

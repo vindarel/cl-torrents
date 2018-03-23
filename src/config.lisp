@@ -29,6 +29,13 @@
   (ignore-errors
     (py-configparser:has-option-p cfg "default" "scrapers")))
 
+(defun config-has-option-p (cfg option)
+  (ignore-errors
+    (py-configparser:has-option-p cfg "default" option)))
+
+(defun config-option (cfg option)
+  (py-configparser:get-option cfg "default" option))
+
 (defun config-torrents (cfg)
   "Return the list of torrent functions to search with."
   (let* ((scrapers (py-configparser:get-option cfg "default" "scrapers"))
