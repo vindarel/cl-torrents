@@ -104,6 +104,10 @@
 (defun async-torrents (words &key (stream t) (log-stream t))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
+  (unless *cache-directory*
+    (ensure-cache))
+  (unless *store*
+    (ensure-cache-and-store))
   (let* ((terms (if (listp words)
                     ;; The main function gives words as a list,
                     ;; the user at the REPL a string.
