@@ -108,6 +108,8 @@
     (ensure-cache))
   (unless *store*
     (ensure-cache-and-store))
+  (unless lparallel:*kernel*
+    (setf lparallel:*kernel* (lparallel:make-kernel 2)))
   (let* ((terms (if (listp words)
                     ;; The main function gives words as a list,
                     ;; the user at the REPL a string.
