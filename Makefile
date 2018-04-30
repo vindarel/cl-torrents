@@ -2,6 +2,7 @@ LISP?=sbcl
 
 build:
 	$(LISP) --load torrents.asd \
+		--load ../replic/replic.asd \
 		--eval '(ql:quickload :torrents)' \
 		--eval '(asdf:make :torrents)' \
 		--eval '(quit)'

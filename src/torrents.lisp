@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage torrents
   (:use :cl
-        :clache)
+        :clache
+        :cl-ansi-text)
   (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
@@ -12,11 +13,12 @@
                 :when-option
                 :find-magnet-link
                 :sublist)
-  (:export :torrentsearch
+  (:export :search-torrents
            :async-torrents
            :magnet
            :browse
            :download
+           :url
            :main))
 (in-package :torrents)
 
@@ -79,11 +81,13 @@
         ;; (format t "Got cached results for ~a.~&" terms)
         (getcache terms store)))))
 
-(defun torrentsearch (words &key (stream t) (nb-results *nb-results*) (log-stream t))
+(defun search-torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
   "Search for torrents on the different sources and print the results, sorted by number of seeders.
-`words': a string (space-separated keywords) or a list of strings.
-`nb-results': max number of results to print.
-`log-stream': used in tests to capture (and ignore) some output."
+
+  `words': a string (space-separated keywords) or a list of strings.
+  `nb-results': max number of results to print.
+  `log-stream': used in tests to capture (and ignore) some output.
+  "
   ;; Better way to define those before but also for the executable ?
   (unless *cache-directory*
     (ensure-cache))
@@ -185,8 +189,10 @@
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "no search results to get the magnet link from.~&")))
 
-(defun url-from (index)
+(defun url (index)
   "Return the url from last search's `index''s result."
+  (when (stringp index)
+    (setf index (parse-integer index)))
   (if *last-search*
       (if (< index (length *last-search*))
           (assoc-value (elt *last-search* index) :href)
@@ -250,14 +256,9 @@
   (if (zerop start)
       (select-completions text *verbs*)))
 
-(defun repl-help ()
-  (mapcar (lambda (it)
-                    (format t "~10a-~t ~a~&" (car it) (cdr it)))
-          *commands*))
-
 (defun browse (index)
     "Open with the default browser (or firefox). Use from Slime."
-    (let ((url (url-from index))
+    (let ((url (url index))
           (browser (or (uiop:getenv "BROWSER")
                        *browser*)))
       (declare (ignorable browser))
@@ -266,7 +267,7 @@
                                      url))
           (format t "couldn't find the url of ~a, got ~a~&" index url))))
 
-(defun open-with-browser (args)
+(defun browse (args)
   "Open firefox to this search result's url. Use from the repl."
   (let* ((index (parse-integer (first args))))
     (browse index)))
@@ -281,83 +282,6 @@
   (member (rl:readline :prompt (format nil  "~%Do you want to quit ? [Y]/n : "))
           '("y" "Y" "")
           :test 'equal))
-
-(defun repl ()
-  "Start a readline interactive prompt.
-
-  Auto completes some verbs (search, magnet, details,...).
-
-  "
-
-  (rl:register-function :complete #'custom-complete)
-
-  (handler-case
-      (do ((i 0 (1+ i))
-           (text "")
-           (verb "")
-           (args "")
-           (details nil))
-          ((string= "quit" (str:trim text)))
-        (setf text
-              (rl:readline :prompt (cl-ansi-text:green (format nil "cl-torrents [~a] > " i))
-                           :add-history t))
-        (setf verb (first (str:words text)))
-        (setf args (rest (str:words text)))
-
-        (if (string= text "NIL")
-            ;; that's a C-d, a blank input is just "".
-            (when (confirm)
-              (uiop:quit)))
-
-        (cond
-          ((or (string= "fortune" verb)
-               (string= "yo" verb))
-           (if (probe-file "/usr/games/fortune")
-               (uiop:run-program "/usr/games/fortune" :output *standard-output*)
-               (format t "nothing in /usr/games/fortune, man.~&")))
-
-          ((string= "version" verb)
-           (format t "~a~&" *version*))
-
-          ((or (string= "help" verb)
-               (string= "?" verb))
-           (repl-help))
-
-          ((string= "details" verb)
-           (setf details (not details))
-           (format t "details set to ~a~&" details))
-
-          ((string= "nb-results" verb)
-           (setf *nb-results* (parse-integer (first args))))
-
-          ((string= "search" verb)
-           (format t "searching: ~a~&" args)
-           ;; catch errors (network)
-           (display-results :results (async-torrents args)
-                            :nb-results *nb-results*
-                            :infos details))
-
-          ((string= "magnet" verb)
-           (format t "~a~&" (magnet (parse-integer (first args)))))
-
-          ((string= "url" verb)
-           (format t "~a~&" (url-from (parse-integer (car args)))))
-
-          ((string= "download" verb)
-           (download *torrent-client* (parse-integer (first args))))
-
-          ((or (string= "open" verb)
-               (string= "firefox" verb))
-           (open-with-browser args)))
-
-
-        (finish-output))
-
-    (#+sbcl sb-sys:interactive-interrupt
-      () (progn
-           (uiop:quit)))
-    (error (c)
-      (format t "Unknown error: ~&~a~&" c))))
 
 (defun main ()
   "Parse command line arguments (portable way) and call the program."
@@ -430,12 +354,19 @@
 
     (if (getf options :interactive)
         (progn
-          (repl)
+          (setf replic:*prompt* (green "torrents > "))
+          (replic:functions-to-commands :replic.base)
+          (replic:functions-to-commands :torrents.commands)
+          (replic:repl)
           (uiop:quit)))
 
     ;; This is the only way I found
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
     ;; trivial-signal didn't work (see issue #3)
+    (unless free-args
+          (format t "You didn't say what to search for.")
+          (opts:describe)
+          (uiop:quit))
     (handler-case
         (display-results :results (async-torrents free-args)
                          :nb-results *nb-results*

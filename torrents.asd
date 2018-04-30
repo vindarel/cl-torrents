@@ -12,6 +12,7 @@
   :author "vindarel"
   :license "MIT"
   :depends-on (
+               :replic
                :dexador
                :plump
                :str
@@ -33,6 +34,7 @@
                  (:file "1337")
                  (:file "downloadsme")
                  (:file "torrents")
+                 (:file "commands")
                  (:file "config"))))
   ;; build executable with asdf:make :torrents.
   :build-operation "program-op"

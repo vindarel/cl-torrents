@@ -32,6 +32,10 @@ To build the executable:
 
 : make build
 
+Search:
+
+: (torrents:search-torrents "matrix")
+
 
 ** Usage
 
@@ -46,7 +50,7 @@ To build the executable:
 
 #+BEGIN_SRC text
 (use-package :torrents)
-(torrentsearch "matrix")
+(search-torrents "matrix")
   [...]
   6: The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]
   5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
@@ -117,15 +121,17 @@ we get the magnet link of the first result.
 
 Start it with =torrents -i=.
 
-See the =help=.
+See the =help= and the help of each command.
 
-Available commands are (use the auto-completion):
+The available commands are (use the auto-completion):
 
-- =search=
+- =search=: search for torrents, print the results sorted by number of seeders.
 - =magnet <i>=, where /i/ is a result index,
 - =open= or =firefox <i>=: open the given torrent page in a web browser
 - =download  <i>=:   open  a  magnet   link  with  a   torrent  client
   (transmission-gtk by default)
+- =highlight=  (and  =unhighlight=):  highlight  the  given  words  in
+  yellow, for this session.
 - =url <i>=
 - =nb-results= =n= to set the number of results to print to /n/
 - =details=: toggle the display of details
@@ -231,7 +237,13 @@ browser = firefox
 
 * Dev
 
-Clone in =~/quicklisp/local-projects= and =(ql:quickload :torrents)=.
+We use our [[https://github.com/vindarel/replic/][replic]] library to automatically build the readline repl:
+
+: git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/
+
+Clone also cl-torrents in =~/quicklisp/local-projects=,
+
+now you can =(ql:quickload :torrents)=.
 
 Unit tests:
 
