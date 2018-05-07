@@ -212,7 +212,13 @@ browser = firefox
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
 *** v0.11 (dev)
-- =cl-torrents.conf= configuration file.
+- =cl-torrents.conf= configuration file:
+  - choose the list of scrapers.
+- =download= command (open magnet link with transmission by default).
+- use the [[https://github.com/vindarel/replic/][replic]] library to build the repl, the commands and their completions.
+  - -> new builtin =highlight= and =unhighlight= commands,
+  - -> better error handling (don't exit the repl on an error).
+- fix cli usage without a keyword search, print help.
 *** v0.10
 
 - added [[https://www.torrentdownloads.me][torrentdownloads.me]] scraper.

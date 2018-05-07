@@ -183,9 +183,11 @@
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."
+  (when (stringp index)
+    (setf index (parse-integer index)))
   (if *last-search*
       (if (< index (length *last-search*))
-          (magnet-link-from (elt *last-search* index))
+          (format t "~a~&" (magnet-link-from (elt *last-search* index)))
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "no search results to get the magnet link from.~&")))
 
@@ -195,7 +197,7 @@
     (setf index (parse-integer index)))
   (if *last-search*
       (if (< index (length *last-search*))
-          (assoc-value (elt *last-search* index) :href)
+          (format t "~a~&" (assoc-value (elt *last-search* index) :href))
           (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
       (format t "no search results to get the url from.~&")))
 
@@ -256,24 +258,26 @@
   (if (zerop start)
       (select-completions text *verbs*)))
 
+(defun browse-elt (index)
+  (let ((url (url index))
+        (browser (or (uiop:getenv "BROWSER")
+                     *browser*)))
+    (declare (ignorable browser))
+    (if url
+        (uiop:launch-program (list browser
+                                   url))
+        (format t "couldn't find the url of ~a, got ~a~&" index url))))
+
 (defun browse (index)
-    "Open with the default browser (or firefox). Use from Slime."
-    (let ((url (url index))
-          (browser (or (uiop:getenv "BROWSER")
-                       *browser*)))
-      (declare (ignorable browser))
-      (if url
-          (uiop:launch-program (list browser
-                                     url))
-          (format t "couldn't find the url of ~a, got ~a~&" index url))))
-
-(defun browse (args)
   "Open firefox to this search result's url. Use from the repl."
-  (let* ((index (parse-integer (first args))))
-    (browse index)))
+  (when (stringp index)
+    (setf index (parse-integer index)))
+  (browse-elt index))
 
-(defun download (soft index)
+(defun download (index &optional (soft "transmission-gtk"))
   "Download with a torrent client."
+  (when (stringp index)
+    (setf index (parse-integer index)))
   (uiop:launch-program (list (find soft *torrent-clients-list* :test #'equal)
                              (magnet-link-from (elt *last-search* index)))))
 

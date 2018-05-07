@@ -6,19 +6,22 @@
 
 (defpackage torrents.commands
   (:use :cl)
-  (:shadowing-import-from :torrents
-                          :search-torrents)
   (:shadow :search)
   (:import-from :torrents
+                :search-torrents
                 :browse
                 :download
-                :magnet)
+                :magnet
+                :url)
   (:export :search
            :browse
            :download
-           :magnet))
+           :magnet
+           :url))
 
 (in-package torrents.commands)
 
-;; alias
-(setf (fdefinition 'search) #'search-torrents)
+(defun search (search &rest words)
+  "Search for torrents on the different sources and print the results, sorted by number of seeders."
+  (setf search (cons search words))
+  (search-torrents search))
