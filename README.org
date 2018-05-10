@@ -23,6 +23,7 @@ Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/ta
    where Quicklisp can find it:
 
 : git clone git@github.com:vindarel/cl-torrents.git ~/quicklisp/local-projects/
+: # also make install
 
 and install it:
 

@@ -2,7 +2,6 @@ LISP?=sbcl
 
 build:
 	$(LISP) --load torrents.asd \
-		--load ../replic/replic.asd \
 		--eval '(ql:quickload :torrents)' \
 		--eval '(asdf:make :torrents)' \
 		--eval '(quit)'
@@ -25,6 +24,4 @@ test-end2end:
 
 install:
 	# install dependencies, mostly for docker.
-	apt update
-	apt install -y git-core
-	git clone https://github.com/Chream/mockingbird ~/quicklisp/local-projects/mockingbird/
+	git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/
