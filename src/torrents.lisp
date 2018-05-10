@@ -187,7 +187,7 @@
     (setf index (parse-integer index)))
   (if *last-search*
       (if (< index (length *last-search*))
-          (format t "~a~&" (magnet-link-from (elt *last-search* index)))
+          (magnet-link-from (elt *last-search* index))
           (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
       (format t "no search results to get the magnet link from.~&")))
 
@@ -197,7 +197,7 @@
     (setf index (parse-integer index)))
   (if *last-search*
       (if (< index (length *last-search*))
-          (format t "~a~&" (assoc-value (elt *last-search* index) :href))
+          (assoc-value (elt *last-search* index) :href)
           (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
       (format t "no search results to get the url from.~&")))
 
