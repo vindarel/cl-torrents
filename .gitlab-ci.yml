@@ -4,6 +4,11 @@ stages:
   - test
   - build
 
+before_script:
+  - apt-get update -qy
+  - apt-get install -y git-core
+  - make install
+
 test:
   stage: test
   only:
