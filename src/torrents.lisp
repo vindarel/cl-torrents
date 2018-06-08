@@ -328,6 +328,11 @@
            :short #\m
            :long "magnet"
            :arg-parser #'parse-integer)
+    (:name :open
+           :description "open with a torrent client (transmission-gtk by default)."
+           :short #\o
+           :long "open"
+           :arg-parser #'parse-integer)
     (:name :interactive
            :description "enter an interactive repl"
            :short #\i
@@ -368,9 +373,9 @@
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
     ;; trivial-signal didn't work (see issue #3)
     (unless free-args
-          (format t "You didn't say what to search for.")
-          (opts:describe)
-          (uiop:quit))
+      (format t "You didn't say what to search for.")
+      (opts:describe)
+      (uiop:quit))
     (handler-case
         (display-results :results (async-torrents free-args)
                          :nb-results *nb-results*
@@ -387,5 +392,11 @@
 
     (if (getf options :magnet)
         (progn
-          (format t "~a~&" (magnet (getf options :magnet)))
-          (exit)))))
+          (format t "~a~&" (magnet (getf options :magnet)))))
+
+    (if (getf options :open)
+        (progn
+          (format t "opening in external client...")
+          (download (getf options :open))))
+
+    (exit)))

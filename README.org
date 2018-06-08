@@ -102,12 +102,13 @@ $ torrents -h
 CL-torrents. Usage:
 
 Available options:
-  -h, --help               print this help text
-  -v, --version            print the version
-  -n, --nb ARG             set the maximum number of results to print.
   -d, --details            print more details (like the torrent's url)
+  -h, --help               print this help text
   -i, --interactive        enter an interactive repl
   -m, --magnet ARG         get the magnet link of the given search result.
+  -n, --nb ARG             set the maximum number of results to print.
+  -o, --open INDEX         download with a torrent client (transmission-gtk by default)
+  -v, --version            print the version
 #+END_SRC
 
 Example: below we  search for "matrix…", we display only  1 result and
@@ -213,6 +214,7 @@ browser = firefox
 
 *** v0.11 (dev)
 
+- added missing =-o= option to download with a torrent client (transmission-gtk).
 - =cl-torrents.conf= configuration file:
   - choose the list of scrapers.
 - =download= command (open magnet link with transmission by default).
