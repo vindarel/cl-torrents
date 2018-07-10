@@ -366,6 +366,10 @@
           (setf replic:*prompt* (green "torrents > "))
           (replic:functions-to-commands :replic.base)
           (replic:functions-to-commands :torrents.commands)
+          (when free-args
+            (display-results :results (async-torrents free-args)
+                             :nb-results *nb-results*
+                             :infos (getf options :infos)))
           (replic:repl)
           (uiop:quit)))
 
