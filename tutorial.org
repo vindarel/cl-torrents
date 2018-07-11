@@ -21,34 +21,44 @@
 
 Writing a little web scraper is not difficult. However, I had to spend
 some time  to find out the  right libraries and resources.  It is also
-not trivial at  first to start a  Lisp project, so this  tutorial is a
-mix of hopefully useful stuff.
+not trivial at  first to start a  Lisp project, so
+
+#+BEGIN_QUOTE
+this  tutorial  is a  mix  of  hopefully  useful stuff,  for  people
+interested  in Common  Lisp  and  with not  much  experience with  the
+language and its ecosystem.
+#+END_QUOTE
 
 In part  1, "Make  it work",  we explore how  to do  *asynchronous web
 scraping*.   We try  things out  at  the repl  and we  create a  first
 package. We  learn basic  *data structures* and  their gotchas  in the
 way, we  also see where  to find documentation, some  useful libraries
-and beginner-friendly stuff and tips like this.
+and beginner-friendly tips.
 
-In part 2, "*Tests  and CI*", we write our first  unit test, with mocks,
+Part 2 is a short introduction to the CL Object System (*CLOS*), which
+is much  more a  pleasure to  work with than  dealing with  alists and
+other data structures.
+
+In part 3, "*Tests  and CI*", we write our first  unit test, with mocks,
 which gives  us the opportunity to  write a first macro,  and we setup
 Continuous Integration on Gitlab CI.
 
-Part 3 is about  *building and delivering self-contained executables*,
+Part 4 is about  *building and delivering self-contained executables*,
 *parsing command line arguments* and  such. While it was necessary for
 us at the time to gather this  information, it is now available in the
 [[https://lispcookbook.github.io/cl-cookbook/scripting.html][Common Lisp  Cookbook]] and is probably  more up to date.  We advise the
 reader to go there.
 
-Part 4, "Moving functions into  their own package", shows and explains
+Part 5, "Moving functions into  their own package", shows and explains
 things that appear strange at  first, like "shadowing import", symbols
 conflicts and such.  We also write  helper functions and make good use
 of closures.
 
-Part 5  is about  *error handling* or  rather condition  handling.
+Part 6  is about  *error handling* or  rather condition  handling.
 
-Part  6, "More  features", is  supposed to  be a  pot-pourri of  other
-things but it shows only a cache system at the moment.
+Part 7, "More features", shows only a cache system at the moment.
+
+Finally, we have a look at [[http://cl21.org/][CL21]].
 
 
 * Make it work
@@ -415,7 +425,7 @@ With a little  look at the [[https://lispcookbook.github.io/cl-cookbook/strings.
 little [[https://github.com/vindarel/cl-str][str]] library (our lib actually):
 
 #+BEGIN_SRC lisp
-(ql:quickload "str") ;; not needed if you loaded the asdf with the right dependencies.
+(ql:quickload "str")
 #+END_SRC
 
 Let's try:
@@ -577,6 +587,15 @@ T
     The indexes are  aligned on 3 digits on the  right with =~3@a= and
     titles are truncated at 65 characters,  nice :) It will be easy to
     add more information on the right side (seeders, leechers).
+
+__Note__: We  can also truncate  the titles  and add an  ellipsis with
+=str:prune=:
+
+#+BEGIN_SRC text
+  2: The Matrix Trilogy  (...)
+  1: The Matrix Reloaded (...)
+  0: Matrix FRENCH DVDRIP(...)
+#+END_SRC
 
 
 ** Getting more torrent information
@@ -878,7 +897,7 @@ we can give it other alists to print, from other torrent sites.
 
 We now want or need more:
 
-- getting more content (seeders, leechers):  done in the app.
+- getting more content (seeders, leechers): this is done in the app.
 - downloading the torrent file ?
 - *error handling* (network errors or timeout, unexpected errors, user
   interrupts) (part 5),
@@ -894,6 +913,109 @@ We now want or need more:
 We'll carry  on by  writing tests, then  we'll build  a self-contained
 executable.
 
+
+* Designing the scrapers with CLOS
+
+At  this point,  we know  how to  scrape The  Pirate Bay  and retrieve
+information like  the torrents' title,  href to their web  page, their
+number of seeders, etc.
+
+We only used regular data  structures like alists.  The library worked
+like  this until  version  0.12,  but we  always  felt  it clunky.  In
+particular,  dealing  with  lists  of alists,  accessing  values  with
+=assoc-value= from Alexandria or loosing our tests when we changed the
+data structures didn't feel right.
+
+We also  only considered one torrent  source, but in reality  we wrote
+scrapers  for  more (five  at  the  time  of  writing). We  must  find
+solutions for code reuse and better representing each torrent source.
+
+We'll  now use  the  Common  Lisp Object  System  (CLOS),  which is  a
+pleasure to  work with. Does it  seem verbose, too weird  ? Well, just
+begin with a little class and experiment by yourself, you'll see.
+
+You'll find more learning resources in the [[https://lispcookbook.github.io/cl-cookbook/clos.html][Cookbook]].
+
+Let's dive in:
+
+#+BEGIN_SRC lisp
+(defclass torrent ()
+  ((title
+    :initarg :title
+    :accessor title)
+   (href
+    :initarg :href
+    :accessor href)
+   (seeders
+    :initarg :seeders
+    :accessor seeders)
+   (leechers
+    :initarg :leechers
+    :accessor leechers)
+   (source
+    :initarg :source
+    :accessor source)))
+
+(defmethod print-object ((it torrent) stream)
+  (print-unreadable-object (it stream)
+    (format stream "~a, ~a"
+            (str:prune 30 (title it))
+            (source it))))
+
+(defun make-torrent (&key title href seeders leechers source)
+  (assert title)
+  (assert source)
+  (assert href)
+  (make-instance 'torrent
+                 :title title
+                 :href href
+                 :seeders seeders
+                 :leechers leechers
+                 :source source))
+#+END_SRC
+
+Notes on the snippet above: the structure of defclass is
+
+#+BEGIN_SRC text
+(defclass <name> (list of super-classes)
+  (list of slots of the form
+    (name attributes))
+ (optionally class options))
+#+END_SRC
+
+An object is created with =make-instance 'class=, but is good practice
+to define a constructor like =make-torrent=.
+
+The   =:initarg=  is   the  keyword   argument  to   the  constructor:
+=(make-instance 'torrent :title "foo")=, the accessor is both a getter
+and a setter:
+
+#+BEGIN_SRC lisp
+(defvar *foo* (make-instance 'torrent :title "foo" :href "http://" :source :test))
+(title *foo*) ;; => "foo"
+(setf (title *foo*) "bar")
+#+END_SRC
+
+=print-object= is for pretty printing. The line
+
+: (defmethod print-object ((it torrent) stream)
+
+/specializes/   the  =print-object=   generic  method   for  =torrent=
+classes. It takes a required =stream= parameter.
+
+See the actual code [[https://github.com/vindarel/cl-torrents/blob/master/src/models.lisp][here]] and how  it is used in scrapers [[https://github.com/vindarel/cl-torrents/blob/master/src/1337.lisp][here]].
+
+
+Working with the CLOS is delightful. If we created objects at the REPL
+and then change the class definition, the objects are updated: deleted
+slots are  deleted, slots  added are instantiated  (with rules  we can
+control), accessor names are updated, etc.
+
+Of  course, working  with  an object  system  allows code-reuse,  CLOS
+allows  to  specialize  methods   for  different  classes,  it  allows
+polymorphism, etc, which we don't show here.
+
+Just dive into the CLOS and have fun !
 
 * Tests and CI
 
