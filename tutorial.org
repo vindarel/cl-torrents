@@ -19,6 +19,37 @@
 
 #+SETUPFILE: theme-readtheorg.setup
 
+Writing a little web scraper is not difficult. However, I had to spend
+some time  to find out the  right libraries and resources.  It is also
+not trivial at  first to start a  Lisp project, so this  tutorial is a
+mix of hopefully useful stuff.
+
+In part  1, "Make  it work",  we explore how  to do  *asynchronous web
+scraping*.   We try  things out  at  the repl  and we  create a  first
+package. We  learn basic  *data structures* and  their gotchas  in the
+way, we  also see where  to find documentation, some  useful libraries
+and beginner-friendly stuff and tips like this.
+
+In part 2, "*Tests  and CI*", we write our first  unit test, with mocks,
+which gives  us the opportunity to  write a first macro,  and we setup
+Continuous Integration on Gitlab CI.
+
+Part 3 is about  *building and delivering self-contained executables*,
+*parsing command line arguments* and  such. While it was necessary for
+us at the time to gather this  information, it is now available in the
+[[https://lispcookbook.github.io/cl-cookbook/scripting.html][Common Lisp  Cookbook]] and is probably  more up to date.  We advise the
+reader to go there.
+
+Part 4, "Moving functions into  their own package", shows and explains
+things that appear strange at  first, like "shadowing import", symbols
+conflicts and such.  We also write  helper functions and make good use
+of closures.
+
+Part 5  is about  *error handling* or  rather condition  handling.
+
+Part  6, "More  features", is  supposed to  be a  pot-pourri of  other
+things but it shows only a cache system at the moment.
+
 
 * Make it work
 
@@ -232,11 +263,11 @@ We came up with this function:
 and if  you prefer a  threading macro /  pipes, no problem,  but we'll
 load another external library:
 
-#+BEGIN_EXPORT latex
-(ql:quickload "cl-arrows")
+#+BEGIN_SRC lisp
+(ql:quickload "arrow-macros")
 ;; and we import its symbols:
-(use-package "cl-arrows")
-#+END_EXPORT
+(use-package "arrow-macros")
+#+END_SRC
 
 #+BEGIN_SRC lisp
 (-<>> *search-url*
@@ -245,7 +276,7 @@ load another external library:
   (lquery:$ <> *selectors*))
 #+END_SRC
 
-[[https://github.com/nightfly19/cl-arrows][cl-arrows]] defines  a few  threading macros. The  classic one  would be
+[[https://github.com/hipeta/arrow-macros][arrow-macros]] defines  a few  threading macros. The  classic one  would be
 =->=,  which inserts  the  result  of the  preceding  form as  _first_
 argument, =->>= that  puts it _last_, which is what  we wanted for the
 two  forms but  not for  the last  one, with  lquery, which  needs the
@@ -311,7 +342,7 @@ names. We have to register here =dexador= and the others:
                :lquery)
 #+END_SRC
 
-and =cl-arrows= if you wish.
+and =arrow-macros= if you wish.
 
 If you /need/ to set package versions, use something like:
 
