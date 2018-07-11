@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage kat
+(defpackage torrents.1337
   (:use :cl)
   (:import-from :torrents.models
                 :make-torrent)
@@ -8,24 +8,27 @@
                 :sublist)
   (:export :torrents)
   )
-(in-package :kat)
-
-;; !!!!!!!!!!!!!!!!!!!
-;; katcr.co is down :(
-;; !!!!!!!!!!!!!!!!!!!
+(in-package :torrents.1337)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Scraping katcr.co.
+;; Scraping 1337.to
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defparameter *base-url* "http://katcr.co")
+(defparameter *base-url* "http://1337x.to")
 
-(defparameter *search-url* "http://katcr.co/new/search-torrents.php?search={}&sort=seeders&order=desc"
+(defparameter *source* :1337
+  "Source short name for human presentation.")
+
+(defparameter *search-url* "http://1337x.to/sort-search/{}/seeders/desc/1/"
   "Base url for a search. Sorted by seeders")
 
 (defparameter *results-selector* "" "CSS selector to get a list of items inside the search results.")
-(setf *results-selector* ".t-row")
+(setf *results-selector* ".search-page tbody tr")
+
+
+(defparameter *search-results* nil
+  "List of the last search results (plump nodes) (to eas e2e tests).")
 
 (defun request (url)
   (dex:get url))
@@ -34,34 +37,32 @@
   (plump:parse html))
 
 (defun query (parsed)
-  ;; debug example: break, inspect "parsed" with a click or by
-  ;; doing sthg with the local "kat::parsed" (eval code with "e").
-  ;; (break)
   (lquery:$ parsed *results-selector*))
 
 (defun result-title (node)
-  (elt (lquery:$ node ".cellMainLink" (text)) 0))
+  ;; title: second <a> in <td class="coll-1 name"
+  (elt (lquery:$ node ".name" (text)) 0))
 
 (defun result-href (node)
-  (elt (lquery:$ node ".cellMainLink" (attr :href)) 0))
+  (elt (lquery:$ node ".name a" (attr :href)) 1))
 
 (defun result-seeders (node)
   ;; could be a better selector.
   (handler-case
-      (parse-integer (elt (lquery:$ node ".ttable_col2" (text)) 1))
+      (parse-integer (elt (lquery:$ node ".seeds" (text)) 0))
     (error ()
       -1)))
 
 (defun result-leechers (node)
   ;; could be a better selector.
   (handler-case
-      (parse-integer (elt (lquery:$ node ".ttable_col1" (text)) 2))
+      (parse-integer (elt (lquery:$ node ".leeches" (text)) 0))
     (error ()
       -1)))
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
-  (format stream "searching '~a' on Kat..." words)
+  (format stream "searching '~a' on ~a..." words *source*)
   (handler-case
       (let* ((query (str:join "+" words))
              (url (str:replace-all "{}" query *search-url*))
@@ -72,12 +73,15 @@
              (toret (map 'list (lambda (node)
                                  `(make-torrent
                                    :title ,(result-title node)
-                                   :href ,(str:concat *base-url* "/new/" (result-href node))
+                                   :href ,(str:concat *base-url* (result-href node))
                                    :seeders ,(result-seeders node)
                                    :leechers ,(result-leechers node)
-                                   :source :kat))
+                                   :source ,*source*))
                          results)))
         (format stream " found ~a results.~&" (length toret))
+        (setf *search-results* toret)
         toret)
-    (error ()
-      (format stream " no results.~&"))))
+    (error (c)
+      (format stream " no results.~&")
+      ;; xxx: logging
+      (format *error-output* "error: ~a~&" c))))

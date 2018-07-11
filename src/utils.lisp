@@ -22,7 +22,9 @@
 
 
 (defun find-magnet-link (parsed)
-  "parsed: plump node."
+  "Return the firts href of the page that starts with 'magnet'.
+
+  parsed: plump node."
   ;; It works for tpb, torrentcd and kat.
   (let* ((hrefs (coerce (lquery:$ parsed "a" (attr :href)) 'list))
          (magnet (remove-if-not (lambda (it)

@@ -11,12 +11,29 @@
 
 (plan nil)
 
-;; prints the search results, may be nice to check output.
-(ok (torrents "matrix") "The search to the Pirate Bay.to works without problems.")
+(subtest "Testing that 1337x.to responds"
+  (let ((res (torrents.1337:torrents '("matrix"))))
+    (ok res
+        "A search is not null")
 
-;; (ok
-;;  (with-output-to-string (out)
-;;    (torrents "matrix" :stream out))
-;;  "The search to the Pirate Bay.to works without problems.")
+    ;; (ok (> 10 (length res))
+    ;;     "10 results")
+
+    (ok (print (first res)))
+
+    (ok (str:starts-with? "magnet"
+                          (torrents::magnet-link-from (first torrents.1337::*search-results*)))
+        "We get the magnet link of the first result.")))
+
+(subtest "Testing torrentdownloads.me"
+  (let ((res (torrents.downloadsme:torrents '("matrix"))))
+    (ok res
+        "The search is not null")
+
+    (ok (print (first res)))
+
+    (ok (str:starts-with? "magnet"
+                          (torrents::magnet-link-from (first torrents.downloadsme::*search-results*)))
+        "magnet link of the first result.")))
 
 (finalize)

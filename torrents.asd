@@ -8,10 +8,11 @@
 (in-package :torrents-asd)
 
 (defsystem torrents
-  :version "0.1"
-  :author ""
-  :license ""
+  :version (:read-file-form "version.lisp-expr")
+  :author "vindarel"
+  :license "MIT"
   :depends-on (
+               :replic
                :dexador
                :plump
                :str
@@ -20,17 +21,25 @@
                :unix-opts ;; with alias opts
                :clache
                :mockingbird
-               :lquery)
+               :lquery
+               :py-configparser
+               :cl-readline
+               :log4cl)
   :components ((:module "src"
                 :components
                 ((:file "utils")
+                 (:file "models")
                  (:file "tpb")
                  (:file "torrentcd")
                  (:file "kat")
-                 (:file "torrents"))))
+                 (:file "1337")
+                 (:file "downloadsme")
+                 (:file "torrents")
+                 (:file "commands")
+                 (:file "config"))))
   ;; build executable with asdf:make :torrents.
   :build-operation "program-op"
-  :build-pathname "asdftorrents"
+  :build-pathname "torrents"
   :entry-point "torrents:main"
 
   :description ""
@@ -47,4 +56,4 @@
                                :fill-pointer t)))
           (setf (fill-pointer seq) (read-sequence seq stream))
           seq)))
-  :in-order-to ((test-op (test-op cl-torrents-test))))
+  :in-order-to ((test-op (test-op torrents-test))))

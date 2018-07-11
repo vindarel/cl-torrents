@@ -6,15 +6,12 @@ Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/ta
 
 * cl-torrents
 
-  This is a  little tool for the  lisp REPL or the  terminal to search
-  for torrents and get magnet links.
+  This is  a little  tool for  the *lisp REPL*  or the  *command line*
+  (also with  a readline *interactive  prompt*) to search  for torrents  and get
+  magnet links.
 
-  We  currently scrape  the following  sites and  present the  results
-  sorted by seeders:
-
-- the  Pirate Bay ([[https://piratebay.to/][piratebay.to]])
-- Kickass Torrents ([[https://katcr.co][katcr.co]])
-- Torrent.cd ([[https://torrent.cd/][torrent.cd]]).
+  We currently  scrape [[http://1337x.to][1337x.to]]  (since v0.9)  and [[https://www.torrentdownloads.me][torrentdownloads.me]]
+  (v0.10) and present the results sorted by seeders.
 
 ** Installation
 
@@ -31,11 +28,21 @@ and install it:
 
 : (ql:quickload "torrents")
 
+To build the executable:
+
+: make build
+
+Search:
+
+: (torrents:search-torrents "matrix")
+
 
 ** Usage
 
    We can  use this little app  both in a  Lisp REPL (Slime) and  in a
-   terminal.
+   terminal, as a command line tool or from its embedded interactive prompt.
+
+   Results are cached in =~/.cl-torrents/cache/=.
 
 *** Lisp REPL
 
@@ -43,7 +50,7 @@ and install it:
 
 #+BEGIN_SRC text
 (use-package :torrents)
-(torrentsearch "matrix")
+(search-torrents "matrix")
   [...]
   6: The Matrix Revolutions (2003) BRRip [Dual Audio] [Hindi+Eng]
   5: Matrix (1999)Blu-Ray 720p Dublado PT-BR - mo93438
@@ -71,42 +78,89 @@ and install it:
 ;; "magnet:?xt=urn:btih:40eca43690cf1b99b0a4d485ebf4855d20b0bac5"
 #+END_SRC
 
-  or the option =-m <index>=.
+  We can open it with a torrent client (transmission-gtk by default):
+
+#+BEGIN_SRC lisp
+(download 0)
+#+END_SRC
 
   And voilà :)
 
   We may add more features, eventually.  Our goal is rather to write a
   tutorial to show you diverse Common Lisp topics.
 
+**** Parameters
+
+=*cache-p*=: if nil, don't use the cache system.
 
 *** Command line
+
+Use the  options given below,
 
 #+BEGIN_SRC text
 $ torrents -h
 CL-torrents. Usage:
 
 Available options:
+  -d, --details            print more details (like the torrent's url)
   -h, --help               print this help text
-  -v, --version            print the version
-  -n, --nb ARG             set the maximum number of results to print.
-  -i, --info               print more information (like the torrent's url)
+  -i, --interactive        enter an interactive repl
   -m, --magnet ARG         get the magnet link of the given search result.
+  -n, --nb ARG             set the maximum number of results to print.
+  -o, --open INDEX         download with a torrent client (transmission-gtk by default)
+  -v, --version            print the version
 #+END_SRC
+
+Example: below we  search for "matrix…", we display only  1 result and
+we get the magnet link of the first result.
 
 : $ torrents -n 1 matrix french 1999 cool -m 0
 
 #+html: <p align='center'><img src='img-cli.png' /></p>
 
-Results are cached.
+*** Readline interface
 
-** Options
+Start it with =torrents -i=.
 
-=-n <i>=: maximum number  of results  to print (50  by default  for convenience,
-when there can be hundreds).
+See the =help= and the help of each command.
 
-: (setf *nb-results* 50)
+The available commands are (use the auto-completion):
 
-=-i= (=--info==) to print more information, like the url.
+- =search=: search for torrents, print the results sorted by number of seeders.
+- =magnet <i>=, where /i/ is a result index,
+- =open= or =firefox <i>=: open the given torrent page in a web browser
+- =download  <i>=:   open  a  magnet   link  with  a   torrent  client
+  (transmission-gtk by default)
+- =highlight=  (and  =unhighlight=):  highlight  the  given  words  in
+  yellow, for this session.
+- =url <i>=
+- =nb-results= =n= to set the number of results to print to /n/
+- =details=: toggle the display of details
+- =quit= (or =C-c=)
+
+We are in  a regular [[https://tiswww.case.edu/php/chet/readline/readline.html#SEC9][readline]] interface, so the  usual keybindings and
+options are available.
+
+#+html: <p align='center'><img src='img-readline.png' /></p>
+
+*** Configuration file (new in v0.11)
+
+    cl-torrents will (try to)  read a =cl-torrents.conf= configuration
+    file  from  three   locations:  cl-torrents  library's  directory,
+    =~/.config/cl-torrents.conf= and the  current directory.  The last
+    one takes precedence.
+
+    Example content:
+
+#+BEGIN_SRC conf
+[default]
+
+scrapers = 1337 DOWNLOADSME
+
+browser = firefox
+#+END_SRC
+
+   On the Lisp side, this is easily provided by [[https://common-lisp.net/project/py-configparser/api-docs.shtml][py-configparser]].
 
 ** Tutorial
 
@@ -144,23 +198,70 @@ when there can be hundreds).
   - [X] =-i= print url
 - [X] build  with  ECL. Used  [[https://hub.docker.com/r/daewok/lisp-devel/][the  lisp-devel]]  docker
   image. Result: a 52Mo  executable with a runtime error.
-- open an url
+- [X] open an url
 - download the torrent file
-- generate a json
-- ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
-- add torrent to a local torrent client
+- [X] ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
+- [X] add torrent to a local torrent client
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
-- self-contained web app,...
+- self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
+- [X] interactive prompt, with completion of commands.
+  - save  the   settings  (details,   nb-results),  possibly   with  a
+    persistent objects storage, will be straightforward.
 
 ** Release notes
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
+*** v0.11 (dev)
+
+- added missing =-o= option to download with a torrent client (transmission-gtk).
+- =cl-torrents.conf= configuration file:
+  - choose the list of scrapers.
+- =download= command (open magnet link with transmission by default).
+- use the [[https://github.com/vindarel/replic/][replic]] library to build the repl, the commands and their completions.
+  - -> new builtin =highlight= and =unhighlight= commands,
+  - -> better error handling (don't exit the repl on an error).
+- fix cli usage without a keyword search, print help.
+
+*** v0.10
+
+- added [[https://www.torrentdownloads.me][torrentdownloads.me]] scraper.
+- new parameter, =*cache-p*=: if nil, don't use the cache.
+
+*** v0.9
+
+- added [[http://1337x.to][1337x.to]] scraper.
+- removed piratebay.to, katcr.co, torrent.cd, they're down :/
+
+*** v0.8
+
+- added a readline-based repl  with some commands: =search=, =magnet=,
+  =open=, with their completion.  See =help=.  Built with [[https://github.com/mrkkrp/cl-readline][cl-readline]],
+  but might use [[https://github.com/vindarel/replic][replic]] anytime soon.
+
 *** v0.7
 
-- fix cache not created
+- fix cache not created by binary
 - create cache in =~/.cl-torrents/cache/=
 
+
+* Dev
+
+We use our [[https://github.com/vindarel/replic/][replic]] library to automatically build the readline repl:
+
+: git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/
+
+Clone also cl-torrents in =~/quicklisp/local-projects=,
+
+now you can =(ql:quickload :torrents)=.
+
+Unit tests:
+
+: make test
+
+End-to-end tests (checking that the websites respond and our scrapers still work):
+
+: make test-end2end
 
 * Resources
 
@@ -170,7 +271,8 @@ when there can be hundreds).
 - [[Https://github.com/CodyReichert/awesome-cl][Awesome-cl]]
 - [[https://lispcookbook.github.io/cl-cookbook/][the Common Lisp Cookbook]]
 - http://quickdocs.org/
-- (my) [[https://lisp-journey.gitlab.io/][lisp-journey]]: introductory posts, lists of resources, screencasts.
+- (my) [[https://lisp-journey.gitlab.io/][lisp-journey]]: introductory posts, lists of resources, selection
+  of screencasts.
 
 
 * Setting up a Common Lisp environment
@@ -179,11 +281,15 @@ when there can be hundreds).
   multiplatform CL  environment shipping: Emacs25 and  Slime (slightly
   customized), SBCL, Quicklisp and Git.
 
-  Otherwise:
+  Emacs      isn't      the      only     editor      though,      see
+   [[https://lispcookbook.github.io/cl-cookbook/editor-support.html][https://lispcookbook.github.io/cl-cookbook/editor-support.html]]  for   Vim  plugins,   to
+  discover Lem (ncurses and Electron frontends), Atom-Slime, notebooks
+  and the ipython-like [[https://github.com/koji-kojiro/cl-repl][cl-repl]].
 
-: apt install sbcl rlwrap
-: rlwrap sbcl
+  Anyway:
+
+: apt install sbcl
 
    and install Quicklisp (two commands) and Slime for Emacs (in MELPA,
-   with   package.el)  or   try  Atom-slime   or  Vim   package.   See
-   [[http://lisp-lang.org/wiki/article/editors][http://lisp-lang.org/wiki/article/editors]].
+   with   package.el).   See
+   [[https://lispcookbook.github.io/cl-cookbook/getting-started.html][https://lispcookbook.github.io/cl-cookbook/getting-started.html]].

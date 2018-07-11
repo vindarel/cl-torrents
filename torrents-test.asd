@@ -8,15 +8,17 @@
 (in-package :torrents-test-asd)
 
 (defsystem torrents-test
-  :author ""
-  :license ""
+  :author "vindarel"
+  :license "MIT"
   :depends-on (:torrents
                :mockingbird
                :prove)
   :components ((:module "tests"
                 :components
-                ((:test-file "torrents"))))
-  :description "Test system for cl-torrents"
+                ((:test-file "test-torrents")
+                 (:test-file "test-downloadsme")
+                 (:test-file "test-1337"))))
+  :description "Test system for cl-torrents."
 
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)

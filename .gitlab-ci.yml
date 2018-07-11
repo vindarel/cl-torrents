@@ -4,12 +4,25 @@ stages:
   - test
   - build
 
+before_script:
+  - apt-get update -qy
+  - apt-get install -y git-core
+  - make install
+
 test:
   stage: test
   only:
     - tags
   script:
     - make test
+
+# Run end-to-end tests regularly.
+e2e:
+  stage: test
+  only:
+    - triggers
+  script:
+    - make test-end2end
 
 build:
   stage: build

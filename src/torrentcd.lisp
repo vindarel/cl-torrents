@@ -1,13 +1,18 @@
 (in-package :cl-user)
 (defpackage torrentcd
   (:use :cl)
+  (:import-from :torrents.models
+                :make-torrent)
   (:import-from :torrents.utils
                 :join-for-query)
-  (:import-from :alexandria
-                :flatten)
   (:export :torrents)
   )
 (in-package :torrentcd)
+
+;; !!!!!!!!!!!!!!!!!!!!!
+;; torrent.cd is down :(
+;; !!!!!!!!!!!!!!!!!!!!!
+
 
 ;; This scraping is fragile... good live tests are mandatory.
 ;; and lacks error handling !
@@ -72,12 +77,12 @@
              (parsed (parse req))
              (results (query parsed))
              (toret (map 'list (lambda (node)
-                                 `((:title . ,(result-title node))
-                                   (:href . ,(str:concat *base-url* (result-href node)))
-                                   (:seeders . ,(result-seeders node))
-                                   (:leechers . ,(result-leechers node))
-                                   (:source . :torrentcd))
-                                 )
+                                 `(make-torrent
+                                   :title ,(result-title node)
+                                   :href ,(str:concat *base-url* (result-href node))
+                                   :seeders ,(result-seeders node)
+                                   :leechers ,(result-leechers node)
+                                   :source :torrentcd))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         toret)
