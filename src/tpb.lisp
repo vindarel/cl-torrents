@@ -1,6 +1,8 @@
 (in-package :cl-user)
 (defpackage tpb
   (:use :cl)
+  (:import-from :torrents.models
+                :make-torrent)
   (:import-from :torrents.utils
                 :colorize-all-keywords
                 :keyword-color-pairs
@@ -44,11 +46,12 @@
              (html (plump:parse req))
              (res (lquery:$ html *selectors*))
              (toret (map 'list (lambda (node)
-                                 `((:title . ,(result-title node))
-                                   (:href . ,(result-href node))
-                                   (:leechers . ,(result-leechers node))
-                                   (:seeders . ,(result-peers node))
-                                   (:source . :tpb)))
+                                 `(make-torrent
+                                   :title ,(result-title node)
+                                   :href  ,(result-href node)
+                                   :seeders ,(result-seeders node)
+                                   :leechers ,(result-leechers node)
+                                   :source :tpb))
                          res)))
         (format stream " found ~a results.~&" (length res))
         toret)

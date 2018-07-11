@@ -1,6 +1,8 @@
 (in-package :cl-user)
 (defpackage torrentcd
   (:use :cl)
+  (:import-from :torrents.models
+                :make-torrent)
   (:import-from :torrents.utils
                 :join-for-query)
   (:export :torrents)
@@ -75,12 +77,12 @@
              (parsed (parse req))
              (results (query parsed))
              (toret (map 'list (lambda (node)
-                                 `((:title . ,(result-title node))
-                                   (:href . ,(str:concat *base-url* (result-href node)))
-                                   (:seeders . ,(result-seeders node))
-                                   (:leechers . ,(result-leechers node))
-                                   (:source . :torrentcd))
-                                 )
+                                 `(make-torrent
+                                   :title ,(result-title node)
+                                   :href ,(str:concat *base-url* (result-href node))
+                                   :seeders ,(result-seeders node)
+                                   :leechers ,(result-leechers node)
+                                   :source :torrentcd))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         toret)

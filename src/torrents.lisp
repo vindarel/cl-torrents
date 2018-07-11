@@ -1,6 +1,7 @@
 (in-package :cl-user)
 (defpackage torrents
   (:use :cl
+        :torrents.models
         :clache
         :cl-ansi-text)
   (:import-from :torrents.utils
@@ -13,7 +14,8 @@
                 :when-option
                 :find-magnet-link
                 :sublist)
-  (:export :search-torrents
+  (:export :make-torrent
+           :search-torrents
            :async-torrents
            :magnet
            :browse
@@ -77,9 +79,22 @@
 (defun get-cached-results (terms &key (store *store*))
   (when *cache-p*
     (when (getcache terms store)
-      (progn
-        ;; (format t "Got cached results for ~a.~&" terms)
-        (getcache terms store)))))
+      ;; If the cached results are alists (old version), make them torrent objects.
+      (let (results)
+        (setf results (getcache terms store))
+        (log:info "Got cached results for ~a" terms)
+        (when (consp (first results))
+          (log:info "This old cache is an alist, we need to make it an object.")
+          (setf results (loop for res in results
+                           :collect (make-torrent
+                                     :title (assoc-value res :title)
+                                     :href (assoc-value res :href)
+                                     :seeders (assoc-value res :seeders)
+                                     :leechers (assoc-value res :leechers)
+                                     :source (assoc-value res :source))))
+          (save-results terms results))
+
+        results))))
 
 (defun search-torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
   "Search for torrents on the different sources and print the results, sorted by number of seeders.
@@ -93,7 +108,7 @@
     (ensure-cache))
   (unless *store*
     (ensure-cache-and-store))
-  (let ((res (async-torrents words :stream stream :log-stream log-stream)))
+  (let ((res (async-torrents words :log-stream log-stream)))
     (display-results :results res :stream stream :nb-results nb-results)))
 
 (defvar *scrapers-alist* '(("1337" . torrents.1337:torrents)
@@ -105,7 +120,7 @@
   "List of scraper functions to call. Modified after reading the
   user's conf files.")
 
-(defun async-torrents (words &key (stream t) (log-stream t))
+(defun async-torrents (words &key (log-stream t))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (unless *cache-directory*
@@ -129,8 +144,8 @@
                           *torrents-list*)))
          (sorted (sort res (lambda (a b)
                              ;; maybe a quicker way, to just give the key ?
-                             (> (assoc-value a :seeders)
-                                (assoc-value b :seeders))))))
+                             (> (seeders a)
+                                (seeders b))))))
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-search* sorted)
@@ -148,7 +163,7 @@
             ;; thus we must compute it and format the format string before printing the title.
             ;;
             ;; xxx see also the v directive: https://stackoverflow.com/questions/48868555/in-common-lisp-format-how-does-recursive-formatting-work
-            (let* ((title (assoc-value it :title))
+            (let* ((title (title it))
                    (title-colored (colorize-all-keywords title *keywords-colors*))
                    (title-padding (+ 65
                                      (- (length title-colored)
@@ -159,12 +174,12 @@
               (format stream format-string
                     (position it results)
                     title-colored
-                    (assoc-value it :seeders)
-                    (assoc-value it :leechers)
-                    (assoc-value it :source)
+                    (seeders it)
+                    (leechers it)
+                    (source it)
                     )
               (if infos
-                  (format stream "~a~&" (assoc-value it :href)))))
+                  (format stream "~a~&" (href it)))))
           (reverse (sublist results 0 nb-results)))
   t)
 
@@ -176,7 +191,7 @@
   "Extract the magnet link from a `torrent' result.
 
    Return the first href of the page that starts with 'magnet'."
-  (let* ((url (assoc-value alist :href))
+  (let* ((url (href alist))
          (html (request-details url))
          (parsed (plump:parse html)))
     (find-magnet-link parsed)))
@@ -197,7 +212,7 @@
     (setf index (parse-integer index)))
   (if *last-search*
       (if (< index (length *last-search*))
-          (assoc-value (elt *last-search* index) :href)
+          (href (elt *last-search* index))
           (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
       (format t "no search results to get the url from.~&")))
 
@@ -345,7 +360,7 @@
       (handler-bind ((opts:unknown-option #'unknown-option)
                      (opts:missing-arg #'missing-arg)
                      (opts:arg-parser-failed #'arg-parser-failed))
-                     ;; (opts:missing-required-option) ;; => upcoming version
+        ;; (opts:missing-required-option) ;; => upcoming version
         (opts:get-opts))
 
     (if (getf options :help)

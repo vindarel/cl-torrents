@@ -1,6 +1,8 @@
 (in-package :cl-user)
 (defpackage torrents.1337
   (:use :cl)
+  (:import-from :torrents.models
+                :make-torrent)
   (:import-from :torrents.utils
                 :join-for-query
                 :sublist)
@@ -69,12 +71,12 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 `((:title . ,(result-title node))
-                                   (:href . ,(str:concat *base-url* (result-href node)))
-                                   (:seeders . ,(result-seeders node))
-                                   (:leechers . ,(result-leechers node))
-                                   (:source . ,*source*))
-                                 )
+                                 `(make-torrent
+                                   :title ,(result-title node)
+                                   :href ,(str:concat *base-url* (result-href node))
+                                   :seeders ,(result-seeders node)
+                                   :leechers ,(result-leechers node)
+                                   :source ,*source*))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         (setf *search-results* toret)

@@ -1,6 +1,8 @@
 (in-package :cl-user)
 (defpackage kat
   (:use :cl)
+  (:import-from :torrents.models
+                :make-torrent)
   (:import-from :torrents.utils
                 :join-for-query
                 :sublist)
@@ -68,24 +70,12 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 ;; With hash-table: ok but lacks pretty printing.
-                                 ;; Again an unusual detail.
-                                 ;; => not relevant since we can inspect it interactively ?
-                                 ;; => fixed with cl21
-                                 ;; => just use structs, or CLOS ?
-                                 ;; (let (atorrent)
-                                 ;;   (setf atorrent (make-hash-table :test #'equalp))
-                                 ;;   (setf (gethash :title atorrent)
-                                 ;;         (lquery:$ node ".cellMainLink" (text)))
-                                 ;;   (setf (gethash :href atorrent)
-                                 ;;         (lquery:$ node ".cellMainLink" (attr :href)))
-                                 ;;   ))
-                                 `((:title . ,(result-title node))
-                                   (:href . ,(str:concat *base-url* "/new/" (result-href node)))
-                                   (:seeders . ,(result-seeders node))
-                                   (:leechers . ,(result-leechers node))
-                                   (:source . :kat))
-                                 )
+                                 `(make-torrent
+                                   :title ,(result-title node)
+                                   :href ,(str:concat *base-url* "/new/" (result-href node))
+                                   :seeders ,(result-seeders node)
+                                   :leechers ,(result-leechers node)
+                                   :source :kat))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         toret)

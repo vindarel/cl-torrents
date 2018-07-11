@@ -1,26 +1,28 @@
 LISP?=sbcl
 
+all: test
+
 build:
-	$(LISP) --load torrents.asd \
+	$(LISP) --non-interactive \
+		--load torrents.asd \
 		--eval '(ql:quickload :torrents)' \
-		--eval '(asdf:make :torrents)' \
-		--eval '(quit)'
+		--eval '(asdf:make :torrents)'
 
 test:
-	sbcl --load torrents.asd \
-	     --eval '(ql:quickload :torrents)' \
-	     --eval '(ql:quickload :torrents-test)' \
-	     --eval '(prove:run #P"tests/test-torrents.lisp")' \
-	     --eval '(prove:run #P"tests/test-1337.lisp")' \
-	     --eval '(prove:run #P"tests/test-downloadsme.lisp")' \
-	     --eval '(quit)'
+	$(LISP) --non-interactive \
+		--load torrents.asd \
+	     	--eval '(ql:quickload :torrents)' \
+	     	--eval '(ql:quickload :torrents-test)' \
+	     	--eval '(prove:run #P"tests/test-torrents.lisp")' \
+	     	--eval '(prove:run #P"tests/test-1337.lisp")' \
+	     	--eval '(prove:run #P"tests/test-downloadsme.lisp")'
 
 test-end2end:
-	sbcl --load torrents.asd \
-	     --eval '(ql:quickload :torrents)' \
-	     --eval '(ql:quickload :torrents-test)' \
-	     --eval '(prove:run #P"tests/end2end.lisp")' \
-	     --eval '(quit)'
+	$(LISP) --non-interactive \
+	        --load torrents.asd \
+	      	--eval '(ql:quickload :torrents)' \
+	     	--eval '(ql:quickload :torrents-test)' \
+	     	--eval '(prove:run #P"tests/end2end.lisp")'
 
 install:
 	# install dependencies, mostly for docker.

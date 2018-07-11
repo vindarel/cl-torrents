@@ -23,11 +23,12 @@
                :mockingbird
                :lquery
                :py-configparser
-               :alexandria  ;; to remove tmp !
-               :cl-readline)
+               :cl-readline
+               :log4cl)
   :components ((:module "src"
                 :components
                 ((:file "utils")
+                 (:file "models")
                  (:file "tpb")
                  (:file "torrentcd")
                  (:file "kat")
