@@ -17,7 +17,13 @@
   (:export :make-torrent
            :search-torrents
            :async-torrents
+           :title
+           :href
+           :seeders
+           :leechers
+           :source
            :magnet
+           :magnet-link-from
            :browse
            :download
            :url
@@ -137,7 +143,6 @@
          (joined-terms (str:join "+" terms))
          (cached-res (get-cached-results joined-terms))
          (res (if cached-res
-                  ;; the cache is mixed with "torrents" and "async-torrents": ok.
                   cached-res
                   (mapcan (lambda (fun)
                             (lparallel:pfuncall fun terms :stream log-stream))
@@ -187,11 +192,11 @@
   "Get the html page of the given url. Mocked in unit tests."
   (dex:get url))
 
-(defun magnet-link-from (alist)
+(defun magnet-link-from (torrent)
   "Extract the magnet link from a `torrent' result.
 
    Return the first href of the page that starts with 'magnet'."
-  (let* ((url (href alist))
+  (let* ((url (href torrent))
          (html (request-details url))
          (parsed (plump:parse html)))
     (find-magnet-link parsed)))

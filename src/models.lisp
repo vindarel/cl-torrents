@@ -4,6 +4,7 @@
 
   (:export :make-torrent
            :title
+           :href
            :seeders
            :leechers
            :source))
