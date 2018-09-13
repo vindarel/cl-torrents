@@ -36,6 +36,20 @@ Search:
 
 : (torrents:search-torrents "matrix")
 
+_Troubleshooting_
+
+If it doesn't work with a =CRYPTO_num_locks= error message:
+
+#+BEGIN_EXPORT ascii
+> ./torrents matrix
+searching '(matrix)' on 1337... no results.
+error: The alien function "CRYPTO_num_locks" is undefined.
+searching '(matrix)' on DOWNLOADSME... no results.
+error: The alien function "CRYPTO_num_locks" is undefined.
+#+END_EXPORT
+
+You might need to upgrade your OpenSSL version. See [[https://gitlab.com/vindarel/cl-torrents/issues/5][this issue]].
+
 
 ** Usage
 
