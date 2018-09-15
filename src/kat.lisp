@@ -70,12 +70,12 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 `(make-torrent
-                                   :title ,(result-title node)
-                                   :href ,(str:concat *base-url* "/new/" (result-href node))
-                                   :seeders ,(result-seeders node)
-                                   :leechers ,(result-leechers node)
-                                   :source :kat))
+                                 (make-torrent
+                                  :title (result-title node)
+                                  :href (str:concat *base-url* "/new/" (result-href node))
+                                  :seeders (result-seeders node)
+                                  :leechers (result-leechers node)
+                                  :source :kat))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         toret)

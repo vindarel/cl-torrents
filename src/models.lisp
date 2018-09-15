@@ -4,6 +4,7 @@
 
   (:export :make-torrent
            :title
+           :href
            :seeders
            :leechers
            :source))
@@ -12,6 +13,7 @@
 (defclass torrent ()
   ((title
     :initarg :title
+    :initform ""
     :accessor title)
    (href
     :initarg :href
@@ -31,9 +33,11 @@
    ))
 
 (defmethod print-object ((it torrent) stream)
-  (print-unreadable-object (it stream)
+  (print-unreadable-object (it stream :type t)
     (format stream "~a, ~a"
-            (str:prune 30 (title it))
+            (str:prune 30 (if (slot-boundp it 'title)
+                              (title it)
+                              ""))
             (source it))))
 
 (defun make-torrent (&key title href seeders leechers source)

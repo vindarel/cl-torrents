@@ -1398,7 +1398,7 @@ test:
    The [[https://lispcookbook.github.io/cl-cookbook/os.html#accessing-the-command-line-arguments][Cookbook]] has us covered  once again and, double coincidence, we
    rely  on  SBCL's  =sb-ext=  to  access the  list  of  command  line
    arguments with =sb-ext:*posix-argv*= (this  is not portable yet but
-   Roswell  fixes that,  follow  the  recipe). It  returns  a list  of
+   a library, or Roswell,  fixes that,  follow  the  recipe). It  returns  a list  of
    arguments,  the first  one being  the  name of  the executable,  as
    usual.
 
@@ -1410,8 +1410,8 @@ test:
   (torrents (subseq sb-ext:*posix-argv* 1)))
 #+END_SRC
 
-   Here we give  a list to =torrents=  so you may want to  change it a
-   bit  to accept  both  lists and  a string  (from  the user  calling
+   Here we give  a list to =torrents=  but I found useful
+   to accept both lists and a string (to allow the user/developper to call
    directly =(torrents "foo bar")= in Slime):
 
 #+BEGIN_SRC lisp
@@ -1435,7 +1435,7 @@ test:
 : rlwrap sbcl
 
    (rlwrap gives repl history. The default SBCL repl is the most basic
-one).
+one. We should have a look to the new [[https://github.com/koji-kojiro/cl-repl][cl-repl]] too, an ipython-like repl.).
 
    If  we  run =save-lisp-and-die=  directly,  we'll  get errors  that
    "cl-torrents  package  does  not  exist",  or  that  "The  function
@@ -1512,11 +1512,15 @@ So, in a Makefile:
 LISP ?= sbcl
 
 build:
-    $(LISP) --load cl-torrents.asd \
+    $(LISP) --non-interactive \
+            --load cl-torrents.asd \
     	    --eval '(ql:quickload :cl-torrents)' \
-	    --eval '(asdf:make :cl-torrents)' \
-	    --eval '(quit)'
+	    --eval '(asdf:make :cl-torrents)'
 #+END_SRC
+
+   The =--non-interactive= option asks to  /not/ enter the debugger if
+   an  error  were  to  happen,  and  exits  after  the  last  command
+   (otherwise we would add a =(quit)=).
 
    Finally [[https://roswell.github.io][Roswell]], that  does a lot, also  has the =ros build=  command, that
    should  work  for  more   implementations.  It  is  a bit under-documented

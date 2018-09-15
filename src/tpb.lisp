@@ -46,12 +46,12 @@
              (html (plump:parse req))
              (res (lquery:$ html *selectors*))
              (toret (map 'list (lambda (node)
-                                 `(make-torrent
-                                   :title ,(result-title node)
-                                   :href  ,(result-href node)
-                                   :seeders ,(result-seeders node)
-                                   :leechers ,(result-leechers node)
-                                   :source :tpb))
+                                 (make-torrent
+                                  :title (result-title node)
+                                  :href  (result-href node)
+                                  :seeders (result-seeders node)
+                                  :leechers (result-leechers node)
+                                  :source :tpb))
                          res)))
         (format stream " found ~a results.~&" (length res))
         toret)

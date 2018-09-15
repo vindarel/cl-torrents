@@ -77,12 +77,12 @@
              (parsed (parse req))
              (results (query parsed))
              (toret (map 'list (lambda (node)
-                                 `(make-torrent
-                                   :title ,(result-title node)
-                                   :href ,(str:concat *base-url* (result-href node))
-                                   :seeders ,(result-seeders node)
-                                   :leechers ,(result-leechers node)
-                                   :source :torrentcd))
+                                 (make-torrent
+                                  :title (result-title node)
+                                  :href (str:concat *base-url* (result-href node))
+                                  :seeders (result-seeders node)
+                                  :leechers (result-leechers node)
+                                  :source :torrentcd))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         toret)

@@ -26,7 +26,7 @@
   (search-torrents search))
 
 (defun magnet (index)
-  (format t "~a~t" (torrents:magnet index)))
+  (format t "~a~&" (torrents:magnet index)))
 
 (defun url (index)
-  (format t "~a~t" (torrents:url index)))
+  (format t "~a~&" (torrents:url index)))
