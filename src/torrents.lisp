@@ -384,8 +384,8 @@
     (if (getf options :interactive)
         (progn
           (setf replic:*prompt* (green "torrents > "))
-          (replic:functions-to-commands :replic.base)
-          (replic:functions-to-commands :torrents.commands)
+          (replic.completion:functions-to-commands :replic.base)
+          (replic.completion:functions-to-commands :torrents.commands)
           (when free-args
             (display-results :results (async-torrents free-args)
                              :nb-results *nb-results*

@@ -38,7 +38,7 @@ Search:
 
 _Troubleshooting_
 
-If it doesn't work with a =CRYPTO_num_locks= error message:
+If a search doesn't work with a =CRYPTO_num_locks= error message:
 
 #+BEGIN_EXPORT ascii
 > ./torrents matrix
@@ -157,7 +157,7 @@ options are available.
 
 #+html: <p align='center'><img src='img-readline.png' /></p>
 
-*** Configuration file (new in v0.11)
+*** Configuration file (in development)
 
     cl-torrents will (try to)  read a =cl-torrents.conf= configuration
     file  from  three   locations:  cl-torrents  library's  directory,
@@ -172,6 +172,16 @@ options are available.
 scrapers = 1337 DOWNLOADSME
 
 browser = firefox
+#+END_SRC
+
+Moreover, you  can set parameters related to the repl  in a  =~/.replic.conf= file:
+
+#+BEGIN_SRC text
+[default]
+confirm-exit = true
+verbose = false
+history = true
+write-history = true
 #+END_SRC
 
    On the Lisp side, this is easily provided by [[https://common-lisp.net/project/py-configparser/api-docs.shtml][py-configparser]].

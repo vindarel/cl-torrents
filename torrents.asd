@@ -12,7 +12,7 @@
   :author "vindarel"
   :license "MIT"
   :depends-on (
-               :replic
+               :replic ;; not on Quicklisp
                :dexador
                :plump
                :str
