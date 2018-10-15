@@ -159,32 +159,36 @@ options are available.
 
 *** Configuration file (in development)
 
-    cl-torrents will (try to)  read a =cl-torrents.conf= configuration
+    cl-torrents will  read a =~./.torrents.conf= configuration
     file  from  three   locations:  cl-torrents  library's  directory,
-    =~/.config/cl-torrents.conf= and the  current directory.  The last
+    =~/.config/.torrents.conf= and =~/.torrents.conf=.  The last
     one takes precedence.
 
-    Example content:
+    For example, those are the default values:
 
 #+BEGIN_SRC conf
 [default]
-
 scrapers = 1337 DOWNLOADSME
-
 browser = firefox
+nb-results = 20
+cache-p = true  # use the cache system.
 #+END_SRC
 
-Moreover, you  can set parameters related to the repl  in a  =~/.replic.conf= file:
+Moreover, you  can set parameters related to the repl:
 
 #+BEGIN_SRC text
 [default]
-confirm-exit = true
+# again, default values:
+confirm-exit = true  # ask with a yes/no prompt before quiting the app.
 verbose = false
-history = true
-write-history = true
+history = true  # use the repl history.
+write-history = true  # read the history, but don't write to it.
 #+END_SRC
 
-   On the Lisp side, this is easily provided by [[https://common-lisp.net/project/py-configparser/api-docs.shtml][py-configparser]].
+  Your can set  them for all replic-like apps  in =~/.replic.conf=, or
+  override them in =.torrents.conf=.
+
+  /Note: we only use a "default" profile for now./
 
 ** Tutorial
 
@@ -236,8 +240,29 @@ write-history = true
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
-*** v0.11 (dev)
+*** dev (upcoming v0.11)
 
+- added   the    ability   to   read   an    ini-like   config   file,
+  =~/.torrents.conf=. All exported variables  from the =:torrent= package
+  can be overriden. They are written without earmuffs:
+#+BEGIN_SRC lisp
+           :*nb-results*
+           :*browser*
+           :*torrent-client*
+           :*cache-p*
+#+END_SRC
+gives
+#+BEGIN_SRC text
+# ~/.torrents.conf
+# those are the defaults.
+[default]
+nb-results = 20
+browser = firefox
+torrent-client = firefox
+cache-p = true
+#+END_SRC
+  See more on replic.
+  (all parameters need more tests)
 - added missing =-o= option to download with a torrent client (transmission-gtk).
 - =cl-torrents.conf= configuration file:
   - choose the list of scrapers.

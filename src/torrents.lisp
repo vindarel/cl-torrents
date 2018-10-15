@@ -27,6 +27,10 @@
            :browse
            :download
            :url
+           :*nb-results*
+           :*browser*
+           :*torrent-client*
+           :*cache-p*
            :main))
 (in-package :torrents)
 
@@ -301,11 +305,12 @@
   (uiop:launch-program (list (find soft *torrent-clients-list* :test #'equal)
                              (magnet-link-from (elt *last-search* index)))))
 
-(defun confirm ()
-  "Ask confirmation. Nothing means yes."
-  (member (rl:readline :prompt (format nil  "~%Do you want to quit ? [Y]/n : "))
-          '("y" "Y" "")
-          :test 'equal))
+;; (defun confirm ()
+;;   "Ask confirmation. Nothing means yes."
+;;   ;; use replic:confirm (refacto, take settings into account).
+;;   (member (rl:readline :prompt (format nil  "~%Do you want to quit ? [Y]/n : "))
+;;           '("y" "Y" "")
+;;           :test 'equal))
 
 (defun main ()
   "Parse command line arguments (portable way) and call the program."
@@ -313,6 +318,10 @@
   ;; if not inside a function, can not build an executable (can not
   ;; save core with multiple threads running).
   (setf lparallel:*kernel* (lparallel:make-kernel 2))
+
+  ;; Read config file(s).
+  (replic.config:apply-config :replic)
+  (replic.config:apply-config :torrents ".torrents.conf")
 
   (handler-case
       (progn
