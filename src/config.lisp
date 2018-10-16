@@ -9,8 +9,8 @@
 
 
 (defun read-config ()
+  (warn "TODO: re-do with replic's config module")
   (setf *cfg-sources* (list
-                       (asdf:system-relative-pathname :torrents "cl-torrents.conf")
                        ;; Setting here and not in defparameter:
                        ;; ensure this is the user's value, not where the exec was built on.
                        (merge-pathnames "./config/cl-torrents.conf" (user-homedir-pathname))

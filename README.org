@@ -159,9 +159,8 @@ options are available.
 
 *** Configuration file (in development)
 
-    cl-torrents will  read a =~./.torrents.conf= configuration
-    file  from  three   locations:  cl-torrents  library's  directory,
-    =~/.config/.torrents.conf= and =~/.torrents.conf=.  The last
+    cl-torrents  will read  a  =~./.torrents.conf= configuration  file
+    from =~/.config/.torrents.conf= and  =~/.torrents.conf=.  The last
     one takes precedence.
 
     For example, those are the default values:
