@@ -312,8 +312,23 @@
 ;;           '("y" "Y" "")
 ;;           :test 'equal))
 
+(defun init-options ()
+  "Read and set all options from config files.
+   For simple values `replic:apply-config` should be enough, but we
+   need to do more processing (get the scrapers list, etc)."
+  (handler-case
+      (progn
+        (ensure-cache-and-store)
+        (when (replic.config:has-option-p "scrapers")
+          (setf *torrents-list* (config-scrapers)))
+        (when (replic.config:has-option-p "browser")
+          ;TODO: should not be necessary appart from replic:apply-config
+          (setf *browser* (replic.config:option "browser"))))
+    (error (c) (format *error-output* "~&~a~&" c))))
+
+
 (defun main ()
-  "Parse command line arguments (portable way) and call the program."
+  "Parse command line arguments, read the config files and call the program."
 
   ;; if not inside a function, can not build an executable (can not
   ;; save core with multiple threads running).
@@ -323,15 +338,9 @@
   (replic.config:apply-config :replic)
   (replic.config:apply-config :torrents ".torrents.conf")
 
-  (handler-case
-      (progn
-        (ensure-cache-and-store)
-        (setf *cfg* (read-config))
-        (when (config-has-scrapers-option-p *cfg*)
-          (setf *torrents-list* (config-torrents *cfg*)))
-        (when (config-has-option-p *cfg* "browser")
-          (setf *browser* (config-option *cfg* "browser"))))
-    (error (c) (format *error-output* "~&~a~&" c)))
+  ;; Read and set all options.
+  (init-options)
+  (replic.config::print-options)        ;; debug
 
   ;; Define the cli args.
   (opts:define-opts

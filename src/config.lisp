@@ -8,37 +8,14 @@
 (defvar *cfg-sources* nil)
 
 
-(defun read-config ()
-  (warn "TODO: re-do with replic's config module")
-  (setf *cfg-sources* (list
-                       ;; Setting here and not in defparameter:
-                       ;; ensure this is the user's value, not where the exec was built on.
-                       (merge-pathnames "./config/cl-torrents.conf" (user-homedir-pathname))
-                       "cl-torrents.conf"))
-  (loop for it in *cfg-sources*
-     do (progn
-          (when (probe-file it)
-            ;; xxx verbose
-            ;; (format t "reading config ~a~&" it)
-            ;; read-files reads a list.
-            (py-configparser:read-files *cfg* (list it)))))
-  *cfg*)
-
 (defun config-has-scrapers-option-p (cfg)
   ;; ignore "no section" errors.
   (ignore-errors
     (py-configparser:has-option-p cfg "default" "scrapers")))
 
-(defun config-has-option-p (cfg option)
-  (ignore-errors
-    (py-configparser:has-option-p cfg "default" option)))
-
-(defun config-option (cfg option)
-  (py-configparser:get-option cfg "default" option))
-
-(defun config-torrents (cfg)
+(defun config-scrapers ()
   "Return the list of torrent functions to search with."
-  (let* ((scrapers (py-configparser:get-option cfg "default" "scrapers"))
+  (let* ((scrapers (replic.config:option "scrapers"))
          (scrapers (str:words (str:replace-all "," " " scrapers)))
          (torrents-list))
     (loop for it in scrapers
