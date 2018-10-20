@@ -24,6 +24,11 @@ Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/ta
 
 : git clone git@github.com:vindarel/cl-torrents.git ~/quicklisp/local-projects/
 
+Clone its dependency, [[https://github.com/vindarel/replic/][replic]], a  library that helps build the readline
+interface:
+
+: git clone https://github.com/vindarel/replic.git ~/quicklisp/local-projects/
+
 and install it:
 
 : (ql:quickload "torrents")
