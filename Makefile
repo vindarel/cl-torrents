@@ -11,6 +11,7 @@ build:
 test:
 	$(LISP) --non-interactive \
 		--load torrents.asd \
+		--load torrents-test.asd \
 	     	--eval '(ql:quickload :torrents)' \
 	     	--eval '(ql:quickload :torrents-test)' \
 	     	--eval '(prove:run #P"tests/test-torrents.lisp")' \
@@ -20,6 +21,7 @@ test:
 test-end2end:
 	$(LISP) --non-interactive \
 	        --load torrents.asd \
+		--load torrents-test.asd \
 	      	--eval '(ql:quickload :torrents)' \
 	     	--eval '(ql:quickload :torrents-test)' \
 	     	--eval '(prove:run #P"tests/end2end.lisp")'
