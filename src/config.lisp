@@ -1,20 +1,11 @@
-
 (in-package :torrents)
 
-(defvar *cfg* (py-configparser:make-config)
-  "The config read from the config.conf files found, in order: in this
-  project root, ~/.config/cl-torrents.conf, in the current directory.")
-
-(defvar *cfg-sources* nil)
-
-
-(defun config-has-scrapers-option-p (cfg)
-  ;; ignore "no section" errors.
-  (ignore-errors
-    (py-configparser:has-option-p cfg "default" "scrapers")))
+;; All the logic of reading config files and setting parameters
+;; is done in replic.config.
 
 (defun config-scrapers ()
-  "Return the list of torrent functions to search with."
+  "Filter the global `*scrapers-alist*` with the `scrapers` parameter in config.
+   Return the list of torrent functions to search with."
   (let* ((scrapers (replic.config:option "scrapers"))
          (scrapers (str:words (str:replace-all "," " " scrapers)))
          (torrents-list))
@@ -23,6 +14,6 @@
             (push (assoc-value *scrapers-alist* it :test #'equal) torrents-list)))
 
     (unless *torrents-list*
-      (format t "info: looks like you disabled all torrent sources.~&")
+      (format t "Info: it looks like you disabled all torrent sources.~&")
       (finish-output))
     torrents-list))
