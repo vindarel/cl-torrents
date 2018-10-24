@@ -400,6 +400,9 @@
           (setf replic:*prompt* (green "torrents > "))
           (replic.completion:functions-to-commands :replic.base)
           (replic.completion:functions-to-commands :torrents.commands)
+          ;; xxx names consistency
+          (replic.completion:add-variables-from :torrents) ;; ok
+
           (when free-args
             (display-results :results (async-torrents free-args)
                              :nb-results *nb-results*

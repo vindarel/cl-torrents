@@ -86,7 +86,7 @@ You might need to upgrade your OpenSSL version. See [[https://gitlab.com/vindare
 
 #+html: <p align="center"><img src="img-colored-results.png" /></p>
 
-  (you need  to enable ansi  colors in Slime,  see [[https://github.com/enriquefernandez/slime-repl-ansi-color][slime-repl-ansi-on]].
+  (you need  to enable ansi  colors in Slime,  see [[https://github.com/enriquefernandez/slime-repl-ansi-color][slime-repl-ansi-color]].
   Disable this feature with =(setf cl-ansi-text:*enabled* nil)=)
 
 
