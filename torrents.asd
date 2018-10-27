@@ -14,6 +14,7 @@
   :depends-on (
                :replic ;; not on Quicklisp
                :dexador
+               :drakma  ;; dexador issue #61
                :plump
                :str
                :lparallel

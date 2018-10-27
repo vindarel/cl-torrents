@@ -31,7 +31,7 @@
   "List of the last search results (plump nodes) (to eas e2e tests).")
 
 (defun request (url)
-  (dex:get url))
+  (drakma:http-request url))
 
 (defun parse (html)
   (plump:parse html))
@@ -84,4 +84,4 @@
     (error (c)
       (format stream " no results.~&")
       ;; xxx: logging
-      (format *error-output* "error: ~a~&" c))))
+      (format *error-output* "error searching on ~a: ~a~&" *source* c))))
