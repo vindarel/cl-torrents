@@ -32,6 +32,11 @@
            :*torrent-client*
            :*cache-p*
            :main))
+
+;; this package will be used for the lisp init file.
+(defpackage torrents.user
+  (:use :cl))
+
 (in-package :torrents)
 
 (defparameter *version* (uiop:read-file-form (asdf:system-relative-pathname :torrents #p"version.lisp-expr")))
@@ -338,6 +343,7 @@
   ;; Process options that need it.
   (process-options)
 
+
   ;; Define the cli args.
   (opts:define-opts
     (:name :help
@@ -367,6 +373,9 @@
            :short #\o
            :long "open"
            :arg-parser #'parse-integer)
+    (:name :no-userinit
+           :description "don't load the user's lisp init file."
+           :long "no-userinit")
     (:name :interactive
            :description "enter an interactive repl"
            :short #\i
@@ -388,10 +397,18 @@
            :prefix (format nil "CL-torrents version ~a. Usage:" *version*)
            :args "[keywords]")
           (exit)))
+
     (if (getf options :version)
         (progn
           (format t "cl-torrents version ~a~&" *version*)
           (exit)))
+
+    ;; Read the lisp init file.
+    (unless (getf options :no-userinit)
+      (replic:load-init (merge-pathnames  ".torrents.lisp" (user-homedir-pathname)))
+      ;; and load the commands from it.
+      (replic.completion:functions-to-commands :torrents.user))
+
     (if (getf options :nb-results)
         (setf *nb-results* (getf options :nb-results)))
 
@@ -410,7 +427,7 @@
           (replic:repl)
           (uiop:quit)))
 
-    ;; This is the only way I found
+    ;; This is the only way I found to catch a C-c.
     ;; https://github.com/fukamachi/clack/blob/master/src/clack.lisp
     ;; trivial-signal didn't work (see issue #3)
     (unless free-args

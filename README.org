@@ -162,9 +162,14 @@ options are available.
 
 #+html: <p align='center'><img src='img-readline.png' /></p>
 
-*** Configuration file (in development)
+*** Configuration files (in development)
 
-    cl-torrents  will read  a  =~./.torrents.conf= configuration  file
+    =cl-torrents= will  read two configuration files.  An ini-style one,
+    and a lispy one.
+
+**** Ini-style config
+
+    First, it will search for a =~.torrents.conf= file
     from =~/.config/.torrents.conf= and  =~/.torrents.conf=.  The last
     one takes precedence.
 
@@ -189,10 +194,57 @@ history = true  # use the repl history.
 write-history = true  # read the history, but don't write to it.
 #+END_SRC
 
-  Your can set  them for all replic-like apps  in =~/.replic.conf=, or
+  You can set  them for all replic-based apps  in =~/.replic.conf=, or
   override them in =.torrents.conf=.
 
   /Note: we only use a "default" profile for now./
+
+**** Lisp init file
+
+If the  file =~/.torrents.lisp=  exists, it will  be loaded  after the
+=.conf= one and before the command line arguments.
+
+The option =--no-userinit= prevents it from loading.
+
+You can  write whatever you  want there, it is  just a lisp  file that
+will be  =load='ed at startup.
+
+/Note/:  what we  will eventually  do then  is to  expose cl-torrents'
+mechanism via hooks.
+
+One thing you can do is define  additional commands to be found at the
+repl. We do so by following [[https://github.com/vindarel/replic/][replic]]'s mechanism:
+
+- define functions inside the =torrents.user= package
+- define the completion choices for some functions
+- =export= the functions you want to see turned into commands.
+
+You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
+=torrents -i= to try that out.
+
+#+BEGIN_SRC lisp
+(in-package :torrents.user)
+
+(defparameter *names* '()
+  "List of names (string) given to `hello`. Will be autocompleted by `goodbye`.")
+
+(defun hello (name)
+  "Takes only one argument. Adds the given name to the global
+  `*names*` global variable, used to complete arguments of `goodbye`. "
+  (format t "hello ~a~&" name)
+  (push name *names*))
+
+(defun goodbye (name)
+  "Says goodbye to name, where `name` should be completed from what was given to `hello`."
+  (format t "goodbye ~a~&" name))
+
+;; Custom completion for goodbye:
+(replic.completion:add-completion "goodbye" (lambda () *names*))
+
+;; and export the two functions to find them as commands.
+(export '(hello
+          goodbye))
+#+END_SRC
 
 ** Tutorial
 
@@ -237,8 +289,6 @@ write-history = true  # read the history, but don't write to it.
 - add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
 - self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
 - [X] interactive prompt, with completion of commands.
-  - save  the   settings  (details,   nb-results),  possibly   with  a
-    persistent objects storage, will be straightforward.
 
 ** Release notes
 
@@ -246,6 +296,8 @@ write-history = true  # read the history, but don't write to it.
 
 *** dev (upcoming v0.11)
 
+- added:  load  =~/.torrents.lisp=,  create   new  commands  from  the
+  =torrents.user= package.
 - added   the    ability   to   read   an    ini-like   config   file,
   =~/.torrents.conf=. All exported variables  from the =:torrent= package
   can be overriden. They are written without earmuffs:
