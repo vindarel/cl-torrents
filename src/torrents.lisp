@@ -373,6 +373,11 @@
            :short #\o
            :long "open"
            :arg-parser #'parse-integer)
+    (:name :load
+           :description "load this given lisp file before startup."
+           :short #\l
+           :long "load"
+           :arg-parser #'identity)
     (:name :no-userinit
            :description "don't load the user's lisp init file."
            :long "no-userinit")
@@ -402,6 +407,12 @@
         (progn
           (format t "cl-torrents version ~a~&" *version*)
           (exit)))
+
+    ;; Load the given lisp file.
+    (when (and (getf options :load)
+               (probe-file (getf options :load)))
+      (replic:load-init (getf options :load))
+      (replic.completion:functions-to-commands :torrents.user))
 
     ;; Read the lisp init file.
     (unless (getf options :no-userinit)
