@@ -32,7 +32,7 @@
   "List of the last search results (plump nodes) (to eas e2e tests).")
 
 (defun request (url)
-  (drakma:http-request url))
+  (dex:get url))
 
 (defun parse (html)
   (plump:parse html))
