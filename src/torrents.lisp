@@ -167,7 +167,7 @@
       (save-results joined-terms sorted))
     sorted))
 
-(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (infos nil))
+(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (details nil))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; I want to color the output.
@@ -190,9 +190,8 @@
                     title-colored
                     (seeders it)
                     (leechers it)
-                    (source it)
-                    )
-              (if infos
+                    (source it))
+              (if details
                   (format stream "~a~&" (href it)))))
           (reverse (sublist results 0 nb-results)))
   t)
@@ -434,7 +433,7 @@
           (when free-args
             (display-results :results (async-torrents free-args)
                              :nb-results *nb-results*
-                             :infos (getf options :infos)))
+                             :details (getf options :details)))
           (replic:repl)
           (uiop:quit)))
 
@@ -448,7 +447,7 @@
     (handler-case
         (display-results :results (async-torrents free-args)
                          :nb-results *nb-results*
-                         :infos (getf options :infos))
+                         :details (getf options :details))
       (#+sbcl sb-sys:interactive-interrupt
         #+ccl  ccl:interrupt-signal-condition
         #+clisp system::simple-interrupt-condition
