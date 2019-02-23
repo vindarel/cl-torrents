@@ -27,6 +27,7 @@
            :browse
            :download
            :url
+           :*last-search*
            :*nb-results*
            :*browser*
            :*torrent-client*
@@ -124,7 +125,8 @@
   (unless *store*
     (ensure-cache-and-store))
   (let ((res (async-torrents words :log-stream log-stream)))
-    (display-results :results res :stream stream :nb-results nb-results)))
+    (display-results :results res :stream stream :nb-results nb-results)
+    res))
 
 (defvar *scrapers-alist* '(("1337" . torrents.1337:torrents)
                            ("downloadsme" . torrents.downloadsme:torrents))
