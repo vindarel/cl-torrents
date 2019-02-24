@@ -1,0 +1,17 @@
+
+
+- [X] POC: display results in a treeview <2019-02-24 dim.>
+  feedback: very quick to do (couple  hours for a noob), great support
+  from nodgui's author.
+- [ ] make numbers stick to the right
+- [ ] menu bar
+- [ ] see magnet link
+- [ ] copy magnet link to clipboard
+- [ ] download torrent file
+- [ ] sort columns
+- [ ] option: bypass cache
+
+Bugs:
+- [ ] "latin capital letter"  error, for example when searching "tears
+  of steel"
+- UI glitch: the searchbox goes under the button.

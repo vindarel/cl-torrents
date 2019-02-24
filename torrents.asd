@@ -57,3 +57,12 @@
           (setf (fill-pointer seq) (read-sequence seq stream))
           seq)))
   :in-order-to ((test-op (test-op torrents-test))))
+
+(defsystem torrents/tk
+  :version (:read-file-form "version.lisp-expr")
+  :depends-on (:torrents
+               :nodgui)
+  :components ((:module "src/gui-tk"
+                        :components
+                        ((:file "gui-tk"))))
+  :description "Simple GUI to search for torrents.")
