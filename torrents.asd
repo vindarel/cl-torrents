@@ -65,4 +65,8 @@
   :components ((:module "src/gui-tk"
                         :components
                         ((:file "gui-tk"))))
-  :description "Simple GUI to search for torrents.")
+  :description "Simple GUI to search for torrents."
+  ;; build an executable with asdf:make :torrents/tk
+  :build-operation "program-op"
+  :build-pathname "torrents-tk"
+  :entry-point "torrents-tk:main")

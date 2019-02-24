@@ -3,7 +3,8 @@
 ;; quickload nodgui before this.
 (defpackage torrents-tk
   (:use :cl
-        :nodgui))
+        :nodgui)
+  (:export :main))
 
 (in-package :torrents-tk)
 
@@ -47,6 +48,8 @@
 (defun insert-results (tree results)
   "Insert torrents last results into that treeview."
   ;; Clear content.
+  ;; this needs nodgui newer than feb, 24th 2019
+  ;; with commit c9ae0ec389.
   (treeview-delete-all tree)
   (loop for result in results
      do (treeview-insert-item tree
@@ -54,3 +57,6 @@
                               ;; xxx: numbers stick to the left instead of the right.
                               :column-values (list (torrents:seeders result)
                                                    (torrents:leechers result)))))
+
+(defun main ()
+  (search-tree))

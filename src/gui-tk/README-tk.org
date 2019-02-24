@@ -1,4 +1,12 @@
+To build it:
 
+: make build-gui
+
+and run it:
+
+: ./torrents-tk &
+
+TODOs:
 
 - [X] POC: display results in a treeview <2019-02-24 dim.>
   feedback: very quick to do (couple  hours for a noob), great support
@@ -12,6 +20,13 @@
 - [ ] option: bypass cache
 
 Bugs:
+
 - [ ] "latin capital letter"  error, for example when searching "tears
   of steel"
 - UI glitch: the searchbox goes under the button.
+- UI glitch: the resize doesn't expand the bottom.
+
+
+Thoughts:
+
+it's fun :)

@@ -8,6 +8,12 @@ build:
 		--eval '(ql:quickload :torrents)' \
 		--eval '(asdf:make :torrents)'
 
+build-gui:
+	$(LISP) --non-interactive \
+		--load torrents.asd \
+		--eval '(ql:quickload :torrents/tk)' \
+		--eval '(asdf:make :torrents/tk)'
+
 test:
 	$(LISP) --non-interactive \
 		--load torrents.asd \
