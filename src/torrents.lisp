@@ -29,7 +29,7 @@
            :browse
            :download
            :url
-           :*last-search*
+           :*last-results*
            :*nb-results*
            :*browser*
            :*details*
@@ -45,7 +45,7 @@
 
 (defparameter *version* (uiop:read-file-form (asdf:system-relative-pathname :torrents #p"version.lisp-expr")))
 
-(defparameter *last-search* nil "Remembering the last search.")
+(defparameter *last-results* nil "Remembering the last search results.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
 (defparameter *keywords* '() "List of keywords given as input by the user.")
 (defvar *details* nil "If true, print additional details (like the url).")
@@ -168,12 +168,12 @@
                                 (seeders b))))))
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
-    (setf *last-search* sorted)
+    (setf *last-results* sorted)
     (unless cached-res
       (save-results joined-terms sorted))
     sorted))
 
-(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (details *details*))
+(defun display-results (&key (results *last-results*) (stream t) (nb-results *nb-results*) (details *details*))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; I want to color the output.
@@ -226,20 +226,20 @@
   "Search the magnet from last search's `index''s result."
   (when (stringp index)
     (setf index (parse-integer index)))
-  (if *last-search*
-      (if (< index (length *last-search*))
-          (magnet-link-from (elt *last-search* index))
-          (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-search*) index))
+  (if *last-results*
+      (if (< index (length *last-results*))
+          (magnet-link-from (elt *last-results* index))
+          (format t "The search returned ~a results, we can not access the magnet link n°~a.~&" (length *last-results*) index))
       (format t "no search results to get the magnet link from.~&")))
 
 (defun url (index)
   "Return the url from last search's `index''s result."
   (when (stringp index)
     (setf index (parse-integer index)))
-  (if *last-search*
-      (if (< index (length *last-search*))
-          (href (elt *last-search* index))
-          (format t "index too big, the last search only returned ~a results.~&" (length *last-search*)))
+  (if *last-results*
+      (if (< index (length *last-results*))
+          (href (elt *last-results* index))
+          (format t "index too big, the last search only returned ~a results.~&" (length *last-results*)))
       (format t "no search results to get the url from.~&")))
 
 (defparameter *commands* '(
@@ -320,7 +320,7 @@
   (when (stringp index)
     (setf index (parse-integer index)))
   (uiop:launch-program (list (find soft *torrent-clients-list* :test #'equal)
-                             (magnet-link-from (elt *last-search* index)))))
+                             (magnet-link-from (elt *last-results* index)))))
 
 ;; (defun confirm ()
 ;;   "Ask confirmation. Nothing means yes."
