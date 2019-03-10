@@ -29,6 +29,7 @@
            :browse
            :download
            :url
+           :filter
            :*last-results*
            :*nb-results*
            :*browser*
@@ -204,7 +205,7 @@
                    (format-string (format nil "~~3@a: ~~~aa ~~4@a/~~4@a ~~a ~~a~~%" title-padding)))
 
               (format stream format-string
-                    (position it results)
+                    (position it *last-results*)
                     title-colored
                     (seeders it)
                     (leechers it)
@@ -327,6 +328,22 @@
     (setf index (parse-integer index)))
   (uiop:launch-program (list (find soft *torrent-clients-list* :test #'equal)
                              (magnet-link-from (elt *last-results* index)))))
+
+
+(defun filter (text)
+  "Show results that have this text in their title.
+   This doesn't change the list of last results.
+
+   The nice thing is that it changes the list of ids to complete, so using any command with tab completion afterwards is more practical, specially with 1 result remaining."
+  (let ((results (remove-if-not (lambda (torrent)
+                                  (str:contains? text (title torrent)))
+                                (sublist *last-results* 0 *nb-results*))))
+    (setf *ids-completion-list*
+          (mapcar (lambda (torrent)
+                    (format nil "~a" (position torrent *last-results*)))
+                  results))
+    (display-results :results results)))
+
 
 ;; (defun confirm ()
 ;;   "Ask confirmation. Nothing means yes."

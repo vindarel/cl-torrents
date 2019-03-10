@@ -152,6 +152,8 @@ The available commands are (use the auto-completion):
 - =open= or =firefox <i>=: open the given torrent page in a web browser
 - =download  <i>=:   open  a  magnet   link  with  a   torrent  client
   (transmission-gtk by default)
+- =filter  <text>=:  show  results  that   have  this  text  in  their
+  title. This reduces the tab-completion of ids for all commands.
 - =highlight=  (and  =unhighlight=):  highlight  the  given  words  in
   yellow, for this session.
 - =url <i>=
@@ -309,6 +311,10 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
 
 *** dev (upcoming v0.11)
 
+- added:  a =filter=  command,  to only  display  results whose  title
+  contains a given  string. It reduces the TAB-completion  of ids (but
+  doesn't constrain it).
+- added: all functions can now TAB-complete the list of ids.
 - added: scrape and display torrents' size.
 - fixed =-d= cli arg.
 - added:  load  =~/.torrents.lisp=,  create   new  commands  from  the

@@ -11,12 +11,16 @@
   (:import-from :torrents
                 :search-torrents
                 :browse
-                :download)
+                :download
+                :filter)
+  ;; Some functions already print their output, we just import & re-export them.
+  ;; see https://github.com/takagi/cl-reexport/
   (:export :search
            :browse
            :download
            :magnet
-           :url))
+           :url
+           :filter))
 
 (in-package :torrents.commands)
 
