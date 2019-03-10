@@ -116,19 +116,19 @@
 
         results))))
 
-(defun search-torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t))
+(defun search-torrents (words &key (stream t) (nb-results *nb-results*) (log-stream t) (cache *cache-p*))
   "Search for torrents on the different sources and print the results, sorted by number of seeders.
 
   `words': a string (space-separated keywords) or a list of strings.
   `nb-results': max number of results to print.
   `log-stream': used in tests to capture (and ignore) some output.
-  "
+  `cache': if true (the default), read from the cache."
   ;; Better way to define those before but also for the executable ?
   (unless *cache-directory*
     (ensure-cache))
   (unless *store*
     (ensure-cache-and-store))
-  (let ((res (async-torrents words :log-stream log-stream)))
+  (let ((res (async-torrents words :log-stream log-stream :cache cache)))
     (display-results :results res :stream stream :nb-results nb-results)
     res))
 
@@ -141,7 +141,7 @@
   "List of scraper functions to call. Modified after reading the
   user's conf files.")
 
-(defun async-torrents (words &key (log-stream t))
+(defun async-torrents (words &key (log-stream t) (cache *cache-p*))
   "Call the scrapers in parallel and sort by seeders."
   ;; With mapcar, we get a list of results. With mapcan, the results are concatenated.
   (unless *cache-directory*
@@ -156,7 +156,7 @@
                     words
                     (str:words words)))
          (joined-terms (str:join "+" terms))
-         (cached-res (get-cached-results joined-terms))
+         (cached-res (when cache (get-cached-results joined-terms)))
          (res (if cached-res
                   cached-res
                   (mapcan (lambda (fun)
