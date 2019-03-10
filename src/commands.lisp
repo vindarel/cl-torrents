@@ -20,6 +20,13 @@
 
 (in-package :torrents.commands)
 
+;; All commands can complete the result ids.
+;; Some commands will reduce the completion list and make it more practical.
+(setf replic.completion:*default-command-completion* (lambda ()
+                                                       ;; Inside a lambda because
+                                                       ;; the list changes ;)
+                                                       torrents::*ids-completion-list*))
+
 (defun search (search &rest words)
   "Search for torrents on the different sources and print the results, sorted by number of seeders."
   (setf search (cons search words))

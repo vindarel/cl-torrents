@@ -74,6 +74,10 @@
 (defparameter *store* nil
   "Cache. The directory must exist.")
 
+;; Completion settings.
+(defvar *ids-completion-list* nil
+  "The list of ids (index of search results) to use at the completion, when we want to filter it. They must be strings, not numbers.")
+
 
 (defun ensure-cache ()
   (setf *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname)))
@@ -169,6 +173,8 @@
     (setf *keywords* terms)
     (setf *keywords-colors* (keyword-color-pairs terms))
     (setf *last-results* sorted)
+    (setf *ids-completion-list* (loop for i below *nb-results*
+                                   collect (format nil "~a" i)))
     (unless cached-res
       (save-results joined-terms sorted))
     sorted))
