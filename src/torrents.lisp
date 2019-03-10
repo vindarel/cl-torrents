@@ -30,6 +30,7 @@
            :*last-search*
            :*nb-results*
            :*browser*
+           :*details*
            :*torrent-client*
            :*cache-p*
            :main))
@@ -45,6 +46,7 @@
 (defparameter *last-search* nil "Remembering the last search.")
 (defparameter *nb-results* 20 "Maximum number of search results to display.")
 (defparameter *keywords* '() "List of keywords given as input by the user.")
+(defvar *details* nil "If true, print additional details (like the url).")
 (defvar *keywords-colors* nil
   "alist associating a keyword with a color. See `keyword-color-pairs'.")
 
@@ -169,7 +171,7 @@
       (save-results joined-terms sorted))
     sorted))
 
-(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (details nil))
+(defun display-results (&key (results *last-search*) (stream t) (nb-results *nb-results*) (details *details*))
   "Results: list of plump nodes. We want to print a numbered list with the needed information (torrent title, the number of seeders,... Print at most *nb-results*."
   (mapcar (lambda (it)
             ;; I want to color the output.
