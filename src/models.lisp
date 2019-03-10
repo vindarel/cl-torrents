@@ -9,6 +9,7 @@
            :leechers
            :size
            :size-unit
+           :format-size
            :source))
 (in-package :torrents.models)
 
@@ -54,6 +55,10 @@
   (if (slot-boundp it 'size-unit)
       (slot-value it 'size-unit)
       ""))
+
+(defun format-size (torrent &optional (stream nil))
+  "Print the size humanly, with its unit."
+  (format stream "~8@a" (format nil "~3,2f ~a" (size torrent) (size-unit torrent))))
 
 (defmethod print-object ((it torrent) stream)
   (print-unreadable-object (it stream :type t)
