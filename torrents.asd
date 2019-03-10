@@ -24,6 +24,7 @@
                :lquery
                :py-configparser
                :cl-readline
+               :parse-float
                :log4cl)
   :components ((:module "src"
                 :components

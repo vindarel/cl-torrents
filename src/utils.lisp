@@ -1,8 +1,10 @@
 (in-package :cl-user)
 (defpackage torrents.utils
-  (:use :cl)
+  (:use :cl
+        :parse-float)
   (:export :sublist
            :find-magnet-link
+           :parse-size
            :exit
            :unknown-option
            :missing-arg
@@ -95,6 +97,31 @@ Keep the letters' possible mixed up or down case.
             (setf new (colorize-keyword-in-string new word color))))
     new)
   )
+
+(defun parse-size (string)
+  "Try to parse this string to a float.
+   Return two values: the size (float) and the unit (string of MB, GB).
+   - `string' looks like 703.9 MB."
+  (handler-case
+      (values
+       (parse-float
+        (ppcre:scan-to-strings "[0-9]+\(.[0-9]+\)?" string))
+       (ppcre:scan-to-strings "[A-Z]+" string))
+    (error (c)
+      (log:error "Error parsing torrent size ~a: ~a~&" string c)
+      (values
+       -1
+       ""))))
+
+;; little test:
+#+nil
+(progn
+  (assert (equal 700.9
+                 (parse-size "700.9 MB")))
+  (assert (equal 0.5
+                 (parse-size "0.5GB")))
+  (assert (string= "GB"
+                   (nth-value 1 (parse-size "0.5GB")))))
 
 (defun exit (&optional (status 0))
   "Exit from Lisp. Return `status' (0 by default)."

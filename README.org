@@ -159,7 +159,18 @@ The available commands are (use the auto-completion):
 - =details=: toggle the display of details
 - =quit= (or =C-c=)
 
-We are in  a regular [[https://tiswww.case.edu/php/chet/readline/readline.html#SEC9][readline]] interface, so the  usual keybindings and
+And the available settings to change with =set= are (use =set='s autocompletion):
+
+- =*details*=: if  true, print more  details below each row  (like the
+  url). Defaults to false.
+- =*nb-results*=: how many results to print. Defaults to 20.
+- =*browser*=: the browser name to use to open urls. Defaults to Firefox.
+- =*torrent-client*=: the desktop torrent client name. Defaults to Transmission.
+- =*cache-p*=: if true (the default), use the cached results.
+
+You can also set them in a configuration file.
+
+Note that we are in  a regular [[https://tiswww.case.edu/php/chet/readline/readline.html#SEC9][readline]] interface, so the  usual keybindings and
 options are available.
 
 #+html: <p align='center'><img src='img-readline.png' /></p>
@@ -298,6 +309,8 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
 
 *** dev (upcoming v0.11)
 
+- added: scrape and display torrents' size.
+- fixed =-d= cli arg.
 - added:  load  =~/.torrents.lisp=,  create   new  commands  from  the
   =torrents.user= package.
 - added   the    ability   to   read   an    ini-like   config   file,

@@ -21,6 +21,8 @@
            :href
            :seeders
            :leechers
+           :size
+           :size-unit
            :source
            :magnet
            :magnet-link-from
@@ -186,14 +188,21 @@
                    (title-padding (+ 65
                                      (- (length title-colored)
                                         (length title))))
+                   ;; we want " 700.90 MB" to be 10 characters and aligned right.
+                   (size-format (format nil "~10@a"
+                                        (format nil "~3,2f ~a"
+                                                (or (size it) "")
+                                                ;; we don't want to see "nil".
+                                                (or (size-unit it) ""))))
                    ;; ~~ prints a ~ so here ~~~aa with title-padding gives ~65a or ~75a.
-                   (format-string (format nil "~~3@a: ~~~aa ~~4@a/~~4@a ~~a~~%" title-padding)))
+                   (format-string (format nil "~~3@a: ~~~aa ~~4@a/~~4@a ~~a ~~a~~%" title-padding)))
 
               (format stream format-string
                     (position it results)
                     title-colored
                     (seeders it)
                     (leechers it)
+                    size-format
                     (source it))
               (if details
                   (format stream "~a~&" (href it)))))

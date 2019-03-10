@@ -4,6 +4,7 @@
   (:import-from :torrents.models
                 :make-torrent)
   (:import-from :torrents.utils
+                :parse-size
                 :join-for-query
                 :sublist)
   (:export :torrents)
@@ -60,6 +61,10 @@
     (error ()
       -1)))
 
+(defun result-size (node)
+  (parse-size (elt (lquery:$ node ".size" (text))
+                   0)))
+
 (defun torrents (words &key (stream t))
   "Return a list of..."
   (format stream "searching '~a' on ~a..." words *source*)
@@ -71,12 +76,16 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 (make-torrent
-                                   :title (result-title node)
-                                   :href (str:concat *base-url* (result-href node))
-                                   :seeders (result-seeders node)
-                                   :leechers (result-leechers node)
-                                   :source *source*))
+                                 (multiple-value-bind (size size-unit)
+                                     (result-size node)
+                                   (make-torrent
+                                    :title (result-title node)
+                                    :href (str:concat *base-url* (result-href node))
+                                    :seeders (result-seeders node)
+                                    :leechers (result-leechers node)
+                                    :size size
+                                    :size-unit size-unit
+                                    :source *source*)))
                          results)))
         (format stream " found ~a results.~&" (length toret))
         (setf *search-results* toret)
