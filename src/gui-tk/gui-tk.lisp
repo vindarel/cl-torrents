@@ -15,7 +15,11 @@
     (let* ((tree (make-instance 'scrolled-treeview
                                 ;; These are the second and third columns.
                                 :columns (list "seeders"
-                                               "leechers")))
+                                               "leechers"
+                                               "size"
+                                               "source")
+                                :command (lambda (selection)
+                                           (log:info selection))))
            (searchbox (grid (make-instance 'entry :width 7)
                             0 0 :sticky "we" :padx 5 :pady 5))
            (button (make-instance 'button
@@ -56,7 +60,9 @@
                               :text (torrents:title result)
                               ;; xxx: numbers stick to the left instead of the right.
                               :column-values (list (torrents:seeders result)
-                                                   (torrents:leechers result)))))
+                                                   (torrents:leechers result)
+                                                   (torrents.models:format-size result)
+                                                   (torrents:source result)))))
 
 (defun main ()
   (search-tree))
