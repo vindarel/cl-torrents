@@ -51,8 +51,8 @@
   (handler-case
       (let ((res (elt (lquery:$ node "p" (text)) 0)))
         res)
-    (error ()
-      (format *error-output* "DOWNLOADSME error parsing title")
+    (error (c)
+      (format *error-output* "DOWNLOADSME error parsing title: ~a" c)
       "")))
 
 (defun result-href (node)
@@ -94,17 +94,22 @@
              (results (query parsed))
              ;; (setf results (coerce results 'list))
              (toret (map 'list (lambda (node)
-                                 (multiple-value-bind (size size-unit)
-                                     (result-size node)
-                                   (make-torrent
-                                    :title (result-title node)
-                                    :href (str:concat *base-url* (result-href node))
-                                    :seeders (result-seeders node)
-                                    :leechers (result-leechers node)
-                                    :size size
-                                    :size-unit size-unit
-                                    :source *source*)))
-                         results)))
+                                 (let ((title (result-title node)))
+                                   (when (not (str:blank? title))
+                                     (multiple-value-bind (size size-unit)
+                                         (result-size node)
+                                       (make-torrent
+                                        :title title
+                                        :href (str:concat *base-url* (result-href node))
+                                        :seeders (result-seeders node)
+                                        :leechers (result-leechers node)
+                                        :size size
+                                        :size-unit size-unit
+                                        :source *source*)))))
+                         results))
+             ;; It has a pb with the parsing of node of index 0.
+             ;; It's simpler to filter out nil objects than to fix the scraper...
+             (toret (remove-if #'null toret)))
         (format stream " found ~a results.~&" (length toret))
         (setf *search-results* toret)
         toret)
