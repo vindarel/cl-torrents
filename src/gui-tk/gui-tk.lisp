@@ -39,9 +39,9 @@
       (treeview-heading tree +treeview-first-column-id+ :text "name")
       ;; For resizing to do something: weight > 0
       (grid-columnconfigure *tk* 0 :weight 1)
+
       (grid searchbox 0 0
-            ;; it goes below the button :S
-            :columnspan 2)
+            :sticky "ew")
       (grid button 0 1
             ;; stick to the right (east).
             :sticky "e")
