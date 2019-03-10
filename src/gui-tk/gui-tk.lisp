@@ -10,6 +10,8 @@
 
 (defun search-tree ()
   ;; not resizable :S
+(defun search-tree (&optional search)
+  ;; The bottom is not resizable :S
   (with-nodgui ()
     (wm-title *tk* "Torrents GUI")
     (let* ((tree (make-instance 'scrolled-treeview
@@ -48,6 +50,9 @@
             :columnspan 2
             ;; sticky by all sides, for resizing to do something.
             :sticky "nsew"))))
+      ;; for debugging.
+      (when search
+        (insert-results tree (torrents:search-torrents search))))))
 
 (defun insert-results (tree results)
   "Insert torrents last results into that treeview."
