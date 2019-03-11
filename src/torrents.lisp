@@ -190,9 +190,10 @@
             ;; thus we must compute it and format the format string before printing the title.
             ;;
             ;; xxx see also the v directive: https://stackoverflow.com/questions/48868555/in-common-lisp-format-how-does-recursive-formatting-work
-            (let* ((title (title it))
-                   (title-colored (colorize-all-keywords title *keywords-colors*))
-                   (title-padding (+ 65
+            (let* ((title-size 65)
+                   (title (title it))
+                   (title-colored (colorize-all-keywords (str:prune (1- title-size) title :ellipsis "…") *keywords-colors*))
+                   (title-padding (+ title-size
                                      (- (length title-colored)
                                         (length title))))
                    ;; we want " 700.90 MB" to be 10 characters and aligned right.
