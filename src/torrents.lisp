@@ -202,7 +202,7 @@
                                                 ;; we don't want to see "nil".
                                                 (or (size-unit it) ""))))
                    ;; ~~ prints a ~ so here ~~~aa with title-padding gives ~65a or ~75a.
-                   (format-string (format nil "~~3@a: ~~~aa ~~4@a/~~4@a ~~a ~~a~~%" title-padding)))
+                   (format-string (format nil "~~3@a: ~~~aa ~~5@a/~~5@a ~~a ~~a~~%" title-padding)))
 
               (format stream format-string
                     (position it *last-results*)
