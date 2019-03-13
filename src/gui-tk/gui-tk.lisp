@@ -11,11 +11,40 @@
 (defun search-tree ()
   ;; not resizable :S
 
+(defvar *searchbar-frame* nil
+  "Search bar at the top.")
+
 (defvar *tree* nil
   "The tree with search results.")
 
 (defvar *bottom-buttons-frame* nil
   "The frame to position the buttons.")
+
+(defun searchbar ()
+  (let* ((frame (make-instance 'frame))
+         (searchbox (make-instance 'entry
+                                   :master frame
+                                   :width 50))
+         (button (make-instance 'button
+                                :master frame
+                                :text "OK"
+                                :command (lambda ()
+                                           (format t "the treeview selection is: ~a~&"
+                                                   (treeview-get-selection *tree*))
+                                           (format t "text is: ~a~&" (text searchbox))
+                                           ;; There is an error with "latin capital letters"
+                                           ;; when searching "tears of steel".
+                                           (insert-results *tree*
+                                                           (torrents:search-torrents (text searchbox)))))))
+
+    (grid searchbox 0 0
+          :sticky "we"
+          :padx 5 :pady 5)
+    (grid button 0 1
+          ;; stick to the right (east).
+          :sticky "e")
+
+    (setf *searchbar-frame* frame)))
 
 (defun bottom-buttons ()
   "magnet, torrent, open,…"
@@ -65,19 +94,7 @@
                                                "size"
                                                "source")
                                 :command (lambda (selection)
-                                           (log:info selection))))
-           (searchbox (grid (make-instance 'entry :width 7)
-                            0 0 :sticky "we" :padx 5 :pady 5))
-           (button (make-instance 'button
-                                  :text "OK"
-                                  :command (lambda ()
-                                             (format t "the treeview selection is: ~a~&"
-                                                     (treeview-get-selection tree))
-                                             (format t "text is: ~a~&" (text searchbox))
-                                             ;; There is an error with "latin capital letters"
-                                             ;; when searching "tears of steel".
-                                             (insert-results tree
-                                                             (torrents:search-torrents (text searchbox)))))))
+                                           (log:info selection)))))
 
       (setf *tree* tree)
 
@@ -86,20 +103,26 @@
       ;; For resizing to do something: weight > 0
       (grid-columnconfigure *tk* 0 :weight 1)
 
-      (grid searchbox 0 0
-            :sticky "ew")
-      (grid button 0 1
-            ;; stick to the right (east).
-            :sticky "e")
+      (searchbar)
+      (grid *searchbar-frame* 0 0
+            :sticky "w")
+
       (grid tree 1 0
             ;; so the button doesn't have a column by itself.
-            :columnspan 2
             ;; sticky by all sides, for resizing to do something.
             :sticky "nsew")
 
       (bottom-buttons)
-      (grid *bottom-buttons-frame* 2 1
+      (grid *bottom-buttons-frame* 2 0
             :sticky "e")
+
+      ;; ;TODO: trying to bind a double click event…
+      ;; (bind tree #$<Double-1>$
+      ;;       (lambda (a)
+      ;;         (declare (ignore a))
+      ;;         (format t "-----click"))
+      ;;       :exclusive t
+      ;;       :append nil)
 
       ;; for debugging.
       (when search
