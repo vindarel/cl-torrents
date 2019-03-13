@@ -41,11 +41,10 @@
                                               (index (position selection items))
                                               (fixed-index (when index
                                                              (- torrents:*nb-results* 1 index))))
-                                         ;; working :)
-                                         (format t "~&-- index: ~a~&" index)
-                                         (format t "~&-- fixed index: ~a~&" fixed-index)
                                          (when fixed-index
-                                           (format t "~&--- open url: ~a" (torrents:browse fixed-index))))))))
+                                           (let ((url (torrents:url fixed-index)))
+                                             (format t "~&opening url: ~a" url)
+                                             (torrents:browse fixed-index))))))))
 
     (setf *bottom-buttons-frame* frame)
 
