@@ -8,9 +8,6 @@
 
 (in-package :torrents-tk)
 
-(defun search-tree ()
-  ;; not resizable :S
-
 (defvar *searchbar-frame* nil
   "Search bar at the top.")
 
@@ -19,6 +16,12 @@
 
 (defvar *tree* nil
   "The tree widget with search results.")
+
+(defvar *bottom-message-frame* nil
+  "Frame to display the label of the magnet link.")
+
+(defvar *bottom-message-label* ""
+  "Label widget to display the selected magnet link.")
 
 (defvar *bottom-buttons-frame* nil
   "The frame to position the buttons.")
@@ -49,6 +52,17 @@
 
     (setf *searchbar-frame* frame)))
 
+(defun bottom-message ()
+  (let* ((frame (make-instance 'frame))
+         (label (make-instance 'label
+                               :master frame
+                               :wraplength 900
+                               :text "magnet link")))
+    (grid label 0 0
+          :sticky "w")
+    (setf *bottom-message-label* label)
+    (setf *bottom-message-frame* frame)))
+
 (defun bottom-buttons ()
   "magnet, torrent, open,…"
   (let* ((frame (make-instance 'frame))
@@ -62,7 +76,10 @@
                                                 (items  (items *tree*))
                                                 (index (position selection items)))
                                            (when index
-                                             (format t "~&--- magnet: ~a" (torrents:magnet index)))))))
+                                             (let ((magnet (torrents:magnet index)))
+                                               (format t "~&--- magnet: ~a~&" magnet)
+                                               (format t "-- text: ~a~&" (text *bottom-message-label*))
+                                               (setf (text *bottom-message-label*)  magnet)))))))
          (button-open (make-instance 'button
                                      :master frame
                                      :text "open"
@@ -155,6 +172,10 @@
     (grid *tree-frame* 1 0
           :sticky "nsew")
 
+    (bottom-message)
+    (grid *bottom-message-frame* 2 0
+          :sticky "w")
+
     (bottom-buttons)
-    (grid *bottom-buttons-frame* 2 0
+    (grid *bottom-buttons-frame* 3 0
           :sticky "e")))
