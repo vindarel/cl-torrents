@@ -76,13 +76,29 @@
                                          (when fixed-index
                                            (let ((url (torrents:url fixed-index)))
                                              (format t "~&opening url: ~a" url)
-                                             (torrents:browse fixed-index))))))))
+                                             (torrents:browse fixed-index)))))))
+         (button-download (make-instance 'button
+                                     :master frame
+                                     :text "download"
+                                     :command
+                                     (lambda ()
+                                       (let* ((selection (car (treeview-get-selection *tree*)))
+                                              (items  (items *tree*))
+                                              (index (position selection items))
+                                              (fixed-index (when index
+                                                             (- torrents:*nb-results* 1 index))))
+                                         (when fixed-index
+                                           (let ((magnet (torrents:magnet fixed-index)))
+                                             (format t "~&magnet: ~a" magnet)
+                                             (torrents:download fixed-index))))))))
 
     (setf *bottom-buttons-frame* frame)
 
     (grid button-magnet 0 0
           :sticky "e")
     (grid button-open 0 1
+          :sticky "e")
+    (grid button-download 0 2
           :sticky "e")))
 
 (defun search-tree (&optional search)
