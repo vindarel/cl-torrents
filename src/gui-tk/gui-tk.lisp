@@ -14,8 +14,11 @@
 (defvar *searchbar-frame* nil
   "Search bar at the top.")
 
+(defvar *tree-frame* nil
+  "The frame containing the treeview widget.")
+
 (defvar *tree* nil
-  "The tree with search results.")
+  "The tree widget with search results.")
 
 (defvar *bottom-buttons-frame* nil
   "The frame to position the buttons.")
@@ -80,53 +83,31 @@
     (grid button-magnet 0 0
           :sticky "e")
     (grid button-open 0 1
-          :sticky "e")
-    ))
+          :sticky "e")))
 
 (defun search-tree (&optional search)
   ;; The bottom is not resizable :S
-  (with-nodgui ()
-    (wm-title *tk* "Torrents GUI")
-    (let* ((tree (make-instance 'scrolled-treeview
-                                ;; These are the second and third columns.
-                                :columns (list "seeders"
-                                               "leechers"
-                                               "size"
-                                               "source")
-                                :command (lambda (selection)
-                                           (log:info selection)))))
+  (let* ((frame (make-instance 'frame))
+         (tree (make-instance 'scrolled-treeview
+                              :master frame
+                              ;; These are the second and third columns.
+                              :columns (list "seeders"
+                                             "leechers"
+                                             "size"
+                                             "source"))))
 
-      (setf *tree* tree)
+    ;; Name the first column:
+    (treeview-heading tree +treeview-first-column-id+ :text "name")
 
-      ;; Name the first column:
-      (treeview-heading tree +treeview-first-column-id+ :text "name")
-      ;; For resizing to do something: weight > 0
-      (grid-columnconfigure *tk* 0 :weight 1)
+    (grid tree 0 0
+          :sticky "nsew")
 
-      (searchbar)
-      (grid *searchbar-frame* 0 0
-            :sticky "w")
+    (setf *tree* tree)
+    (setf *tree-frame* frame)
 
-      (grid tree 1 0
-            ;; so the button doesn't have a column by itself.
-            ;; sticky by all sides, for resizing to do something.
-            :sticky "nsew")
-
-      (bottom-buttons)
-      (grid *bottom-buttons-frame* 2 0
-            :sticky "e")
-
-      ;; ;TODO: trying to bind a double click event…
-      ;; (bind tree #$<Double-1>$
-      ;;       (lambda (a)
-      ;;         (declare (ignore a))
-      ;;         (format t "-----click"))
-      ;;       :exclusive t
-      ;;       :append nil)
-
-      ;; for debugging.
-      (when search
-        (insert-results tree (torrents:search-torrents search))))))
+    ;; For debugging, show some results right away.
+    (when search
+      (insert-results tree (torrents:search-torrents search)))))
 
 (defun insert-results (tree results)
   "Insert torrents last results into that treeview."
@@ -143,5 +124,21 @@
                                                    (torrents.models:format-size result)
                                                    (torrents:source result)))))
 
-(defun main ()
-  (search-tree))
+(defun main (&optional search)
+  (with-nodgui ()
+    (wm-title *tk* "Torrents GUI")
+
+    ;; For resizing to do something: weight must be > 0
+    (grid-columnconfigure *tk* 0 :weight 1)
+
+    (searchbar)
+    (grid *searchbar-frame* 0 0
+          :sticky "w")
+
+    (search-tree search)
+    (grid *tree-frame* 1 0
+          :sticky "nsew")
+
+    (bottom-buttons)
+    (grid *bottom-buttons-frame* 2 0
+          :sticky "e")))
