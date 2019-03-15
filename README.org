@@ -10,7 +10,8 @@ Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/ta
   (also with  a readline *interactive  prompt*) to search  for torrents  and get
   magnet links.
 
-/update feb, 2019/: a little *GUI* is in the works.
+/update feb,  2019/: a little  *GUI* is in  the works. The  *[[https://github.com/vindarel/cl-torrents-web][Web UI]]*
+ works and only needs polishing (they're both simple, as POCs).
 
   We currently  scrape [[http://1337x.to][1337x.to]]  (since v0.9)  and [[https://www.torrentdownloads.me][torrentdownloads.me]]
   (v0.10) and present the results sorted by seeders.
