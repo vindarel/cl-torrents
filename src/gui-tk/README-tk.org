@@ -6,27 +6,34 @@ and run it:
 
 : ./torrents-tk &
 
-TODOs:
+POC TODOs:
 
-- [X] POC: display results in a treeview <2019-02-24 dim.>
+- [X] display results in a treeview <2019-02-24 dim.>
   feedback: very quick to do (couple  hours for a noob), great support
   from nodgui's author.
-- [ ] make numbers stick to the right
 - [ ] menu bar
-- [ ] see magnet link
+- [ ] see magnet link in a popup window
+- [X] open the url of the selection in a browser <2019-03-13 mer.>
+
+And then:
+
 - [ ] copy magnet link to clipboard
-- [ ] download torrent file
 - [ ] sort columns
 - [ ] option: bypass cache
+- [ ] make numbers stick to the right
 
 Bugs:
 
 - [ ] "latin capital letter"  error, for example when searching "tears
   of steel"
-- UI glitch: the searchbox goes under the button.
+- [X] UI glitch: the searchbox goes under the button. fixed: don't use
+  columnspan but :sticky east/west.
 - UI glitch: the resize doesn't expand the bottom.
 
 
 Thoughts:
 
 it's fun :)
+
+it's possible to  interactively build the UI from the  repl, button by button O_o
+http://www.peter-herth.de/ltk/ltkdoc/node8.html
