@@ -35,3 +35,14 @@ build:
     paths:
       # xxx include the version number
       - torrents
+
+build-gui:
+  stage: build
+  # only:
+    # Only when a new tag is pushed.
+    # - tags
+  script:
+    - make build-gui
+  artifacts:
+    paths:
+      - torrents-tk
