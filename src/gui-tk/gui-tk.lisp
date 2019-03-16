@@ -164,18 +164,19 @@
     ;; For resizing to do something: weight must be > 0
     (grid-columnconfigure *tk* 0 :weight 1)
 
-    (searchbar)
-    (grid *searchbar-frame* 0 0
-          :sticky "w")
+    (let ((row 0))
+      (searchbar)
+      (grid *searchbar-frame* row 0
+            :sticky "w")
 
-    (search-tree search)
-    (grid *tree-frame* 1 0
-          :sticky "nsew")
+      (search-tree search)
+      (grid *tree-frame* (incf row) 0
+            :sticky "nsew")
 
-    (bottom-message)
-    (grid *bottom-message-frame* 2 0
-          :sticky "w")
+      (bottom-message)
+      (grid *bottom-message-frame* (incf row) 0
+            :sticky "w")
 
-    (bottom-buttons)
-    (grid *bottom-buttons-frame* 3 0
-          :sticky "e")))
+      (bottom-buttons)
+      (grid *bottom-buttons-frame* (incf row) 0
+            :sticky "e"))))
