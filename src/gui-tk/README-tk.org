@@ -12,7 +12,7 @@ POC TODOs:
   feedback: very quick to do (couple  hours for a noob), great support
   from nodgui's author.
 - [ ] menu bar
-- [ ] see magnet link in a popup window
+- see magnet link in a popup window => just open or dl for now.
 - [X] open the url of the selection in a browser <2019-03-13 mer.>
 
 And then:
@@ -22,18 +22,20 @@ And then:
 - [ ] option: bypass cache
 - [ ] make numbers stick to the right
 
-Bugs:
+BUGS:
 
 - [ ] "latin capital letter"  error, for example when searching "tears
   of steel"
 - [X] UI glitch: the searchbox goes under the button. fixed: don't use
   columnspan but :sticky east/west.
-- UI glitch: the resize doesn't expand the bottom.
+- [ ] UI glitch: the resize doesn't expand the bottom.
 
 
 Thoughts:
 
 it's fun :)
+
+easily discoverable.
 
 it's possible to  interactively build the UI from the  repl, button by button O_o
 http://www.peter-herth.de/ltk/ltkdoc/node8.html

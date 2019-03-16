@@ -17,12 +17,6 @@
 (defvar *tree* nil
   "The tree widget with search results.")
 
-(defvar *bottom-message-frame* nil
-  "Frame to display the label of the magnet link.")
-
-(defvar *bottom-message-label* ""
-  "Label widget to display the selected magnet link.")
-
 (defvar *bottom-buttons-frame* nil
   "The frame to position the buttons.")
 
@@ -52,34 +46,9 @@
 
     (setf *searchbar-frame* frame)))
 
-(defun bottom-message ()
-  (let* ((frame (make-instance 'frame))
-         (label (make-instance 'label
-                               :master frame
-                               :wraplength 900
-                               :text "magnet link")))
-    (grid label 0 0
-          :sticky "w")
-    (setf *bottom-message-label* label)
-    (setf *bottom-message-frame* frame)))
-
 (defun bottom-buttons ()
   "magnet, torrent, open,…"
   (let* ((frame (make-instance 'frame))
-         (button-magnet (make-instance 'button
-                                       :master frame
-                                       :text "magnet"
-                                       :command
-                                       (lambda ()
-                                         (let* ((selection (car (treeview-get-selection *tree*)))
-                                                ;; this needs nodgui newer than march, 12th 2019.
-                                                (items  (items *tree*))
-                                                (index (position selection items)))
-                                           (when index
-                                             (let ((magnet (torrents:magnet index)))
-                                               (format t "~&--- magnet: ~a~&" magnet)
-                                               (format t "-- text: ~a~&" (text *bottom-message-label*))
-                                               (setf (text *bottom-message-label*)  magnet)))))))
          (button-open (make-instance 'button
                                      :master frame
                                      :text "open"
@@ -111,8 +80,6 @@
 
     (setf *bottom-buttons-frame* frame)
 
-    (grid button-magnet 0 0
-          :sticky "e")
     (grid button-open 0 1
           :sticky "e")
     (grid button-download 0 2
@@ -172,10 +139,6 @@
       (search-tree search)
       (grid *tree-frame* (incf row) 0
             :sticky "nsew")
-
-      (bottom-message)
-      (grid *bottom-message-frame* (incf row) 0
-            :sticky "w")
 
       (bottom-buttons)
       (grid *bottom-buttons-frame* (incf row) 0
