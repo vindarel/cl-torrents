@@ -8,6 +8,9 @@
 
 (in-package :torrents-tk)
 
+(defconstant +results-columns-width+ '(498 80 80 80 150)
+  "Width of the treeview columns.")
+
 (defvar *searchbar-frame* nil
   "Search bar at the top.")
 
@@ -92,7 +95,8 @@
                               :columns (list "seeders"
                                              "leechers"
                                              "size"
-                                             "source"))))
+                                             "source")
+                              :columns-width +results-columns-width+)))
 
     ;; Name the first column:
     (treeview-heading tree +treeview-first-column-id+ :text "name")
