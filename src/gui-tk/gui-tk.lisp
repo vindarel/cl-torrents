@@ -32,8 +32,6 @@
                                            (format t "the treeview selection is: ~a~&"
                                                    (treeview-get-selection *tree*))
                                            (format t "text is: ~a~&" (text searchbox))
-                                           ;; There is an error with "latin capital letters"
-                                           ;; when searching "tears of steel".
                                            (insert-results *tree*
                                                            (torrents:search-torrents (text searchbox)))))))
 
@@ -116,13 +114,21 @@
   ;; with commit c9ae0ec389.
   (treeview-delete-all tree)
   (loop for result in (torrents.utils:sublist results 0 torrents:*nb-results*)
-     do (treeview-insert-item tree
-                              :text (torrents:title result)
-                              ;; xxx: numbers stick to the left instead of the right.
-                              :column-values (list (torrents:seeders result)
-                                                   (torrents:leechers result)
-                                                   (torrents.models:format-size result)
-                                                   (torrents:source result)))))
+     do (treeview-insert-item
+         tree
+         :text
+         (str:replace-all "~" "~~"
+                          ;; Titles may contain "~J" (tears of steel), which is
+                          ;; interpreted as a wrong format directive.
+                          ;; This doesn't seem to occur on the repl.
+                          ;; Should be fixed with commit
+                          ;; https://notabug.org/cage/nodgui/commit/c178400b430eda70a574c4a0d4b4dd78f9e465a8
+                          (torrents:title result))
+         ;; xxx: numbers stick to the left instead of the right.
+         :column-values (list (torrents:seeders result)
+                              (torrents:leechers result)
+                              (torrents.models:format-size result)
+                              (torrents:source result)))))
 
 (defun main (&optional search)
   (with-nodgui ()

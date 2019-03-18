@@ -21,11 +21,12 @@ And then:
 - [ ] sort columns
 - [ ] option: bypass cache
 - [ ] make numbers stick to the right
+- [ ] minimize to tray
 
 BUGS:
 
-- [ ] "latin capital letter"  error, for example when searching "tears
-  of steel"
+- [X] "latin capital letter"  error, for example when searching "tears
+  of steel". Because of "~JMX" (tears of steel).
 - [X] UI glitch: the searchbox goes under the button. fixed: don't use
   columnspan but :sticky east/west.
 - [ ] UI glitch: the resize doesn't expand the bottom.
@@ -37,5 +38,5 @@ it's fun :)
 
 easily discoverable.
 
-it's possible to  interactively build the UI from the  repl, button by button O_o
+it's possible to  interactively build the UI from the  repl, widget by widget O_o
 http://www.peter-herth.de/ltk/ltkdoc/node8.html
