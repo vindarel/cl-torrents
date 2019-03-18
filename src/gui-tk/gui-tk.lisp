@@ -8,7 +8,7 @@
 
 (in-package :torrents-tk)
 
-(defconstant +results-columns-width+ '(498 80 80 80 150)
+(defparameter +results-columns-width+ '(498 80 80 80 150)
   "Width of the treeview columns.")
 
 (defvar *searchbar-frame* nil
