@@ -34,4 +34,6 @@ test-end2end:
 
 install:
 	# install dependencies, mostly for docker.
-	git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/
+	git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/replic
+	echo "------ cloning nodgui"
+	git clone https://notabug.org/cage/nodgui ~/quicklisp/local-projects/nodgui
