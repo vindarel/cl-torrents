@@ -43,7 +43,7 @@
   :build-pathname "torrents"
   :entry-point "torrents:main"
 
-  :description ""
+  :description "Search for torrents on popular trackers. Lisp library, CLI interface, terminal application, Tk GUI."
   :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.org"
