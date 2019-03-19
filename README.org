@@ -1,50 +1,54 @@
-TLDR: see the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
-
 [[https://gitlab.com/vindarel/cl-torrents][file:https://gitlab.com/vindarel/cl-torrents/badges/master/pipeline.svg]]
 
-Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/78Mo, self-contained executable/).
+  This is  a little  app to search for torrents on popular trackers.
 
-* cl-torrents
+  It comes as:
 
-  This is  a little  tool for  the *lisp REPL*  or the  *command line*
-  (also with  a readline *interactive  prompt*) to search  for torrents  and get
-  magnet links.
-
-/update feb,  2019/: a little  *GUI* is in  the works. The  *[[https://github.com/vindarel/cl-torrents-web][Web UI]]*
- works and only needs polishing (they're both simple, as POCs).
+- a *lisp library*,
+- a *command line* interface,
+- a terminal *readline interface*,
+- a simple *GUI*.
+- The *[[https://github.com/vindarel/cl-torrents-web][Web UI]]* works too.
 
   We currently  scrape [[http://1337x.to][1337x.to]]  (since v0.9)  and [[https://www.torrentdownloads.me][torrentdownloads.me]]
   (v0.10) and present the results sorted by seeders.
 
+  Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/78Mo, self-contained executable/).
+
+#+html: <p align="center"><img src="img-colored-results.png" /></p>
+
+#+html: <p align='center'><img src='img-readline.png' /></p>
+
+#+html: <p align="center"><img src="assets/torrents-tk.png" /></p>
+
 ** Installation
 
-   See the download link above.  It is a self-contained executable for
+   The library is on Quicklisp (february 2019) and [[http://ultralisp.org/][Ultralisp]].
+
+: (ql:quickload "torrents")
+: (torrents:search-torrents "tears of steel")
+
+   See the download link of the binary above.  It is a self-contained executable for
    GNU/Linux  64-bits.    You  do  /not/   need  to  install   a  Lisp
    implementation. It's a 78Mo binary.
 
-   The Lisp lib  is not  distributed with  Quicklisp (or Roswell) (yet?).  Clone this  repo
-   where Quicklisp can find it:
-
-: git clone git@github.com:vindarel/cl-torrents.git ~/quicklisp/local-projects/
-
-Clone its dependency, [[https://github.com/vindarel/replic/][replic]], a  library that helps build the readline
-interface:
-
-: git clone https://github.com/vindarel/replic.git ~/quicklisp/local-projects/
-
-and install it:
-
-: (ql:quickload "torrents")
-
-To build the executable:
+To build the readline app, do:
 
 : make build
 
-Search:
+To build the Tk GUI:
 
-: (torrents:search-torrents "matrix")
+: make build-gui
+
+then run
+
+: ./torrents --help
+: ./torrents-tk &
+
 
 _Troubleshooting_
+
+The Tk GUI needs [[https://notabug.org/cage/nodgui/][nodgui]] newer than march, 2019.
 
 If a search doesn't work with a =CRYPTO_num_locks= error message:
 
@@ -64,7 +68,8 @@ You might need to upgrade your OpenSSL version. See [[https://gitlab.com/vindare
    We can  use this little app  both in a  Lisp REPL (Slime) and  in a
    terminal, as a command line tool or from its embedded interactive prompt.
 
-   Results are cached in =~/.cl-torrents/cache/=.
+   Results   are  cached   in  =~/.cl-torrents/cache/=.   Delete  this
+   directory if you want new results.
 
 *** Lisp REPL
 
@@ -262,33 +267,6 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
           goodbye))
 #+END_SRC
 
-** Tutorial
-
-   Writing   a   little   web   scraper   like   this   one   is   not
-   difficult. However, I had to spend  some time to find out the right
-   libraries and resources.  It is also  not trivial at first to start
-   a  Lisp project.  So this  tutorial is  a mix  of hopefully  useful
-   stuff:
-
-- web scraping,
-- async web scraping,
-- trying out things at the REPL,
-- where to find documentation,
-- creating and loading a project,
-- basic data structures and gotchas,
-- some useful libraries,
-- unit tests, with mocks, running tests from the shell, continuous integration,
-- parsing command line arguments, creating executables, continuous delivery,
-- basics of error handling,
-- ...
-
-  It will eventually  tackle more topics and  features (more settings,
-  working with a local copy of TPB…) but in the meanwhile, read
-
-  the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
-
-  It was built with https://github.com/fniessen/org-html-themes.
-
 ** Ideas, todos
 
 - [X] cache (on files) v0.3
@@ -312,6 +290,8 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
 
 *** dev (upcoming v0.11)
 
+- added:  a simple  Tk GUI  (search,  open in  browser, download  with
+  torrent desktop client).
 - added:  a =filter=  command,  to only  display  results whose  title
   contains a given  string. It reduces the TAB-completion  of ids (but
   doesn't constrain it).
@@ -374,11 +354,9 @@ cache-p = true
 
 * Dev
 
-We use our [[https://github.com/vindarel/replic/][replic]] library to automatically build the readline repl:
+We use our [[https://github.com/vindarel/replic/][replic]] library to automatically build the readline repl.
 
-: git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/
-
-Clone also cl-torrents in =~/quicklisp/local-projects=,
+Clone cl-torrents in =~/quicklisp/local-projects=,
 
 now you can =(ql:quickload :torrents)=.
 
@@ -401,22 +379,34 @@ End-to-end tests (checking that the websites respond and our scrapers still work
 - (my) [[https://lisp-journey.gitlab.io/][lisp-journey]]: introductory posts, lists of resources, selection
   of screencasts.
 
+** Tutorial
 
-* Setting up a Common Lisp environment
+   Writing   a   little   web   scraper   like   this   one   is   not
+   difficult. However, I had to spend  some time to find out the right
+   libraries and resources.  It is also  not trivial at first to start
+   a Lisp project.  So the first thing  we did is write a tutorial. It
+   is a mix of hopefully useful stuff:
 
-  The  easiest solution  of all  is to  try [[https://portacle.github.io/][Portacle]],  a portable  and
-  multiplatform CL  environment shipping: Emacs25 and  Slime (slightly
-  customized), SBCL, Quicklisp and Git.
+- web scraping,
+- async web scraping,
+- trying out things at the REPL,
+- where to find documentation,
+- creating and loading a project,
+- basic data structures and gotchas,
+- some useful libraries,
+- unit tests, with mocks, running tests from the shell, continuous integration,
+- parsing command line arguments, creating executables, continuous delivery,
+- basics of error handling,
+- ...
 
-  Emacs      isn't      the      only     editor      though,      see
-   [[https://lispcookbook.github.io/cl-cookbook/editor-support.html][https://lispcookbook.github.io/cl-cookbook/editor-support.html]]  for   Vim  plugins,   to
-  discover Lem (ncurses and Electron frontends), Atom-Slime, notebooks
-  and the ipython-like [[https://github.com/koji-kojiro/cl-repl][cl-repl]].
+  It will eventually  tackle more topics and  features (more settings,
+  working with a local copy of TPB…) but in the meanwhile, read
 
-  Anyway:
+  the [[https://vindarel.github.io/cl-torrents/tutorial.html][tutorial]] !
 
-: apt install sbcl
+  It was built with https://github.com/fniessen/org-html-themes.
 
-   and install Quicklisp (two commands) and Slime for Emacs (in MELPA,
-   with   package.el).   See
-   [[https://lispcookbook.github.io/cl-cookbook/getting-started.html][https://lispcookbook.github.io/cl-cookbook/getting-started.html]].
+
+* Licence
+
+MIT.
