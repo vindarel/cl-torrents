@@ -15,9 +15,9 @@
 
   Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/78Mo, self-contained executable/).
 
-#+html: <p align="center"><img src="img-colored-results.png" /></p>
+#+html: <p align="center"><img src="assets/img-colored-results.png" /></p>
 
-#+html: <p align='center'><img src='img-readline.png' /></p>
+#+html: <p align='center'><img src='assets/img-readline.png' /></p>
 
 #+html: <p align="center"><img src="assets/torrents-tk.png" /></p>
 
@@ -92,7 +92,7 @@ You might need to upgrade your OpenSSL version. See [[https://gitlab.com/vindare
   a bit relaxed  with our search terms), each keyword  is printed in a
   different color:
 
-#+html: <p align="center"><img src="img-colored-results.png" /></p>
+#+html: <p align="center"><img src="assets/img-colored-results.png" /></p>
 
   (you need  to enable ansi  colors in Slime,  see [[https://github.com/enriquefernandez/slime-repl-ansi-color][slime-repl-ansi-color]].
   Disable this feature with =(setf cl-ansi-text:*enabled* nil)=)
@@ -143,7 +143,7 @@ we get the magnet link of the first result.
 
 : $ torrents -n 1 matrix french 1999 cool -m 0
 
-#+html: <p align='center'><img src='img-cli.png' /></p>
+#+html: <p align='center'><img src='assets/img-cli.png' /></p>
 
 *** Readline interface
 
@@ -181,7 +181,7 @@ You can also set them in a configuration file.
 Note that we are in  a regular [[https://tiswww.case.edu/php/chet/readline/readline.html#SEC9][readline]] interface, so the  usual keybindings and
 options are available.
 
-#+html: <p align='center'><img src='img-readline.png' /></p>
+#+html: <p align='center'><img src='assets/img-readline.png' /></p>
 
 *** Configuration files (in development)
 
