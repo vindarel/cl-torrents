@@ -432,6 +432,9 @@ End-to-end tests (checking that the websites respond and our scrapers still work
 * Changelog
 - november, 2019: added connection to transmission-remote (not in
   Quicklisp yet)
+- june, 2019
+  - changed the location of the lisp init file from =~/.torrents.lisp=
+    to =~/.config/torrents.lisp=.
 * Licence
 
 MIT.

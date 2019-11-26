@@ -526,7 +526,7 @@
 
     ;; Read the lisp init file.
     (unless (getf options :no-userinit)
-      (replic:load-init (merge-pathnames  ".torrents.lisp" (user-homedir-pathname)))
+      (replic:load-init (merge-pathnames ".config/torrents.lisp" (user-homedir-pathname)))
       ;; and load the commands from it.
       (replic.completion:functions-to-commands :torrents.user))
 
