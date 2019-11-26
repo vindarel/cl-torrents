@@ -35,6 +35,7 @@
   (dex:get url))
 
 (defun parse (html)
+  ;TODO: we can use lquery:$ (initialize <request>) instead of calling plump:parse directly.
   (plump:parse html))
 
 (defun query (parsed)

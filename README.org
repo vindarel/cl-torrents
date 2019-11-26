@@ -312,6 +312,10 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
 
 *** dev (upcoming v0.11)
 
+- november, 2019: added connection to transmission-remote (not in
+  Quicklisp yet)
+- june, 2019: changed the location of the lisp init file from
+  =~/.torrents.lisp= to =~/.config/torrents.lisp=.
 - added:  a simple  Tk GUI  (search,  open in  browser, download  with
   torrent desktop client).
 - added:  a =filter=  command,  to only  display  results whose  title
@@ -428,13 +432,6 @@ End-to-end tests (checking that the websites respond and our scrapers still work
 
   It was built with https://github.com/fniessen/org-html-themes.
 
-
-* Changelog
-- november, 2019: added connection to transmission-remote (not in
-  Quicklisp yet)
-- june, 2019
-  - changed the location of the lisp init file from =~/.torrents.lisp=
-    to =~/.config/torrents.lisp=.
 * Licence
 
 MIT.
