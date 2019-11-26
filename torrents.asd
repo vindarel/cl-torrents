@@ -12,7 +12,8 @@
   :author "vindarel"
   :license "MIT"
   :depends-on (
-               :replic ;; not on Quicklisp
+               :replic
+               :cl-transmission         ;; june 2019: not in Quicklisp
                :dexador
                :plump
                :str
@@ -36,6 +37,7 @@
                  (:file "1337")
                  (:file "downloadsme")
                  (:file "torrents")
+                 (:file "transmission-remote")
                  (:file "commands")
                  (:file "config"))))
   ;; build executable with asdf:make :torrents.

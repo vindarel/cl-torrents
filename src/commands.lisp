@@ -12,12 +12,14 @@
                 :search-torrents
                 :browse
                 :download
+                :remote-download
                 :filter)
   ;; Some functions already print their output, we just import & re-export them.
   ;; see https://github.com/takagi/cl-reexport/
   (:export :search
            :browse
            :download
+           :remote-download
            :magnet
            :url
            :filter))

@@ -1,6 +1,7 @@
 [[https://gitlab.com/vindarel/cl-torrents][file:https://gitlab.com/vindarel/cl-torrents/badges/master/pipeline.svg]]
 
-  This is  a little  app to search for torrents on popular trackers.
+  This is a little app to  search for torrents on popular trackers and
+  to open them with a local or a remote client.
 
   It comes as:
 
@@ -27,6 +28,8 @@
 
 : (ql:quickload "torrents")
 : (torrents:search-torrents "tears of steel")
+
+Note: the master branch needs [[https://github.com/libre-man/cl-transmission/][cl-transmission]] which isn't on Quicklisp yet.
 
    See the download link of the binary above.  It is a self-contained executable for
    GNU/Linux  64-bits.    You  do  /not/   need  to  install   a  Lisp
@@ -109,6 +112,21 @@ You might need to upgrade your OpenSSL version. See [[https://gitlab.com/vindare
 
 #+BEGIN_SRC lisp
 (download 0)
+#+END_SRC
+
+  Download it with a remote client (only transmission-remote so far):
+
+  you need settings, see below. TODO
+#+BEGIN_SRC lisp
+;; in ~/.config/torrents.lisp
+(setf *remote-client-url* "my.url.without.port")
+(setf *remote-client-username* "transmission")
+(setf *remote-client-password* "password")
+;; port is 9091 by default.
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(remote-download 0)
 #+END_SRC
 
   And voilà :)
@@ -233,15 +251,20 @@ will be  =load='ed at startup.
 /Note/:  what we  will eventually  do then  is to  expose cl-torrents'
 mechanism via hooks.
 
+**** Extending the app, creating commands
+
 One thing you can do is define  additional commands to be found at the
 repl. We do so by following [[https://github.com/vindarel/replic/][replic]]'s mechanism:
 
 - define functions inside the =torrents.user= package
 - define the completion choices for some functions
-- =export= the functions you want to see turned into commands.
+- =export=   the    functions   you   want   to    see   turned   into
+  commands. =cl-torrents=, with the help of the =replic= library, will
+  automatically turn  them into commands available  at the application
+  prompt.
 
 You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
-=torrents -i= to try that out.
+=torrents -i= to try this out.
 
 #+BEGIN_SRC lisp
 (in-package :torrents.user)
@@ -271,17 +294,16 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
 
 - [X] cache (on files) v0.3
 - [X] CI
-- local copy of TPB
-- more command line options (specially verbosity)
-  - [X] =-i= print url
+- use a local copy of TPB
 - [X] build  with  ECL. Used  [[https://hub.docker.com/r/daewok/lisp-devel/][the  lisp-devel]]  docker
   image. Result: a 52Mo  executable with a runtime error.
 - [X] open an url
 - download the torrent file
 - [X] ini config file, to parse with [[https://common-lisp.net/project/py-configparser/][py-configparser]]
 - [X] add torrent to a local torrent client
-- add the torrent to a remote transmission client, with [[https://github.com/libre-man/cl-transmission/][cl-transmission]].
-- self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]),...
+- [X]  add  the   torrent  to  a  remote   transmission  client,  with
+  [[https://github.com/libre-man/cl-transmission/][cl-transmission]]. v0.12
+- [X] self-contained web app ([[https://lispcookbook.github.io/cl-cookbook/scripting.html][doc]]). POC: [[https://github.com/vindarel/cl-torrents-web][cl-torrents-web]].
 - [X] interactive prompt, with completion of commands.
 
 ** Release notes
@@ -407,6 +429,9 @@ End-to-end tests (checking that the websites respond and our scrapers still work
   It was built with https://github.com/fniessen/org-html-themes.
 
 
+* Changelog
+- november, 2019: added connection to transmission-remote (not in
+  Quicklisp yet)
 * Licence
 
 MIT.

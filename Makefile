@@ -37,3 +37,5 @@ install:
 	git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/replic
 	echo "------ cloning nodgui"
 	git clone https://notabug.org/cage/nodgui ~/quicklisp/local-projects/nodgui
+	echo "------ cloning cl-transmission"
+	git clone https://github.com/libre-man/cl-transmission/ ~/quicklisp/local-projects/cl-transmission

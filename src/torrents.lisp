@@ -28,6 +28,7 @@
            :magnet-link-from
            :browse
            :download
+           :remote-download
            :url
            :filter
            :*last-results*
@@ -35,6 +36,9 @@
            :*browser*
            :*details*
            :*torrent-client*
+           :*remote-client-url*
+           :*remote-client-username*
+           :*remote-client-password*
            :*cache-p*
            :main))
 
@@ -56,11 +60,34 @@
 (defparameter *browser* "firefox"
   "Default browser, in case $BROWSER is not set.")
 
+;; Torrent client (local).
 (defparameter *torrent-client* "transmission-gtk"
   "Default torrent client.")
 
 (defparameter *torrent-clients-list* '("transmission-gtk")
   "List of available torrent clients, along with the optional command line options.")
+
+;; ;;;;;;;;;;;;;;;;;;;;;;
+;; Remote torrent client.
+;; ;;;;;;;;;;;;;;;;;;;;;;
+(defparameter *remote-client-url* nil
+  "Full URL to connect to our remote torrent client. Set it along with the username and password in the lisp init file, ~/.config/torrents.lisp, which is loaded at startup.")
+
+(defparameter *remote-client-username* nil
+  "Username to login to the remote client.")
+
+(defparameter *remote-client-password* nil
+  "Password to login to the remote client.")
+
+(defparameter *remote-clients-alist* '(("transmission-remote" . #'make-transmission-remote))
+  "An alist that associates a remote client name (a string, taken from
+  the user's config file) and a function to create an instance of it.")
+
+(defparameter *remote-client-name* (first (first *remote-clients-alist*))
+  "Name of the remote client we will connect to.")
+
+(defparameter *remote-client* nil
+  "The remote client we are connected to (instance of remote-client).")
 
 ;; Parameters below: create at startup, not at build time.
 (defparameter *config-directory* nil
@@ -75,10 +102,39 @@
 (defparameter *store* nil
   "Cache. The directory must exist.")
 
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,,
 ;; Completion settings.
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,,
 (defvar *ids-completion-list* nil
   "The list of ids (index of search results) to use at the completion, when we want to filter it. They must be strings, not numbers.")
 
+
+;; Remote client object: needs a method for login, adding a torrent and getting its list.
+(defclass remote-client ()
+  ((name :accessor name :initarg :name
+         :type string
+         :documentation "The name isn't very important.")
+   (instance :accessor instance :initarg :instance
+             :documentation "Here comes the real object of the remote client.")))
+
+
+(defun create-remote-client ()
+  (format t "Creating remote client to ~a with username '~a'...~&" *remote-client-name* *remote-client-username*)
+  (unless *remote-client-username*
+    (error "No username to connect to ~a. Please check your config file.~&" *remote-client-name*))
+  (let ((creator-function (second (assoc-value *remote-clients-alist* *remote-client-name*))))
+    (format t "... got creator function: ~a.~&" creator-function)
+    (setf *remote-client*
+          (funcall creator-function
+                   *remote-client-url*
+                   *remote-client-username*
+                   *remote-client-password*))))
+
+(defmethod remote-client-connect ((client remote-client))
+  (error "not implemented. Use a subclass."))
+
+(defmethod remote-client-add ((client remote-client) magnet/file)
+  (error "not implemented. Call the method specialized for your remote torrent."))
 
 (defun ensure-cache ()
   (setf *config-directory* (merge-pathnames #p".cl-torrents/" (user-homedir-pathname)))
@@ -189,7 +245,8 @@
             ;; We must add to the padding the length of the extra color markers,
             ;; thus we must compute it and format the format string before printing the title.
             ;;
-            ;; xxx see also the v directive: https://stackoverflow.com/questions/48868555/in-common-lisp-format-how-does-recursive-formatting-work
+            ;; TODO: use the v directive: https://stackoverflow.com/questions/48868555/in-common-lisp-format-how-does-recursive-formatting-work
+            ;; https://lispcookbook.github.io/cl-cookbook/strings.html#formatting-a-format-string
             (let* ((title-size 65)
                    (title (title it))
                    (title-colored (colorize-all-keywords (str:prune (1- title-size) title :ellipsis "…") *keywords-colors*))
@@ -329,6 +386,23 @@
     (setf index (parse-integer index)))
   (uiop:launch-program (list (find soft *torrent-clients-list* :test #'equal)
                              (magnet-link-from (elt *last-results* index)))))
+
+
+(defun remote-download (index)
+  "Download with a remote torrent client, if we have the credentials"
+  (unless *remote-client*
+     (create-remote-client))
+  (format t "Connecting to ~a at url '~a' with user '~a'…~&"
+          (name *remote-client*)
+          *remote-client-url*
+          *remote-client-username*)
+  (remote-client-connect *remote-client*)
+  (let ((magnet (magnet index)))
+    (unless magnet
+      (error "invalid torrent index ~a for the list of last results (length ~a).~&"
+             index (length *last-results*)))
+    (when (remote-client-add *remote-client* magnet)
+      (format t "torrent ~a added to ~a~&" index (name *remote-client*)))))
 
 
 (defun filter (text)
