@@ -14,7 +14,7 @@
   We currently  scrape [[http://1337x.to][1337x.to]]  (since v0.9)  and [[https://www.torrentdownloads.me][torrentdownloads.me]]
   (v0.10) and present the results sorted by seeders.
 
-  Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/78Mo, self-contained executable/).
+  Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/23MB, self-contained executable/).
 
 #+html: <p align="center"><img src="assets/img-colored-results.png" /></p>
 
@@ -33,7 +33,7 @@ Note: the master branch needs [[https://github.com/libre-man/cl-transmission/][c
 
    See the download link of the binary above.  It is a self-contained executable for
    GNU/Linux  64-bits.    You  do  /not/   need  to  install   a  Lisp
-   implementation. It's a 78Mo binary.
+   implementation. It's a 23MB binary.
 
 To build the readline app, do:
 

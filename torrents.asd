@@ -61,6 +61,12 @@
           seq)))
   :in-order-to ((test-op (test-op torrents-test))))
 
+;; build a smaller executable with SBCL's core compression:
+;; 84 to 23MB, however startup time increases from 0.04 to 0.35s (noticeable).
+#+sb-core-compression
+(defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
+  (uiop:dump-image (asdf:output-file o c) :executable t :compression t))
+
 (defsystem torrents/tk
   :version (:read-file-form "version.lisp-expr")
   :depends-on (:torrents
