@@ -29,7 +29,8 @@
 : (ql:quickload "torrents")
 : (torrents:search-torrents "tears of steel")
 
-Note: the master branch needs [[https://github.com/libre-man/cl-transmission/][cl-transmission]] which isn't on Quicklisp yet.
+Note: the master branch needs [[https://github.com/libre-man/cl-transmission/][cl-transmission]] which was added
+to the Quicklisp distribution of december, 2019.
 
    See the download link of the binary above.  It is a self-contained executable for
    GNU/Linux  64-bits.    You  do  /not/   need  to  install   a  Lisp
