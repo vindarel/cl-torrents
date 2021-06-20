@@ -433,6 +433,17 @@ End-to-end tests (checking that the websites respond and our scrapers still work
 
   It was built with https://github.com/fniessen/org-html-themes.
 
+** Bypassing ISP blocking
+
+Some Internet Service Providers block access to torrent sites, as it's
+the case in France. They currently don't block the HTTP version of
+torrents-paradise, but that one works on IPFS anyways. You can bypass
+them by using other DNS servers than your ISP's.
+
+Here's how to do it on Ubuntu: https://doc.ubuntu-fr.org/dns (french)
+
+You can use [[https://www.opennic.org/][OpenNIC]] addresses or again the ones of the [[https://www.fdn.fr/actions/dns/][French Data Network]] association.
+
 * Licence
 
 MIT.
