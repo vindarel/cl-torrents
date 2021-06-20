@@ -88,7 +88,12 @@
   "Return a list of..."
   (format stream "searching '~a' on ~a..." words *source*)
   (handler-case
-      (let* ((query (str:join "+" words))
+      (let* ((terms (if (listp words)
+                        words
+                        ;; The main gives words as a list,
+                        ;; the user at the Slime REPL one string.
+                        (str:words words)))
+             (query (str:join "+" terms))
              (url (str:replace-all "{}" query *search-url*))
              (req (request url))
              (parsed (parse req))
