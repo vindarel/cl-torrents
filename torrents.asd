@@ -13,8 +13,10 @@
   :license "MIT"
   :depends-on (
                :replic
-               :cl-transmission         ;; june 2019: not in Quicklisp
+               :cl-transmission
+               :access
                :dexador
+               :jonathan
                :plump
                :str
                :lparallel
@@ -36,8 +38,9 @@
                  (:file "kat")
                  (:file "1337")
                  (:file "downloadsme")
+                 (:file "torrents-paradise")
                  (:file "torrents")
-                 (:file "transmission-remote")
+                 ;; (:file "transmission-remote")
                  (:file "commands")
                  (:file "config"))))
   ;; build executable with asdf:make :torrents.

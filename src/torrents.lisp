@@ -279,14 +279,22 @@
   "Get the html page of the given url. Mocked in unit tests."
   (dex:get url))
 
+(defun looks-like-magnet-link-p (s)
+  (and (str:non-blank-string-p s)
+       (str:starts-with-p "magnet" s)))
+
 (defun magnet-link-from (torrent)
   "Extract the magnet link from a `torrent' result.
 
    Return the first href of the page that starts with 'magnet'."
-  (let* ((url (href torrent))
-         (html (request-details url))
-         (parsed (plump:parse html)))
-    (find-magnet-link parsed)))
+  (cond
+    ((looks-like-magnet-link-p (magnet-link torrent))
+     (magnet-link torrent))
+    (t
+     (let* ((url (href torrent))
+            (html (request-details url))
+            (parsed (plump:parse html)))
+       (find-magnet-link parsed)))))
 
 (defun magnet (index)
   "Search the magnet from last search's `index''s result."

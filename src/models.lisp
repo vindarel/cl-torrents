@@ -10,6 +10,7 @@
            :size
            :size-unit
            :format-size
+           :magnet-link
            :source))
 (in-package :torrents.models)
 
@@ -32,6 +33,9 @@
    (size-unit
     :initarg :size-unit :initform nil
     :accessor size-unit)
+   (magnet-link
+    :initarg :magnet-link :initform nil
+    :accessor magnet-link)
    (source
     :initarg :source :initform nil
     :accessor source)
@@ -68,7 +72,8 @@
             (seeders it)
             (source it))))
 
-(defun make-torrent (&key title href seeders leechers size source size-unit)
+(defun make-torrent (&key title href seeders leechers size source size-unit
+                       magnet-link)
   (assert title)
   (assert source)
   (assert href)
@@ -79,4 +84,5 @@
                  :leechers leechers
                  :size size
                  :size-unit size-unit
+                 :magnet-link magnet-link
                  :source source))

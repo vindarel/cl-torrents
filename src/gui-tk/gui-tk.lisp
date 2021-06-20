@@ -6,6 +6,12 @@
         :nodgui)
   (:export :main))
 
+;;;
+;;; TODO: pre-select the search field
+;;; TODO: search on Enter key event.
+;;; etc
+;;;
+
 (in-package :torrents-tk)
 
 (defparameter +results-columns-width+ '(498 80 80 80 150)

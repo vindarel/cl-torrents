@@ -11,10 +11,14 @@
 - a simple *GUI*.
 - The *[[https://github.com/vindarel/cl-torrents-web][Web UI]]* works too.
 
-  We currently  scrape [[http://1337x.to][1337x.to]]  (since v0.9)  and [[https://www.torrentdownloads.me][torrentdownloads.me]]
-  (v0.10) and present the results sorted by seeders.
+  We currently  scrape [[http://1337x.to][1337x.to]]  (since v0.9), [[https://www.torrentdownloads.me][torrentdownloads.me]]
+  (v0.10) and [[https://torrent-paradise.ml][torrents-paradise]] (v0.11) and present the results sorted by seeders.
 
-  Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/23MB, self-contained executable/).
+  Download for GNU/Linux 64 bits: see [[https://gitlab.com/vindarel/cl-torrents/tags][Releases]] (/23MB, self-contained
+  executable/).
+
+NOTE: torrents-paradise has a rich collection, a simple website as in KISS, it works on IPFS and has
+it offers an API… frankly, I want to use its web service and click on its adds.
 
 #+html: <p align="center"><img src="assets/img-colored-results.png" /></p>
 
@@ -311,14 +315,18 @@ You  can  copy the  example  below  in =~/.torrents.lisp=  and  re-run
 
 [[https://gitlab.com/vindarel/cl-torrents/tags][https://gitlab.com/vindarel/cl-torrents/tags]]
 
-*** dev (upcoming v0.11)
-
-- november, 2019: added connection to transmission-remote (not in
-  Quicklisp yet)
-- june, 2019: changed the location of the lisp init file from
-  =~/.torrents.lisp= to =~/.config/torrents.lisp=.
+*** WIP
 - added:  a simple  Tk GUI  (search,  open in  browser, download  with
   torrent desktop client).
+
+*** v0.12
+- june, 2021: added [[https://torrent-paradise.ml][torrents-paradise]] API.
+
+*** v0.11
+- november, 2019: added connection to transmission-remote
+- added rarbg scraper (needs new tests)
+- june, 2019: changed the location of the lisp init file from
+  =~/.torrents.lisp= to =~/.config/torrents.lisp=.
 - added:  a =filter=  command,  to only  display  results whose  title
   contains a given  string. It reduces the TAB-completion  of ids (but
   doesn't constrain it).
@@ -381,11 +389,11 @@ cache-p = true
 
 * Dev
 
-We use our [[https://github.com/vindarel/replic/][replic]] library to automatically build the readline repl.
-
 Clone cl-torrents in =~/quicklisp/local-projects=,
 
 now you can =(ql:quickload :torrents)=.
+
+We use our [[https://github.com/vindarel/replic/][replic]] library to automatically build the readline repl.
 
 Unit tests:
 
@@ -394,6 +402,9 @@ Unit tests:
 End-to-end tests (checking that the websites respond and our scrapers still work):
 
 : make test-end2end
+
+Try the Ltk GUI: load =gui-tk.lisp= and run =(main)=.
+
 
 * Resources
 
@@ -407,6 +418,10 @@ End-to-end tests (checking that the websites respond and our scrapers still work
   of screencasts.
 
 ** Tutorial
+
+  *update, 2021*: this tutorial is one of the first things I wrote
+  when discovering CL and it probably bitrot a bit. I'd recommend the
+  Cookbook now as I ported most of its useful content there.
 
    Writing   a   little   web   scraper   like   this   one   is   not
    difficult. However, I had to spend  some time to find out the right
