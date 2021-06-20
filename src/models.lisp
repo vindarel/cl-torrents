@@ -15,26 +15,25 @@
 
 (defclass torrent ()
   ((title
-    :initarg :title
-    :initform ""
+    :initarg :title :initform ""
     :accessor title)
    (href
-    :initarg :href
+    :initarg :href :initform ""
     :accessor href)
    (seeders
-    :initarg :seeders
+    :initarg :seeders :initform nil
     :accessor seeders)
    (leechers
-    :initarg :leechers
+    :initarg :leechers :initform nil
     :accessor leechers)
    (size
-    :initarg :size
+    :initarg :size :initform nil
     :accessor size)
    (size-unit
-    :initarg :size-unit
+    :initarg :size-unit :initform nil
     :accessor size-unit)
    (source
-    :initarg :source
+    :initarg :source :initform nil
     :accessor source)
    ;; (magnet
    ;;  :initarg :magnet
