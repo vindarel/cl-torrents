@@ -365,12 +365,17 @@
   (if (zerop start)
       (select-completions text *verbs*)))
 
+(defun looks-like-url-p (s)
+  ;; Let's not load a library for this yet.
+  (str:starts-with-p "http" s))
+
 (defun browse-elt (index)
   (let ((url (url index))
         (browser (or (uiop:getenv "BROWSER")
                      *browser*)))
     (declare (ignorable browser))
-    (if url
+    (if (and url
+             (looks-like-url-p url))
         (uiop:launch-program (list browser
                                    url))
         (format t "couldn't find the url of ~a, got ~a~&" index url))))
