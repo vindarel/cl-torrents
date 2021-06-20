@@ -62,10 +62,11 @@
 
 (defmethod print-object ((it torrent) stream)
   (print-unreadable-object (it stream :type t)
-    (format stream "~a, ~a"
+    (format stream "~a, x~a seeders, ~a"
             (str:prune 30 (if (slot-boundp it 'title)
                               (title it)
                               ""))
+            (seeders it)
             (source it))))
 
 (defun make-torrent (&key title href seeders leechers size source size-unit)
