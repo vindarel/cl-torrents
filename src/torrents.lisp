@@ -193,12 +193,13 @@
     (display-results :results res :stream stream :nb-results nb-results)
     res))
 
-(defvar *scrapers-alist* '(("1337" . torrents.1337:torrents)
-                           ("downloadsme" . torrents.downloadsme:torrents))
+(defparameter *scrapers-alist* '(("1337" . torrents.1337:torrents)
+                                 ("downloadsme" . torrents.downloadsme:torrents)
+                                 ("torrents-paradise" . torrents.torrents-paradise:torrents))
   "Alist to associate a scraper name (str, for a user config) to its
   symbol function to call.")
 
-(defvar *torrents-list* (mapcar #'cdr *scrapers-alist*)
+(defparameter *torrents-list* (mapcar #'cdr *scrapers-alist*)
   "List of scraper functions to call. Modified after reading the
   user's conf files.")
 
