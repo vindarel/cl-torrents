@@ -202,7 +202,20 @@ And the available settings to change with =set= are (use =set='s autocompletion)
 You can also set them in a configuration file.
 
 Note that we are in  a regular [[https://tiswww.case.edu/php/chet/readline/readline.html#SEC9][readline]] interface, so the  usual keybindings and
-options are available.
+options are available. For example, Readline obeys the =~/.inputrc=
+startup file. You can change the way the TAB key does completion:
+
+: TAB: menu-complete
+
+if you add this, the first press on TAB will insert the first
+completion candidate (VS listing all the choices, and requiring a
+second keypress). For cl-torrents, it is convenient because we can
+enter the first result quickly: I typically do =search foo= then
+=download TAB=.
+
+Note: I found out that =C-x C-r= re-reads the inputrc file, so you can
+try without quitting cl-torrents.
+
 
 #+html: <p align='center'><img src='assets/img-readline.png' /></p>
 
