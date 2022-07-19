@@ -51,7 +51,8 @@ Results are a list of this:
 
 (defun torrents (words &key (stream t))
   "Search torrents."
-  (format stream "searching '~a' on ~a…" words *source-name*)
+  (format stream "searching '~a' on ~a… " (str:join " " words)
+          (cl-ansi-text:cyan *source-name*))
   (handler-case
       (let* ((terms (if (listp words)
                         words
@@ -74,6 +75,10 @@ Results are a list of this:
                          res)))
         (format stream " found ~a results.~&" (length data))
         toret)
+    (usocket:connection-refused-error ()
+      (uiop:format! *error-output* "~&error searching on ~a: ~a.~&"
+                    *source-name*
+                    (cl-ansi-text:red "the site is unreachable")))
     (error ()
       (format stream " no results.~&"))))
 

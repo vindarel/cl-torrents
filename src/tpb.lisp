@@ -33,7 +33,7 @@
 
 (defun torrents (words &key (stream t))
   "Search torrents."
-  (format stream "searching '~a' on ~a..." (str:join " " words)
+  (format stream "searching '~a' on ~a... " (str:join " " words)
           (cl-ansi-text:cyan "the Pirate Bay"))
   (handler-case
       (let* ((terms (if (listp words)
@@ -58,8 +58,8 @@
         toret)
 
     (usocket:connection-refused-error ()
-      (uiop:format! *error-output* "~&error searching on ~a: ~a"
-                    (cl-ansi-text:cyan "the Pirate Bay")
+      (uiop:format! *error-output* "~&error searching on ~a: ~a.~&"
+                    "the Pirate Bay"
                     (cl-ansi-text:red "the site is unreachable")))
     (error ()
       (format stream " no results.~&"))))

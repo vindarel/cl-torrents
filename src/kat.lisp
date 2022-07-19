@@ -61,7 +61,7 @@
 
 (defun torrents (words &key (stream t))
   "Return a list of..."
-  (format stream "searching '~a' on Kat..." words)
+  (format stream "searching '~a' on Kat... " words)
   (handler-case
       (let* ((query (str:join "+" words))
              (url (str:replace-all "{}" query *search-url*))
@@ -80,8 +80,8 @@
         (format stream " found ~a results.~&" (length toret))
         toret)
     (usocket:connection-refused-error ()
-      (uiop:format! *error-output* "~&error searching on ~a: ~a"
-                    (cl-ansi-text:cyan "Kat")
+      (uiop:format! *error-output* "~&error searching on ~a: ~a.~&"
+                    "Kat"
                     (cl-ansi-text:red "the site is unreachable")))
     (error ()
       (format stream " no results.~&"))))
