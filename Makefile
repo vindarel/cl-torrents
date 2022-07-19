@@ -34,8 +34,9 @@ test-end2end:
 
 install:
 	# install dependencies, mostly for docker.
-	git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/replic
-	echo "------ cloning nodgui"
-	git clone https://notabug.org/cage/nodgui ~/quicklisp/local-projects/nodgui
-	echo "------ cloning cl-transmission"
-	git clone https://github.com/libre-man/cl-transmission/ ~/quicklisp/local-projects/cl-transmission
+	# git clone https://github.com/vindarel/replic/ ~/quicklisp/local-projects/replic
+	# echo "------ cloning nodgui"  # before it was in Quicklisp?
+	# git clone https://notabug.org/cage/nodgui ~/quicklisp/local-projects/nodgui
+	# echo "------ cloning cl-transmission"  # before QL too?
+	# git clone https://github.com/libre-man/cl-transmission/ ~/quicklisp/local-projects/cl-transmission
+	echo "All dependencies should be in Quicklisp now. Nothing to do."
