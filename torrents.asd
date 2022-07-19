@@ -13,6 +13,7 @@
   :license "MIT"
   :depends-on (
                :replic
+               :x.let-star
                :cl-transmission
                :access
                :dexador
