@@ -79,5 +79,9 @@
                          results)))
         (format stream " found ~a results.~&" (length toret))
         toret)
+    (usocket:connection-refused-error ()
+      (uiop:format! *error-output* "~&error searching on ~a: ~a"
+                    (cl-ansi-text:cyan "Kat")
+                    (cl-ansi-text:red "the site is unreachable")))
     (error ()
       (format stream " no results.~&"))))

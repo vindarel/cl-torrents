@@ -87,7 +87,8 @@
 ;TODO: refactor with other scrapers.
 (defun torrents (words &key (stream t))
   "Return a list of..."
-  (format stream "searching '~a' on ~a..." words *source*)
+  (format stream "searching '~a' on ~a..." (str:join " " words)
+          (cl-ansi-text:cyan (string *source*)))
   (handler-case
       (let* ((terms (if (listp words)
                         words
@@ -120,7 +121,11 @@
         (format stream " found ~a results.~&" (length toret))
         (setf *search-results* toret)
         toret)
+    (usocket:connection-refused-error ()
+      (uiop:format! *error-output* "~&error searching on ~a: ~a"
+                    (cl-ansi-text:cyan (string *source*))
+                    (cl-ansi-text:red "the site is unreachable")))
     (error (c)
-      (format stream " no results.~&")
+      (uiop:format! stream " no results.~&")
       ;; xxx: logging
       (format *error-output* "error searching on ~a: ~a~&" *source* c))))
