@@ -26,6 +26,11 @@ it offers an API… frankly, I want to use its web service and click on its adds
 
 #+html: <p align="center"><img src="assets/torrents-tk.png" /></p>
 
+With the new default Yaru theme (and [[https://lisp-journey.gitlab.io/blog/pretty-gui-in-common-lisp-with-nodgui-tk-themes/][there are more]]):
+
+#+html: <p align="center"><img src="assets/tk-gui-yaru-theme.png" /></p>
+
+
 ** Installation
 
    The library is on Quicklisp (february 2019) and [[http://ultralisp.org/][Ultralisp]].
