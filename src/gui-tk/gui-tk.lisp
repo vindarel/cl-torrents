@@ -141,7 +141,7 @@
                               (torrents:source result)))))
 
 (defun main (&optional search)
-  (with-nodgui ()
+  (with-nodgui (:theme "yaru")
     (wm-title *tk* "Torrents GUI")
 
     ;; For resizing to do something: weight must be > 0
