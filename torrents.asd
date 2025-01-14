@@ -24,7 +24,6 @@
                :cl-ansi-text
                :unix-opts ;; with alias opts
                :clache
-               :mockingbird
                :lquery
                :py-configparser
                :cl-readline
